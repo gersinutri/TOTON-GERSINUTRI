@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GERSI NUTRI - Totem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        .hidden { display: none; }
+        body { font-family: sans-serif; background-color: #f8fafc; overflow: hidden; }
+        .food-card { transition: transform 0.2s; cursor: pointer; }
+        .food-card:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
+
+    <header class="bg-[#166534] text-white p-6 text-center shadow-lg">
+        <h1 class="text-3xl font-black tracking-widest uppercase">GERSI NUTRI</h1>
+        <p class="text-sm opacity-90">Cozinha Saudável e Prática</p>
+    </header>
+
+    <main id="menu-area" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-4 bg-gray-50">
+        <div class="col-span-2 text-center py-20">
+            <p class="text-gray-500 font-bold">Atualizando cardápio da Gersi Nutri...</p>
+        </div>
+    </main>
+
+    <footer class="bg-white p-6 border-t-2 border-gray-100 flex items-center justify-between shadow-lg">
+        <div>
+            <p class="text-xs text-gray-400 uppercase font-bold">Total do Pedido</p>
+            <p id="total-value" class="font-black text-2xl text-gray-800">R$ 0,00</p>
+        </div>
+        <button onclick="abrirPagamento()" class="bg-[#22c55e] text-white px-8 py-4 rounded-2xl font-black text-lg uppercase">
+            Pagar via PIX
+        </button>
+    </footer>
+
+    <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
+        <h2 class="text-3xl font-black text-gray-800 mb-2">Finalizar Pedido</h2>
+        <p id="total-confirm" class="text-2xl text-green-700 font-bold mb-8"></p>
+        <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-gray-50 mb-6">
+            <p class="text-gray-400">[QR CODE DO PIX]</p>
+        </div>
+        <button onclick="fecharPagamento()" class="text-gray-400 font-bold underline uppercase text-sm">Cancelar</button>
+    </div>
+
+    <script>
+        let total = 0;
+        // INSIRA O SEU LINK DO GOOGLE SHEETS ABAIXO ENTRE AS ASPAS:
+        const URL_CSV = https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?output=csv
+        function carregarCardapio() {
+            Papa.parse(URL_CSV, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) { montarMenu(results.data); },
+                error: function() { document.getElementById('menu-area').innerHTML = "<p class='text-center col-span-2 text-red-500'>Erro ao carregar a planilha. Verifique a publicação.</p>"; }
+            });
+        }
+
+        function montarMenu(produtos) {
+            const container = document.getElementById('menu-area');
+            container.innerHTML = ''; 
+            produtos.forEach(item => {
+                const precoNum = parseFloat(item.Preco.replace(',', '.'));
+                container.innerHTML += `
+                    <div onclick="adicionarAoCarrinho('${item.Nome}', ${precoNum})" class="food-card bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100">
+                        <img src="${item.Imagem}" class="h-44 w-full object-cover">
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] text-green-700 font-bold uppercase tracking-widest">${item.Categoria}</span>
+                                <h3 class="font-bold text-gray-800 text-sm leading-tight mt-1">${item.Nome}</h3>
+                            </div>
+                            <span class="font-black text-lg text-gray-900 mt-4">R$ ${precoNum.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function adicionarAoCarrinho(nome, preco) {
+            total += preco;
+            document.getElementById('total-value').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        function abrirPagamento() {
+            if(total <= 0) return alert("Selecione itens primeiro!");
+            document.getElementById('total-confirm').innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('payment-screen').classList.remove('hidden');
+        }
+
+        function fecharPagamento() { document.getElementById('payment-screen').classList.add('hidden'); }
+    </script>
+</body>
+</html>
