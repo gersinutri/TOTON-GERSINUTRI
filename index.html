@@ -1,3 +1,19 @@
+Aqui está o código completo do seu arquivo index.html totalmente ajustado com o novo link da sua planilha "Toton Gersi 2026"!
+
+Além de colocar o link novo, eu fiz uma pequena melhoria no código para garantir que o texto (nome, preço e categoria) apareça com letras pretas bem destacadas embaixo das fotos, exatamente como no layout profissional que planejamos.
+
+O que fazer agora:
+Copie todo o código do bloco abaixo.
+
+Vá no GitHub, entre no seu arquivo index.html e clique no ícone do lápis ✏️ (Editar).
+
+Selecione tudo o que está lá, apague e cole este novo código.
+
+Desça até o final da página e clique no botão verde Commit changes (Salvar).
+
+HTML
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -54,8 +70,8 @@
 
     <script>
         let total = 0;
-        // Seu link oficial já inserido de forma definitiva:
-        const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?output=csv';
+        // O link novo da sua tabela "Toton Gersi 2026" foi inserido aqui:
+        const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
         function carregarCardapio() {
             Papa.parse(URL_CSV, {
@@ -81,7 +97,7 @@
             }
 
             dados.forEach(item => {
-                // Encontra as propriedades da planilha independente de estarem maiúsculas ou minúsculas
+                // Mapeamento inteligente para evitar erros de letras maiúsculas/minúsculas
                 const chaves = Object.keys(item);
                 const chaveNome = chaves.find(c => c.toLowerCase().trim() === 'nome') || 'Nome';
                 const chavePreco = chaves.find(c => c.toLowerCase().trim() === 'preco' || c.toLowerCase().trim() === 'preço') || 'Preco';
@@ -93,23 +109,23 @@
                 const categoria = item[chaveCat] || 'Geral';
                 const imagem = item[chaveImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
 
-                // Trata o preço caso o usuário tenha digitado com vírgula ou cifrão
+                // Tratamento do preço para o formato de cálculo
                 let precoLimpo = precoTexto.replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
                 let precoNum = parseFloat(precoLimpo);
                 if (isNaN(precoNum)) precoNum = 0;
 
-                if(item[chaveNome]) {
+                if(item[chaveNome] && item[chaveNome].trim() !== "") {
                     container.innerHTML += `
                         <div onclick="adicionarAoCarrinho('${nome}', ${precoNum})" class="food-card bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100">
                             <img src="${imagem}" class="h-44 w-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=GERSI+NUTRI'">
                             <div class="p-4 flex-1 flex flex-col justify-between">
                                 <div>
-                                    <span class="text-[10px] text-green-700 font-bold uppercase tracking-widest">${categoria}</span>
-                                    <h3 class="font-bold text-gray-800 text-sm leading-tight mt-1 h-10 overflow-hidden">${nome}</h3>
+                                    <span class="text-[10px] text-green-700 font-bold uppercase tracking-widest block mb-1">${categoria}</span>
+                                    <h3 class="font-bold text-gray-800 text-base leading-tight h-12 overflow-hidden">${nome}</h3>
                                 </div>
                                 <div class="mt-4 flex items-center justify-between">
-                                    <span class="font-black text-lg text-gray-900">R$ ${precoNum.toFixed(2).replace('.', ',')}</span>
-                                    <div class="bg-green-100 text-green-800 p-1 rounded-full text-xs">➕</div>
+                                    <span class="font-black text-xl text-gray-900">R$ ${precoNum.toFixed(2).replace('.', ',')}</span>
+                                    <div class="bg-green-100 text-green-800 p-2 rounded-full text-xs font-bold">➕</div>
                                 </div>
                             </div>
                         </div>
@@ -118,7 +134,7 @@
             });
 
             if(container.innerHTML === '') {
-                container.innerHTML = "<p class='text-center col-span-2 text-gray-500'>A planilha foi lida, mas as linhas estão sem informações válidas.</p>";
+                container.innerHTML = "<p class='text-center col-span-2 text-gray-500'>A planilha foi lida, mas nenhuma linha válida foi encontrada.</p>";
             }
         }
 
