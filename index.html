@@ -3,58 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERSI NUTRI - Totem Autoatendimento</title>
+    <title>GERSI NUTRI - Totem Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         .hidden { display: none; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; overflow: hidden; }
-        .food-card { transition: transform 0.2s; cursor: pointer; }
-        .food-card:active { transform: scale(0.95); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
+        .food-card { transition: all 0.2s; cursor: pointer; }
+        .food-card:hover { transform: translateY(-4px); }
+        .food-card:active { transform: scale(0.98); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
 
-    <header class="bg-[#166534] text-white p-6 text-center shadow-lg">
-        <h1 class="text-3xl font-black tracking-widest uppercase">GERSI NUTRI</h1>
-        <p class="text-sm opacity-90">Cozinha Saudável e Prática</p>
+    <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
+        <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
+        <p class="text-xs uppercase tracking-wider opacity-80 mt-1">Alimentação Saudável Inteligente</p>
     </header>
 
-    <main id="menu-area" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-4 bg-gray-50">
+    <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-2 gap-6 bg-slate-50">
         <div class="col-span-2 text-center py-20">
-            <div class="animate-spin inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-gray-500 font-bold">Atualizando cardápio da Gersi Nutri...</p>
+            <div class="animate-spin inline-block w-10 h-10 border-4 border-[#166534] border-t-transparent rounded-full mb-4"></div>
+            <p class="text-slate-600 font-semibold text-lg">Sincronizando com a Cozinha...</p>
         </div>
     </main>
 
-    <footer class="bg-white p-6 border-t-2 border-gray-100 flex items-center justify-between shadow-lg">
-        <div class="flex items-center gap-3">
-            <div class="text-3xl">🛒</div>
+    <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
             <div>
-                <p class="text-xs text-gray-400 uppercase font-bold tracking-tighter">Total do Pedido</p>
-                <p id="total-value" class="font-black text-2xl text-gray-800">R$ 0,00</p>
+                <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Seu Pedido</p>
+                <p id="total-value" class="font-black text-3xl text-slate-800">R$ 0,00</p>
             </div>
         </div>
-        <button onclick="abrirPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg uppercase tracking-tight">
-            Pagar via PIX
+        <button onclick="abrirPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-12 py-5 rounded-2xl font-black text-xl shadow-lg shadow-green-100 transition-all uppercase tracking-wide">
+            Finalizar Pedido
         </button>
     </footer>
 
-    <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
-        <h2 class="text-3xl font-black text-gray-800 mb-2">Finalizar Pedido</h2>
-        <p id="total-confirm" class="text-2xl text-green-700 font-bold mb-8"></p>
-        
-        <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-gray-50 mb-6">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=GERSI_NUTRI_PAGAMENTO" alt="QR Code">
-        </div>
+    <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+            <img id="modal-img" class="h-48 w-full object-cover" src="" alt="">
+            <div class="p-6 overflow-y-auto flex-1">
+                <span id="modal-cat" class="text-xs text-green-700 font-bold uppercase tracking-widest"></span>
+                <h2 id="modal-nome" class="text-2xl font-black text-slate-800 mt-1"></h2>
+                <p id="modal-preco-base" class="text-lg text-slate-500 font-medium mt-1"></p>
+                
+                <div class="mt-6 border-t border-slate-100 pt-4">
+                    <p class="font-bold text-slate-700 mb-3">Quantidade</p>
+                    <div class="flex items-center gap-4">
+                        <button onclick="alterarQtd(-1)" class="w-12 h-12 rounded-xl bg-slate-100 text-xl font-bold text-slate-700 flex items-center justify-center active:bg-slate-200">-</button>
+                        <span id="modal-qtd" class="text-xl font-black text-slate-800 w-6 text-center">1</span>
+                        <button onclick="alterarQtd(1)" class="w-12 h-12 rounded-xl bg-slate-100 text-xl font-bold text-slate-700 flex items-center justify-center active:bg-slate-200">+</button>
+                    </div>
+                </div>
 
-        <p class="text-blue-600 font-bold animate-pulse mb-10">Aguardando confirmação do banco...</p>
-        <button onclick="fecharPagamento()" class="text-gray-400 font-bold underline uppercase text-sm">Cancelar e voltar</button>
+                <div id="adicionais-secao" class="mt-6 border-t border-slate-100 pt-4 hidden">
+                    <p class="font-bold text-slate-700 mb-1">Adicionais</p>
+                    <p class="text-xs text-slate-400 mb-3">Selecione o que deseja acrescentar:</p>
+                    <div id="adicionais-lista" class="space-y-2">
+                        </div>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                <button onclick="fecharModal()" class="text-slate-400 font-bold uppercase text-sm tracking-wide">Voltar</button>
+                <button onclick="confirmarInclusao()" id="btn-adicionar-carrinho" class="bg-[#166534] text-white px-6 py-4 rounded-xl font-bold transition-all shadow-md shadow-green-900/10">
+                    Adicionar R$ 0,00
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
+        <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
+        <p id="total-confirm" class="text-3xl text-green-700 font-black mb-8"></p>
+        <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-slate-50 p-4 mb-6 shadow-inner">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=GERSI_NUTRI_TOTEM" id="pix-qr" class="w-full h-full object-contain">
+        </div>
+        <p class="text-blue-600 font-bold animate-pulse text-lg mb-10">Processando pagamento em tempo real...</p>
+        <button onclick="fecharPagamento()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider">Cancelar Operação</button>
     </div>
 
     <script>
-        let total = 0;
-        // O link novo da sua tabela "Toton Gersi 2026" foi inserido aqui:
+        let totalGeral = 0;
+        let cardapioOriginal = [];
+        let itemAtual = null;
+
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
         function carregarCardapio() {
@@ -63,10 +99,8 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
+                    cardapioOriginal = results.data;
                     montarMenu(results.data);
-                },
-                error: function() {
-                    document.getElementById('menu-area').innerHTML = "<p class='text-center col-span-2 text-red-500'>Erro ao conectar com a planilha.</p>";
                 }
             });
         }
@@ -75,67 +109,137 @@
             const container = document.getElementById('menu-area');
             container.innerHTML = ''; 
 
-            if (!dados || dados.length === 0) {
-                container.innerHTML = "<p class='text-center col-span-2 text-gray-500'>Nenhum produto encontrado na planilha.</p>";
-                return;
-            }
-
-            dados.forEach(item => {
-                // Mapeamento inteligente para evitar erros de letras maiúsculas/minúsculas
+            dados.forEach((item, index) => {
                 const chaves = Object.keys(item);
-                const chaveNome = chaves.find(c => c.toLowerCase().trim() === 'nome') || 'Nome';
-                const chavePreco = chaves.find(c => c.toLowerCase().trim() === 'preco' || c.toLowerCase().trim() === 'preço') || 'Preco';
-                const chaveCat = chaves.find(c => c.toLowerCase().trim() === 'categoria') || 'Categoria';
-                const chaveImg = chaves.find(c => c.toLowerCase().trim() === 'imagem') || 'Imagem';
+                const cNome = chaves.find(c => c.toLowerCase().trim() === 'nome');
+                const cPreco = chaves.find(c => c.toLowerCase().trim().replace('ç', 'c') === 'preco');
+                const cCat = chaves.find(c => c.toLowerCase().trim() === 'categoria');
+                const cImg = chaves.find(c => c.toLowerCase().trim() === 'imagem');
 
-                const nome = item[chaveNome] || 'Produto sem nome';
-                const precoTexto = item[chavePreco] ? String(item[chavePreco]) : '0';
-                const categoria = item[chaveCat] || 'Geral';
-                const imagem = item[chaveImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
+                if(!item[cNome] || item[cNome].trim() === "") return;
 
-                // Tratamento do preço para o formato de cálculo
+                const nome = item[cNome];
+                const categoria = item[cCat] || 'Nutri';
+                const imagem = item[cImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
+                
+                let precoTexto = item[cPreco] ? String(item[cPreco]) : '0';
                 let precoLimpo = precoTexto.replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
-                let precoNum = parseFloat(precoLimpo);
-                if (isNaN(precoNum)) precoNum = 0;
+                let precoNum = parseFloat(precoLimpo) || 0;
 
-                if(item[chaveNome] && item[chaveNome].trim() !== "") {
-                    container.innerHTML += `
-                        <div onclick="adicionarAoCarrinho('${nome}', ${precoNum})" class="food-card bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100">
-                            <img src="${imagem}" class="h-44 w-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=GERSI+NUTRI'">
-                            <div class="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <span class="text-[10px] text-green-700 font-bold uppercase tracking-widest block mb-1">${categoria}</span>
-                                    <h3 class="font-bold text-gray-800 text-base leading-tight h-12 overflow-hidden">${nome}</h3>
-                                </div>
-                                <div class="mt-4 flex items-center justify-between">
-                                    <span class="font-black text-xl text-gray-900">R$ ${precoNum.toFixed(2).replace('.', ',')}</span>
-                                    <div class="bg-green-100 text-green-800 p-2 rounded-full text-xs font-bold">➕</div>
-                                </div>
+                container.innerHTML += `
+                    <div onclick="configurarItem(${index})" class="food-card bg-white rounded-[2rem] shadow-sm overflow-hidden flex flex-col border border-slate-100">
+                        <div class="h-48 w-full overflow-hidden bg-slate-100">
+                            <img src="${imagem}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=GERSI+NUTRI'">
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between bg-white text-left">
+                            <div>
+                                <span class="text-[10px] text-green-700 font-extrabold uppercase tracking-widest block mb-1">${categoria}</span>
+                                <h3 class="font-black text-slate-800 text-lg leading-snug">${nome}</h3>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <span class="font-black text-xl text-slate-900">R$ ${precoNum.toFixed(2).replace('.', ',')}</span>
+                                <div class="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider">Escolher</div>
                             </div>
                         </div>
-                    `;
-                }
+                    </div>
+                `;
             });
-
-            if(container.innerHTML === '') {
-                container.innerHTML = "<p class='text-center col-span-2 text-gray-500'>A planilha foi lida, mas nenhuma linha válida foi encontrada.</p>";
-            }
         }
 
-        function adicionarAoCarrinho(nome, preco) {
-            total += preco;
-            document.getElementById('total-value').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        function configurarItem(index) {
+            const item = cardapioOriginal[index];
+            const chaves = Object.keys(item);
+            
+            const nome = item[chaves.find(c => c.toLowerCase().trim() === 'nome')];
+            const precoTexto = item[chaves.find(c => c.toLowerCase().trim().replace('ç', 'c') === 'preco')] || '0';
+            const cat = item[chaves.find(c => c.toLowerCase().trim() === 'categoria')] || 'Nutri';
+            const img = item[chaves.find(c => c.toLowerCase().trim() === 'imagem')] || '';
+            const adiTexto = item[chaves.find(c => c.toLowerCase().trim() === 'adicionais')] || '';
+            const prcAdiTexto = item[chaves.find(c => c.toLowerCase().trim() === 'precosadicionais')] || '';
+
+            let precoNum = parseFloat(precoTexto.replace(',', '.')) || 0;
+
+            itemAtual = { nome, precoBase: precoNum, qtd: 1, imagem: img, categoria: cat, adicionaisEscolhidos: {} };
+
+            // Renderiza o Modal
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-cat').innerText = cat;
+            document.getElementById('modal-nome').innerText = nome;
+            document.getElementById('modal-preco-base').innerText = `Preço unitário: R$ ${precoNum.toFixed(2).replace('.', ',')}`;
+            document.getElementById('modal-qtd').innerText = '1';
+
+            // Trata Adicionais
+            const secaoAdi = document.getElementById('adicionais-secao');
+            const listaAdi = document.getElementById('adicionais-lista');
+            listaAdi.innerHTML = '';
+
+            if(adiTexto.trim() !== "") {
+                secaoAdi.classList.remove('hidden');
+                const nomesAdi = adiTexto.split(',');
+                const valoresAdi = prcAdiTexto.split(',');
+
+                nomesAdi.forEach((n, i) => {
+                    const nomeAdi = n.trim();
+                    const valAdi = parseFloat(valoresAdi[i]?.trim()) || 0;
+
+                    listaAdi.innerHTML += `
+                        <label class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100 active:bg-slate-100">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" onchange="toggleAdicional('${nomeAdi}', ${valAdi}, this)" class="w-5 h-5 accent-[#166534] rounded">
+                                <span class="font-bold text-slate-700 text-sm">${nomeAdi}</span>
+                            </div>
+                            <span class="text-sm font-extrabold text-slate-500">+ R$ ${valAdi.toFixed(2).replace('.', ',')}</span>
+                        </label>
+                    `;
+                });
+            } else {
+                secaoAdi.classList.add('hidden');
+            }
+
+            atualizarPrecoModal();
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function alterarQtd(valor) {
+            if(itemAtual.qtd + valor < 1) return;
+            itemAtual.qtd += valor;
+            document.getElementById('modal-qtd').innerText = itemAtual.qtd;
+            atualizarPrecoModal();
+        }
+
+        function toggleAdicional(nome, valor, checkbox) {
+            if(checkbox.checked) {
+                itemAtual.adicionaisEscolhidos[nome] = valor;
+            } else {
+                delete itemAtual.adicionaisEscolhidos[nome];
+            }
+            atualizarPrecoModal();
+        }
+
+        function atualizarPrecoModal() {
+            let subtotalUnitario = itemAtual.precoBase;
+            for(let key in itemAtual.adicionaisEscolhidos) {
+                subtotalUnitario += itemAtual.adicionaisEscolhidos[key];
+            }
+            const totalItem = subtotalUnitario * itemAtual.qtd;
+            document.getElementById('btn-adicionar-carrinho').innerText = `Adicionar R$ ${totalItem.toFixed(2).replace('.', ',')}`;
+            itemAtual.totalCalculado = totalItem;
+        }
+
+        function fecharModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        function confirmarInclusao() {
+            totalGeral += itemAtual.totalCalculado;
+            document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            fecharModal();
         }
 
         function abrirPagamento() {
-            if(total <= 0) return alert("Adicione itens ao carrinho primeiro!");
-            document.getElementById('total-confirm').innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+            if(totalGeral <= 0) return alert("Selecione algum item primeiro!");
+            document.getElementById('total-confirm').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('payment-screen').classList.remove('hidden');
-            
-            setTimeout(() => {
-                alert("SUCESSO! O pedido da GERSI NUTRI foi confirmado.");
-                location.reload();
-            }, 8000);
         }
 
         function fecharPagamento() {
