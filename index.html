@@ -86,7 +86,7 @@
                             <span id="modal-preco-base" class="text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-md inline-block"></span>
                         </div>
                     </div>
-                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/70 px-4 rounded-xl">
+                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/50 px-4 rounded-xl">
                         <p class="font-bold text-sm text-slate-700">Quantidade</p>
                         <div class="flex items-center gap-3">
                             <button onclick="alterarQtd(-1)" class="w-10 h-10 rounded-xl bg-slate-200 text-xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">-</button>
@@ -107,20 +107,20 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO -->
-        <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-start p-10 pt-16 text-center overflow-y-auto">
-            <h2 class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
-            <p class="text-slate-400 text-sm mb-6">Escolha como prefere pagar o seu pedido</p>
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO (AJUSTADO ID E CLASSE DE ALINHAMENTO) -->
+        <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center transition-all duration-300 overflow-y-auto">
+            <h2 id="method-title" class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
+            <p id="method-desc" class="text-slate-400 text-sm mb-6">Escolha como prefere pagar o seu pedido</p>
             <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-6"></p>
             
-            <div id="box-campo-identificacao" class="w-full max-w-xl bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6 text-left space-y-2 shadow-sm transition-all">
+            <div id="box-campo-identificacao" class="w-full max-w-xl bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6 text-left space-y-2 shadow-sm transition-all duration-300">
                 <label class="block font-black text-sm text-slate-700 uppercase tracking-wide">
                     👤 Identificação no Cupom <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
                 </label>
-                <input type="text" id="cliente-identificacao" readonly onclick="abrirTecladoVirtual()" placeholder="Toque aqui para digitar seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#166534] focus:ring-2 focus:ring-green-100 transition-all cursor-pointer">
+                <input type="text" id="cliente-identificacao" readonly onclick="abrirTecladoVirtual()" placeholder="Toque aqui para digitar seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-200 cursor-pointer">
             </div>
             
-            <div class="grid grid-cols-2 gap-8 w-full max-w-xl mb-10">
+            <div id="botoes-pagamento-container" class="grid grid-cols-2 gap-8 w-full max-w-xl mb-10 transition-all duration-300">
                 <!-- Botão PIX -->
                 <button onclick="escolherForma('PIX')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-[#166534] rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
                     <svg class="w-16 h-16 text-green-600 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -140,8 +140,7 @@
                 </button>
             </div>
             <button onclick="fecharMetodoPagamento()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block mb-6">Voltar ao Cardápio</button>
-            <!-- Div invisível para ajudar a rolar o campo -->
-            <div id="espaco-teclado-reserva" class="h-0 transition-all"></div>
+            <div id="espaco-teclado-reserva" class="h-0 transition-all duration-300"></div>
         </div>
 
         <!-- TELA 2: EXIBIÇÃO DE ACORDO COM A ESCOLHA -->
@@ -316,8 +315,8 @@
             document.getElementById('modal-preco-base').innerText = `Preço unitário: R$ ${precoNum.toFixed(2).replace('.', ',')}`;
             document.getElementById('modal-qtd').innerText = '1';
 
-            const listaAdi = document.getElementById('adicionais-lista');
-            listaAdi.innerHTML = '';
+            const MathAdi = document.getElementById('adicionais-lista');
+            MathAdi.innerHTML = '';
 
             if(adiTexto && adiTexto.trim() !== "") {
                 const nomesAdi = adiTexto.split(',');
@@ -325,11 +324,11 @@
                 nomesAdi.forEach((n, i) => {
                     const nomeAdi = n.trim();
                     const valAdi = parseFloat(valoresAdi[i]?.trim()) || 0;
-                    gerarHtmlAdicional(nomeAdi, valAdi, listaAdi);
+                    gerarHtmlAdicional(nomeAdi, valAdi, MathAdi);
                 });
             } else {
-                gerarHtmlAdicional("Salada Extra", 3.50, listaAdi);
-                gerarHtmlAdicional("Molho Especial", 2.00, listaAdi);
+                gerarHtmlAdicional("Salada Extra", 3.50, MathAdi);
+                gerarHtmlAdicional("Molho Especial", 2.00, MathAdi);
             }
 
             atualizarPrecoModal();
@@ -372,7 +371,7 @@
         function fecharModal() { document.getElementById('custom-modal').classList.add('hidden'); }
 
         function confirmarInclusao() {
-            totalGeral += itemAtual.totalCalculated ?? itemAtual.totalCalculado;
+            totalGeral += itemAtual.totalCalculado;
             carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual)));
             document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             fecharModal();
@@ -412,23 +411,47 @@
             document.getElementById('method-screen').classList.remove('hidden');
         }
 
-        // FUNÇÕES DO TECLADO VIRTUAL ATUALIZADAS COM AJUSTE DE ROLAGEM DE TELA
+        // CORREÇÃO VISUAL DE ALINHAMENTO DO CONTÊINER DO MÉTODO DE PAGAMENTO
         function abrirTecladoVirtual() {
-            document.getElementById('espaco-teclado-reserva').classList.add('h-[400px]');
+            const screen = document.getElementById('method-screen');
+            const inputField = document.getElementById('cliente-identificacao');
+            
+            // 1. Desativa a centralização vertical rígida e empurra o conteúdo para o topo
+            screen.classList.remove('justify-center');
+            screen.classList.add('justify-start');
+            
+            // 2. Cria o espaço de reserva na parte de baixo para empurrar os botões
+            document.getElementById('espaco-teclado-reserva').classList.add('h-[440px]');
+            
+            // 3. Aplica destaque na caixa de input ativa
+            inputField.classList.add('border-[#166534]', 'ring-4', 'ring-green-100');
+            
+            // 4. Abre o teclado físico-visual na tela
             document.getElementById('totem-keyboard-container').classList.remove('hidden');
             
-            // Força a tela a deslizar para centralizar a caixa de identificação na visão do cliente
+            // 5. Rola a tela perfeitamente para centralizar o foco do cliente
             setTimeout(() => {
                 document.getElementById('box-campo-identificacao').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 80);
+            }, 50);
         }
 
         function fecharTecladoVirtual() {
-            document.getElementById('espaco-teclado-reserva').classList.remove('h-[400px]');
+            const screen = document.getElementById('method-screen');
+            const inputField = document.getElementById('cliente-identificacao');
+            
+            // 1. Remove os destaques visuais do input
+            inputField.classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
+            
+            // 2. Remove o espaço reserva de rodapé e recolhe o teclado
+            document.getElementById('espaco-teclado-reserva').classList.remove('h-[440px]');
             document.getElementById('totem-keyboard-container').classList.add('hidden');
             
-            // Retorna o scroll para o topo de forma suave
-            document.getElementById('method-screen').scrollTo({ top: 0, behavior: 'smooth' });
+            // 3. Devolve a centralização vertical original para a tela cheia
+            screen.classList.remove('justify-start');
+            screen.classList.add('justify-center');
+            
+            // 4. Reseta a rolagem suave para o topo
+            screen.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function tecladoDigitar(caractere) {
