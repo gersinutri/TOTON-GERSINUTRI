@@ -107,17 +107,29 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO (AJUSTADO ID E CLASSE DE ALINHAMENTO) -->
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO + OBSERVAÇÃO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center transition-all duration-300 overflow-y-auto">
             <h2 id="method-title" class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
-            <p id="method-desc" class="text-slate-400 text-sm mb-6">Escolha como prefere pagar o seu pedido</p>
-            <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-6"></p>
+            <p id="method-desc" class="text-slate-400 text-sm mb-4">Escolha como prefere pagar o seu pedido</p>
+            <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-4"></p>
             
-            <div id="box-campo-identificacao" class="w-full max-w-xl bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6 text-left space-y-2 shadow-sm transition-all duration-300">
-                <label class="block font-black text-sm text-slate-700 uppercase tracking-wide">
-                    👤 Identificação no Cupom <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
-                </label>
-                <input type="text" id="cliente-identificacao" readonly onclick="abrirTecladoVirtual()" placeholder="Toque aqui para digitar seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none transition-all duration-200 cursor-pointer">
+            <!-- GRADE COM OS DOIS CAMPOS DE TEXTO -->
+            <div class="w-full max-w-xl grid grid-cols-2 gap-4 mb-6 text-left">
+                <!-- Campo 1: Nome -->
+                <div id="box-identificacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300">
+                    <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
+                        👤 Seu Nome <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
+                    </label>
+                    <input type="text" id="cliente-identificacao" readonly onclick="abrirTecladoVirtual('cliente-identificacao', 'box-identificacao')" placeholder="Toque para digitar..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
+                </div>
+
+                <!-- Campo 2: Observação (Novo!) -->
+                <div id="box-observacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300">
+                    <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
+                        📝 Observação <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
+                    </label>
+                    <input type="text" id="cliente-observacao" readonly onclick="abrirTecladoVirtual('cliente-observacao', 'box-observacao')" placeholder="Ex: Sem cebola, gelo..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
+                </div>
             </div>
             
             <div id="botoes-pagamento-container" class="grid grid-cols-2 gap-8 w-full max-w-xl mb-10 transition-all duration-300">
@@ -236,6 +248,10 @@
         let itemAtual = null;
         let carrinhoItens = [];
         let formaPagamentoEscolhida = "";
+        
+        // VARIÁVEIS DE CONTROLE DO TECLADO
+        let inputAtivoId = "";
+        let boxAtivoId = "";
 
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
@@ -411,56 +427,62 @@
             document.getElementById('method-screen').classList.remove('hidden');
         }
 
-        // CORREÇÃO VISUAL DE ALINHAMENTO DO CONTÊINER DO MÉTODO DE PAGAMENTO
-        function abrirTecladoVirtual() {
+        // FUNÇÕES INTELIGENTES DE CONTROLE DO TECLADO TÁTIL MULTI-CAMPOS
+        function abrirTecladoVirtual(inputId, boxId) {
+            // Se já tiver outro campo ativo, remove o foco dele primeiro
+            if(inputAtivoId !== "") {
+                document.getElementById(inputAtivoId).classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
+            }
+
+            inputAtivoId = inputId;
+            boxAtivoId = boxId;
+
             const screen = document.getElementById('method-screen');
-            const inputField = document.getElementById('cliente-identificacao');
+            const targetInput = document.getElementById(inputId);
             
-            // 1. Desativa a centralização vertical rígida e empurra o conteúdo para o topo
             screen.classList.remove('justify-center');
             screen.classList.add('justify-start');
             
-            // 2. Cria o espaço de reserva na parte de baixo para empurrar os botões
+            document.getElementById('espaco-teclado-reserva').classImg = '';
             document.getElementById('espaco-teclado-reserva').classList.add('h-[440px]');
             
-            // 3. Aplica destaque na caixa de input ativa
-            inputField.classList.add('border-[#166534]', 'ring-4', 'ring-green-100');
-            
-            // 4. Abre o teclado físico-visual na tela
+            targetInput.classList.add('border-[#166534]', 'ring-4', 'ring-green-100');
             document.getElementById('totem-keyboard-container').classList.remove('hidden');
             
-            // 5. Rola a tela perfeitamente para centralizar o foco do cliente
             setTimeout(() => {
-                document.getElementById('box-campo-identificacao').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById(boxId).scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 50);
         }
 
         function fecharTecladoVirtual() {
+            if(inputAtivoId === "") return;
+
             const screen = document.getElementById('method-screen');
-            const inputField = document.getElementById('cliente-identificacao');
+            const targetInput = document.getElementById(inputAtivoId);
             
-            // 1. Remove os destaques visuais do input
-            inputField.classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
+            targetInput.classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
             
-            // 2. Remove o espaço reserva de rodapé e recolhe o teclado
             document.getElementById('espaco-teclado-reserva').classList.remove('h-[440px]');
             document.getElementById('totem-keyboard-container').classList.add('hidden');
             
-            // 3. Devolve a centralização vertical original para a tela cheia
             screen.classList.remove('justify-start');
             screen.classList.add('justify-center');
             
-            // 4. Reseta a rolagem suave para o topo
             screen.scrollTo({ top: 0, behavior: 'smooth' });
+
+            inputAtivoId = "";
+            boxAtivoId = "";
         }
 
         function tecladoDigitar(caractere) {
-            const input = document.getElementById('cliente-identificacao');
+            if(inputAtivoId === "") return;
+            const input = document.getElementById(inputAtivoId);
             input.value += caractere;
         }
 
         function tecladoApagar() {
-            const input = document.getElementById('cliente-identificacao');
+            if(inputAtivoId === "") return;
+            const input = document.getElementById(inputAtivoId);
             input.value = input.value.slice(0, -1);
         }
 
@@ -468,8 +490,12 @@
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
             
+            // Puxa as informações dos inputs higienizados
             const identCliente = document.getElementById('cliente-identificacao').value.trim();
+            const obsCliente = document.getElementById('cliente-observacao').value.trim();
+            
             const linhaCliente = identCliente !== "" ? `Cliente: ${identCliente}\n` : "";
+            const linhaObs = obsCliente !== "" ? `OBS: ${obsCliente}\n` : "";
 
             let textoCupom = `========================================\n`;
             textoCupom += `              GERSI NUTRI               \n`;
@@ -477,7 +503,8 @@
             textoCupom += `Senha: ${numeroSenha}\n`;
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
             textoCupom += `Forma de Pagamento: ${formaPagamentoEscolhida}\n`;
-            textoCupom += linhaCliente;
+            textoCupom += linhaCliente; // Injeta o nome se houver
+            textoCupom += linhaObs;     // Injeta a observação se houver
             textoCupom += `----------------------------------------\n`;
             textoCupom += `Qtd  Item                       Total\n`;
             textoCupom += `----------------------------------------\n`;
@@ -500,10 +527,12 @@
             setTimeout(() => {
                 window.print();
                 
+                // Reseta o carrinho, valores e limpa os dois campos de texto
                 totalGeral = 0;
                 carrinhoItens = [];
                 formaPagamentoEscolhida = "";
                 document.getElementById('cliente-identificacao').value = "";
+                document.getElementById('cliente-observacao').value = "";
                 document.getElementById('total-value').innerText = "R$ 0,00";
                 containerCupom.innerHTML = ""; 
                 document.getElementById('payment-screen').classList.add('hidden');
