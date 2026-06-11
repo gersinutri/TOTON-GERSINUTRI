@@ -270,14 +270,14 @@
         let boxAtivoId = "";
         let indexSlideAtivo = 0;
 
-        // Controle da API do Mercado Pago
         let paymentCheckInterval = null;
         let currentPaymentId = null;
 
-        // =========================================================================
-        // ⚡ CREDENCIAL ATIVA DO MERCADO PAGO DA GERSI NUTRI
-        // =========================================================================
+        // Credencial Ativa Oficial do Mercado Pago
         const MERCADO_PAGO_TOKEN = "APP_USR-4512963183077429-061118-77665467b151055938926bfe9498c043-132105105"; 
+        
+        // Rota Proxy para contornar o bloqueio CORS do navegador
+        const PROXY_CORS = "https://cors-anywhere.herokuapp.com/";
 
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
@@ -505,7 +505,6 @@
                 document.getElementById('area-pix').classList.remove('hidden');
                 document.getElementById('payment-screen').classList.remove('hidden');
 
-                // Inicia a geração dinâmica via Mercado Pago
                 criarPagamentoPixMercadoPago(totalGeral);
             } else {
                 document.getElementById('total-confirm-cartao').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -514,8 +513,10 @@
             }
         }
 
+        // CORREÇÃO CIRÚRGICA: Requisição encapsulada com Proxy para quebrar a trava CORS do navegador
         function criarPagamentoPixMercadoPago(valor) {
-            const url = "https://api.mercadopago.com/v1/payments";
+            const urlRealMercadoPago = "https://api.mercadopago.com/v1/payments";
+            const urlComProxy = PROXY_CORS + urlRealMercadoPago;
             
             const dadosPagamento = {
                 transaction_amount: parseFloat(valor.toFixed(2)),
@@ -528,7 +529,7 @@
                 }
             };
 
-            fetch(url, {
+            fetch(urlComProxy, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${MERCADO_PAGO_TOKEN}`,
@@ -542,7 +543,6 @@
                     const copiaECola = data.point_of_interaction.transaction_data.qr_code;
                     currentPaymentId = data.id; 
 
-                    // Injeta o código na tela
                     const qrContainer = document.getElementById('pix-qr-container');
                     qrContainer.innerHTML = '';
                     new QRCode(qrContainer, {
@@ -557,16 +557,15 @@
                     document.getElementById('pix-loading').classList.add('hidden');
                     document.getElementById('pix-status-text').innerText = "Aguardando transferência Pix...";
 
-                    // Ativa o monitoramento em tempo real
                     iniciarChecagemPix();
                 } else {
-                    alert("Erro nas credenciais do Mercado Pago.");
+                    alert("Erro nas credenciais ou limites da conta do Mercado Pago.");
                     voltarParaSelecao();
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert("Falha de conexão com a API de pagamentos.");
+                alert("Falha de conexão com a API de pagamentos. Verifique a internet do totem.");
                 voltarParaSelecao();
             });
         }
@@ -576,9 +575,10 @@
             paymentCheckInterval = setInterval(() => {
                 if (!currentPaymentId) return;
 
-                const url = `https://api.mercadopago.com/v1/payments/${currentPaymentId}`;
+                const urlRealStatus = `https://api.mercadopago.com/v1/payments/${currentPaymentId}`;
+                const urlStatusComProxy = PROXY_CORS + urlRealStatus;
 
-                fetch(url, {
+                fetch(urlStatusComProxy, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${MERCADO_PAGO_TOKEN}`
@@ -586,7 +586,6 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    // Monitoramento de sucesso!
                     if (data.status === "approved") {
                         pararChecagemPix();
                         document.getElementById('pix-status-text').innerText = "🎉 PAGO COM SUCESSO! IMPRIMINDO...";
