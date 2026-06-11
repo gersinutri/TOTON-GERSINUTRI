@@ -13,31 +13,9 @@
         .food-card:active { transform: scale(0.97); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        /* CONTROLE VISUAL: Esconde o cupom na tela normal */
-        #cupom-impressao { display: none; }
-
-        /* CONFIGURAÇÃO EXCLUSIVA DE IMPRESSÃO */
-        @media print {
-            body, header, main, footer, #custom-modal, #payment-screen { display: none !important; }
-            #cupom-impressao { 
-                display: block !important; 
-                width: 100% !important; 
-                max-width: 80mm !important; /* Tamanho padrão de bobina térmica */
-                font-family: monospace !important; 
-                font-size: 14px !important; 
-                color: black !important; 
-                background: white !important; 
-                padding: 10px !important;
-                margin: 0 !important;
-            }
-        }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
-
-    <!-- ÁREA DO CUPOM ESTRUTURADA FORA DO SISTEMA DE CLASSES DO TAILWIND -->
-    <div id="cupom-impressao"></div>
 
     <!-- CABEÇALHO -->
     <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
@@ -277,21 +255,19 @@
 
         function fecharPagamento() { document.getElementById('payment-screen').classList.add('hidden'); }
 
-        // AJUSTE CRÍTICO: ESCRITA E RENDERIZAÇÃO IMEDIATA
+        // NOVA FUNÇÃO DE IMPRESSÃO VIA MICRO-JANELA ISOLADA (BLINDADA CONTRA TELA BRANCA)
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
-            const divCupom = document.getElementById('cupom-impressao');
             
-            let textoCupom = `
-========================================
-              GERSI NUTRI               
-========================================
-Senha: ${numeroSenha}
-Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}
-----------------------------------------
-Qtd  Item                       Total
-----------------------------------------
-`;
+            // 1. Monta o texto puro estruturado do cupom
+            let textoCupom = `========================================\n`;
+            textoCupom += `              GERSI NUTRI               \n`;
+            textoCupom += `========================================\n`;
+            textoCupom += `Senha: ${numeroSenha}\n`;
+            textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
+            textoCupom += `----------------------------------------\n`;
+            textoCupom += `Qtd  Item                       Total\n`;
+            textoCupom += `----------------------------------------\n`;
 
             carrinhoItens.forEach(item => {
                 textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.totalCalculado.toFixed(2).replace('.',',')}\n`;
@@ -300,26 +276,44 @@ Qtd  Item                       Total
                 }
             });
 
-            textoCupom += `----------------------------------------
-TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.',',')}
-----------------------------------------
-       PAGAMENTO CONFIRMADO VIA PIX     
-========================================
-`;
+            textoCupom += `----------------------------------------\n`;
+            textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.',',')}\n`;
+            textoCupom += `----------------------------------------\n`;
+            textoCupom += `       PAGAMENTO CONFIRMADO VIA PIX     \n`;
+            textoCupom += `========================================\n`;
 
-            // Removemos as tags ocultas de layout e colocamos texto puro diretamente
-            divCupom.innerHTML = `<pre style="margin:0; padding:0; font-family:monospace; font-size:14px; white-space:pre-wrap; color:black; background:white;">${textoCupom}</pre>`;
+            // 2. Abre uma nova janela em branco na memória do navegador
+            const janelaImpressao = window.open('', '_blank', 'width=300,height=600');
+            
+            // 3. Escreve o cupom diretamente dentro dela com estilos limpos e sem Tailwind para não bugar
+            janelaImpressao.document.write(`
+                <html>
+                <head>
+                    <title>Cupom Gersi Nutri</title>
+                    <style>
+                        body { margin: 0; padding: 10px; font-family: monospace; font-size: 14px; color: black; background: white; }
+                        pre { margin: 0; white-space: pre-wrap; }
+                    </style>
+                </head>
+                <body>
+                    <pre>${textoCupom}</pre>
+                    <script>
+                        // Executa a impressão assim que a micro-janela carregar o texto
+                        window.onload = function() {
+                            window.print();
+                            window.close(); // Fecha a abinha extra automaticamente depois
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
 
-            // Aumentamos levemente o tempo para 500ms garantindo que a área de transferência do Opera processe o HTML
-            setTimeout(() => {
-                window.print();
-
-                // Limpa o carrinho e fecha a janela após o comando
-                totalGeral = 0;
-                carrinhoItens = [];
-                document.getElementById('total-value').innerText = "R$ 0,00";
-                fecharPagamento();
-            }, 500);
+            // 4. Reseta os valores da tela principal do Totem imediatamente
+            totalGeral = 0;
+            carrinhoItens = [];
+            document.getElementById('total-value').innerText = "R$ 0,00";
+            fecharPagamento();
         }
     </script>
 </body>
