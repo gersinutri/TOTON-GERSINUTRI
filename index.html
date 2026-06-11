@@ -14,10 +14,10 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* CONFIGURAÇÃO EXCLUSIVA DE IMPRESSÃO: Esconde o site e mostra só o cupom */
+        /* CONFIGURAÇÃO EXCLUSIVA DE IMPRESSÃO: Oculta o site e força o cupom */
         @media print {
             body, header, main, footer, #custom-modal, #payment-screen { display: none !important; }
-            #cupom-impressao { display: block !important; width: 80mm; font-family: monospace; font-size: 12px; color: black; background: white; p: 0; margin: 0; }
+            #cupom-impressao { display: block !important; width: 100% !important; font-family: monospace !important; font-size: 14px !important; color: black !important; background: white !important; padding: 10px !important; }
         }
     </style>
 </head>
@@ -92,8 +92,8 @@
         </div>
         <p class="text-blue-600 font-bold animate-pulse text-lg mb-4">Processando pagamento em tempo real...</p>
         
-        <button onclick="dispararImpressao()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold mb-10 text-xs uppercase tracking-wider">
-            [Simular Confirmação do Banco e Imprimir]
+        <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-black mb-10 text-sm uppercase tracking-wider shadow-md">
+            [ Simular Pagamento e Imprimir ]
         </button>
         
         <button onclick="fecharPagamento()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Cancelar Operação</button>
@@ -103,7 +103,7 @@
         let totalGeral = 0;
         let cardapioOriginal = [];
         let itemAtual = null;
-        let carrinhoItens = []; // Guarda a lista de itens para gerar o cupom
+        let carrinhoItens = [];
 
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
@@ -244,7 +244,7 @@
 
         function confirmarInclusao() {
             totalGeral += itemAtual.totalCalculado;
-            carrinhoItens.push(itemAtual); // Salva o item estruturado no carrinho
+            carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual))); // Clonagem profunda para evitar bugs de referência
             document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             fecharModal();
         }
@@ -257,61 +257,50 @@
 
         function fecharPagamento() { document.getElementById('payment-screen').classList.add('hidden'); }
 
-        // GERADOR E DISPARADOR DA IMPRESSÃO AUTOMÁTICA
+        // LOGICA DE IMPRESSÃO CORRIGIDA COM DELAY (ANTI-TELA-BRANCA)
         function dispararImpressao() {
-            const numeroSenha = Math.floor(Math.random() * 90) + 10; // Senha aleatória entre 10 e 99
+            const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const divCupom = document.getElementById('cupom-impressao');
             
-            // Monta o cabeçalho do recibo
+            // Montagem pura do texto simples (formato cupom 80mm)
             let textoCupom = `
-                <div style="text-align:center; font-weight:bold; font-size:16px;">GERSI NUTRI</div>
-                <div style="text-align:center; margin-bottom:10px;">Alimentacao Saudavel</div>
-                <div>----------------------------------------</div>
-                <div>Senha: <span style="font-size:20px; font-weight:bold;">${numeroSenha}</span></div>
-                <div>Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}</div>
-                <div>----------------------------------------</div>
-                <div style="font-weight:bold; display:flex; justify-content:space-between;">
-                    <span>Item</span><span>Total</span>
-                </div>
-                <div>----------------------------------------</div>
-            `;
+========================================
+              GERSI NUTRI               
+========================================
+Senha: ${numeroSenha}
+Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}
+----------------------------------------
+Qtd  Item                       Total
+----------------------------------------
+`;
 
-            // Percorre os produtos comprados
             carrinhoItens.forEach(item => {
-                textoCupom += `
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-top:5px;">
-                        <span>${item.qtd}x ${item.nome}</span>
-                        <span>R$ ${item.totalCalculado.toFixed(2).replace('.',',')}</span>
-                    </div>
-                `;
-                // Lista os adicionais escolhidos embaixo do nome do produto, se houver
+                textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.totalCalculado.toFixed(2).replace('.',',')}\n`;
                 for(let adi in item.adicionaisEscolhidos) {
-                    textoCupom += `<div style="font-size:11px; padding-left:10px;">+ ${adi}</div>`;
+                    textoCupom += `     + ${adi}\n`;
                 }
             });
 
-            // Monta o rodapé do recibo
-            textoCupom += `
-                <div>----------------------------------------</div>
-                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
-                    <span>TOTAL:</span><span>R$ ${totalGeral.toFixed(2).replace('.',',')}</span>
-                </div>
-                <div>----------------------------------------</div>
-                <div style="text-align:center; font-weight:bold; margin-top:10px;">PAGAMENTO CONFIRMADO VIA PIX</div>
-                <div style="text-align:center; margin-top:5px; font-size:10px;">Obrigado e bom apetite!</div>
-                <br><br><br>
-            `;
+            textoCupom += `----------------------------------------
+TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.',',')}
+----------------------------------------
+       PAGAMENTO CONFIRMADO VIA PIX     
+========================================
+`;
 
-            divCupom.innerHTML = textoCupom;
+            // Insere como texto puro estruturado (pre) para manter o alinhamento da impressora
+            divCupom.innerHTML = `<pre style="margin:0; padding:0; white-space:pre-wrap;">${textoCupom}</pre>`;
 
-            // Executa o comando de impressão do navegador
-            window.print();
+            // O SEGREDO: Dá um tempo de 300ms para o navegador renderizar o texto antes de abrir o painel de impressão
+            setTimeout(() => {
+                window.print();
 
-            // Após fechar a janela de impressão, o totem limpa os dados e reseta para o próximo cliente
-            totalGeral = 0;
-            carrinhoItens = [];
-            document.getElementById('total-value').innerText = "R$ 0,00";
-            fecharPagamento();
+                // Reseta o totem após fechar o painel de impressão
+                totalGeral = 0;
+                carrinhoItens = [];
+                document.getElementById('total-value').innerText = "R$ 0,00";
+                fecharPagamento();
+            }, 300);
         }
     </script>
 </body>
