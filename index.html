@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERSI NUTRI - Totem com Impressão</title>
+    <title>GERSI NUTRI - Totem Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
@@ -14,16 +14,16 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Esconde o cupom completamente na tela do totem */
+        /* O cupom fica invisível na tela normal do totem */
         #cupom-area-impressao { display: none; }
 
-        /* CONFIGURAÇÃO DE IMPRESSÃO EXCLUSIVA PARA O CHROME */
+        /* REGRAS EXCLUSIVAS DE IMPRESSÃO (BLINDAGEM CONTRA TELA BRANCA) */
         @media print {
-            /* Esconde absolutamente tudo que é visual na tela */
+            /* Esconde toda a interface visual do totem no papel */
             body, header, main, footer, #custom-modal, #payment-screen, .fixed, .absolute { 
                 display: none !important; 
             }
-            /* Força apenas o bloco do cupom a aparecer no papel */
+            /* Obriga apenas o container do cupom a aparecer na bobina */
             #cupom-area-impressao { 
                 display: block !important; 
                 width: 100% !important; 
@@ -32,28 +32,27 @@
                 font-size: 14px !important; 
                 color: black !important; 
                 background: white !important; 
-                padding: 0 !important;
+                padding: 10px !important;
                 margin: 0 !important;
             }
             pre {
                 white-space: pre-wrap !important;
                 font-family: monospace !important;
+                margin: 0;
+                padding: 0;
             }
         }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
 
-    <!-- CONTAINER DO CUPOM (FICA OCULTO NA TELA E APARECE SÓ NA IMPRESSORA) -->
     <div id="cupom-area-impressao"></div>
 
-    <!-- CABEÇALHO -->
     <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
         <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
         <p class="text-xs uppercase tracking-wider opacity-80 mt-1">Alimentação Saudável Inteligente</p>
     </header>
 
-    <!-- CARDÁPIO -->
     <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-2 gap-6 bg-slate-50 content-start">
         <div class="col-span-2 text-center py-20">
             <div class="animate-spin inline-block w-10 h-10 border-4 border-[#166534] border-t-transparent rounded-full mb-4"></div>
@@ -61,7 +60,6 @@
         </div>
     </main>
 
-    <!-- RODAPÉ FIXO -->
     <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
         <div class="flex items-center gap-4">
             <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -75,7 +73,6 @@
         </button>
     </footer>
 
-    <!-- POP-UP DE CUSTOMIZAÇÃO -->
     <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div class="relative h-48 shrink-0 bg-slate-100">
@@ -110,7 +107,6 @@
         </div>
     </div>
 
-    <!-- TELA DE CHECKOUT / PIX -->
     <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
         <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
         <p id="total-confirm" class="text-3xl text-green-700 font-black mb-8"></p>
@@ -119,7 +115,6 @@
         </div>
         <p class="text-blue-600 font-bold animate-pulse text-lg mb-4">Processando pagamento em tempo real...</p>
         
-        <!-- BOTÃO DE SIMULAÇÃO -->
         <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-black mb-10 text-sm uppercase tracking-wider shadow-md">
             [ Simular Pagamento e Imprimir ]
         </button>
@@ -171,7 +166,7 @@
                 if(!item[cNome] || item[cNome].trim() === "") return;
 
                 const nome = item[cNome];
-                const categoria = item[cCat] || 'Nutri';
+                const category = item[cCat] || 'Nutri';
                 const imagem = item[cImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
                 const precoNum = extrairPreco(item);
 
@@ -182,7 +177,7 @@
                         </div>
                         <div class="p-4 flex-1 flex flex-col justify-between bg-white text-left">
                             <div>
-                                <span class="text-[10px] text-green-700 font-black uppercase tracking-widest block mb-0.5">${categoria}</span>
+                                <span class="text-[10px] text-green-700 font-black uppercase tracking-widest block mb-0.5">${category}</span>
                                 <h3 class="font-bold text-slate-800 text-base leading-tight h-10 overflow-hidden">${nome}</h3>
                             </div>
                             <div class="flex items-center justify-between mt-2">
@@ -199,7 +194,7 @@
             const item = cardapioOriginal[index];
             const chaves = Object.keys(item);
             
-            const nome = item[chaves.find(c => r => r.toLowerCase().trim() === 'nome')];
+            const nome = item[chaves.find(c => c.toLowerCase().trim() === 'nome')];
             const cat = item[chaves.find(c => c.toLowerCase().trim() === 'categoria')] || 'Nutri';
             const img = item[chaves.find(c => c.toLowerCase().trim() === 'imagem')] || '';
             const adiTexto = item[chaves.find(c => c.toLowerCase().trim() === 'adicionais')] || '';
@@ -285,7 +280,7 @@
 
         function fecharPagamento() { document.getElementById('payment-screen').classList.add('hidden'); }
 
-        // NOVA FUNÇÃO INTERNA (IMPRIME DIRETO NA ABA ATUAL)
+        // MÉTODO COMPATÍVEL COM GOOGLE CHROME (IMPRIME DIRETO NA MESMA ABA)
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
@@ -312,17 +307,17 @@
             textoCupom += `       PAGAMENTO CONFIRMADO VIA PIX     \n`;
             textoCupom += `========================================\n`;
 
-            // Injeta o texto dentro da div oculta do próprio site
-            containerCupom.innerHTML = `<pre style="margin:0; padding:0; font-family:monospace; font-size:14px;">${textoCupom}</pre>`;
+            // Injeta o texto estruturado diretamente no HTML do próprio site
+            containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
 
-            // Dispara a impressão na mesma página (o CSS cuida de ocultar o resto)
+            // O comando de impressão roda de forma nativa e síncrona na mesma aba
             window.print();
 
-            // Reseta o carrinho após fechar a janela do Chrome
+            // Reseta a interface do Totem logo após fechar o painel de impressão do Chrome
             totalGeral = 0;
             carrinhoItens = [];
             document.getElementById('total-value').innerText = "R$ 0,00";
-            containerCupom.innerHTML = ""; // Limpa o cupom
+            containerCupom.innerHTML = ""; // Limpa a memória do cupom
             fecharPagamento();
         }
     </script>
