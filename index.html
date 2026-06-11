@@ -180,7 +180,6 @@
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black"></p>
                 <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-slate-50 p-4 shadow-inner relative">
                     <div id="pix-qr-container" class="w-full h-full flex items-center justify-center"></div>
-                    <!-- Spinner de Carregamento Inicial -->
                     <div id="pix-loading" class="absolute inset-0 bg-slate-50 flex items-center justify-center rounded-2xl font-bold text-slate-500 text-sm">Gerando PIX...</div>
                 </div>
                 <p id="pix-status-text" class="text-green-600 font-bold animate-pulse text-lg">Aguardando transferência Pix...</p>
@@ -276,9 +275,9 @@
         let currentPaymentId = null;
 
         // =========================================================================
-        // 🔑 COLOQUE SEU ACCESS TOKEN DO MERCADO PAGO AQUI DENTRO DAS ASPAS
+        // ⚡ CREDENCIAL ATIVA DO MERCADO PAGO DA GERSI NUTRI
         // =========================================================================
-        const MERCADO_PAGO_TOKEN = "SEU_ACCESS_TOKEN_PRODUCAO_AQUI"; 
+        const MERCADO_PAGO_TOKEN = "APP_USR-4512963183077429-061118-77665467b151055938926bfe9498c043-132105105"; 
 
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
@@ -490,9 +489,6 @@
             document.getElementById('method-screen').classList.add('hidden'); 
         }
 
-        // =========================================================================
-        // ⚡ INTEGRAÇÃO REAL E AUTOMÁTICA VIA MERCADO PAGO API
-        // =========================================================================
         function escolherForma(forma) {
             fecharTecladoVirtual();
             formaPagamentoEscolhida = forma;
@@ -509,7 +505,7 @@
                 document.getElementById('area-pix').classList.remove('hidden');
                 document.getElementById('payment-screen').classList.remove('hidden');
 
-                // Disparar a criação do PIX dinâmico no Mercado Pago
+                // Inicia a geração dinâmica via Mercado Pago
                 criarPagamentoPixMercadoPago(totalGeral);
             } else {
                 document.getElementById('total-confirm-cartao').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -544,9 +540,9 @@
             .then(data => {
                 if (data.point_of_interaction && data.point_of_interaction.transaction_data) {
                     const copiaECola = data.point_of_interaction.transaction_data.qr_code;
-                    currentPaymentId = data.id; // Salva o ID da transação para monitorar
+                    currentPaymentId = data.id; 
 
-                    // Renderiza o QR Code dinâmico na tela
+                    // Injeta o código na tela
                     const qrContainer = document.getElementById('pix-qr-container');
                     qrContainer.innerHTML = '';
                     new QRCode(qrContainer, {
@@ -561,22 +557,22 @@
                     document.getElementById('pix-loading').classList.add('hidden');
                     document.getElementById('pix-status-text').innerText = "Aguardando transferência Pix...";
 
-                    // Inicia o loop automático de verificação (a cada 3 segundos)
+                    // Ativa o monitoramento em tempo real
                     iniciarChecagemPix();
                 } else {
-                    alert("Erro ao gerar PIX. Verifique seu Access Token do Mercado Pago nas configurações.");
+                    alert("Erro nas credenciais do Mercado Pago.");
                     voltarParaSelecao();
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert("Falha na comunicação com o Mercado Pago.");
+                alert("Falha de conexão com a API de pagamentos.");
                 voltarParaSelecao();
             });
         }
 
         function iniciarChecagemPix() {
-            pararChecagemPix(); // Garante que não tem outro rodando paralelo
+            pararChecagemPix(); 
             paymentCheckInterval = setInterval(() => {
                 if (!currentPaymentId) return;
 
@@ -590,21 +586,20 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    // Se o status for "approved", o dinheiro entrou!
+                    // Monitoramento de sucesso!
                     if (data.status === "approved") {
                         pararChecagemPix();
                         document.getElementById('pix-status-text').innerText = "🎉 PAGO COM SUCESSO! IMPRIMINDO...";
                         document.getElementById('pix-status-text').classList.remove('text-green-600');
                         document.getElementById('pix-status-text').classList.add('text-emerald-500', 'text-xl');
                         
-                        // Avança automaticamente para a impressão sem intervenção humana
                         setTimeout(() => {
                             dispararImpressao();
                         }, 1000);
                     }
                 })
-                .catch(err => console.log("Aguardando confirmação...", err));
-            }, 3000); // 3 segundos é o tempo ideal recomendado de checagem
+                .catch(err => console.log("Consultando transação...", err));
+            }, 3000);
         }
 
         function pararChecagemPix() {
