@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERSI NUTRI - Totem Profissional</title>
+    <title>GERSI NUTRI - Totem Profissional Vertical</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
@@ -14,10 +14,8 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Esconde o cupom na tela do totem */
         #cupom-area-impressao { display: none; }
 
-        /* REGRAS DE IMPRESSÃO QUE PREVINEM TELA BRANCA NO CHROME */
         @media print {
             #totem-conteudo-geral { display: none !important; }
             #cupom-area-impressao { 
@@ -43,18 +41,14 @@
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
 
-    <!-- CONTAINER DO CUPOM -->
     <div id="cupom-area-impressao"></div>
 
-    <!-- BLINDAGEM GERAL DO CONTEÚDO VISUAL -->
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
-            <p class="text-xs uppercase tracking-wider opacity-80 mt-1">Alimentação Saudável Inteligente</p>
+            <p class="text-xs uppercase tracking-wider opacity-85 mt-1">Alimentação Saudável Inteligente</p>
         </header>
 
-        <!-- CARDÁPIO EM GRADE (EXATAMENTE COMO NA FOTO QUE DEU CERTO) -->
         <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-3 gap-6 bg-slate-50 content-start">
             <div class="col-span-3 text-center py-20">
                 <div class="animate-spin inline-block w-10 h-10 border-4 border-[#166534] border-t-transparent rounded-full mb-4"></div>
@@ -62,7 +56,6 @@
             </div>
         </main>
 
-        <!-- RODAPÉ FIXO -->
         <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
             <div class="flex items-center gap-4">
                 <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -76,46 +69,46 @@
             </button>
         </footer>
 
-        <!-- POP-UP DE CUSTOMIZAÇÃO -->
         <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                <div class="relative h-48 shrink-0 bg-slate-100">
+            <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+                <div class="relative h-32 shrink-0 bg-slate-100">
                     <img id="modal-img" class="w-full h-full object-cover" src="" alt="">
                 </div>
                 
-                <div class="p-6 overflow-y-auto flex-1 space-y-4">
-                    <div>
-                        <span id="modal-cat" class="text-xs text-green-700 font-black uppercase tracking-widest block"></span>
-                        <h2 id="modal-nome" class="text-2xl font-black text-slate-800 mt-1"></h2>
-                        <p id="modal-preco-base" class="text-base text-slate-500 font-bold mt-1"></p>
+                <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span id="modal-cat" class="text-[10px] text-green-700 font-black uppercase tracking-widest block"></span>
+                            <h2 id="modal-nome" class="text-xl font-black text-slate-800 leading-tight mt-0.5"></h2>
+                        </div>
+                        <p id="modal-preco-base" class="text-sm text-slate-500 font-bold bg-slate-100 px-3 py-1.5 rounded-xl whitespace-nowrap"></p>
                     </div>
                     
-                    <div class="border-t border-b border-slate-100 py-4 flex items-center justify-between bg-slate-50/50 px-4 rounded-2xl">
-                        <p class="font-bold text-slate-700">Quantidade</p>
-                        <div class="flex items-center gap-4">
-                            <button onclick="alterarQtd(-1)" class="w-12 h-12 rounded-xl bg-slate-200 text-2xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">-</button>
-                            <span id="modal-qtd" class="text-xl font-black text-slate-800 w-8 text-center">1</span>
-                            <button onclick="alterarQtd(1)" class="w-12 h-12 rounded-xl bg-slate-200 text-2xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">+</button>
+                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/70 px-4 rounded-xl">
+                        <p class="font-bold text-sm text-slate-700">Quantidade</p>
+                        <div class="flex items-center gap-3">
+                            <button onclick="alterarQtd(-1)" class="w-10 h-10 rounded-xl bg-slate-200 text-xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">-</button>
+                            <span id="modal-qtd" class="text-lg font-black text-slate-800 w-6 text-center">1</span>
+                            <button onclick="alterarQtd(1)" class="w-10 h-10 rounded-xl bg-slate-200 text-xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">+</button>
                         </div>
                     </div>
 
-                    <div id="adicionais-secao" class="pt-2">
-                        <p class="font-bold text-slate-700 mb-1">Adicionais</p>
-                        <p class="text-xs text-slate-400 mb-3">Turbine seu prato:</p>
-                        <div id="adicionais-lista" class="space-y-2"></div>
+                    <div id="adicionais-secao" class="pt-1">
+                        <p class="font-bold text-sm text-slate-700 mb-0.5">Adicionais</p>
+                        <p class="text-[11px] text-slate-400 mb-2">Turbine seu prato de forma rápida:</p>
+                        <div id="adicionais-lista" class="grid grid-cols-2 gap-2"></div>
                     </div>
                 </div>
 
-                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
-                    <button onclick="fecharModal()" class="text-slate-500 font-bold uppercase text-sm tracking-wide hover:text-slate-700">Voltar</button>
-                    <button onclick="confirmarInclusao()" id="btn-adicionar-carrinho" class="bg-[#166534] text-white px-8 py-4 rounded-xl font-black shadow-md text-base">
+                <div class="p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+                    <button onclick="fecharModal()" class="text-slate-500 font-bold uppercase text-xs tracking-wide hover:text-slate-700 px-4 py-2">Voltar</button>
+                    <button onclick="confirmarInclusao()" id="btn-adicionar-carrinho" class="bg-[#166534] text-white px-8 py-3.5 rounded-xl font-black shadow-md text-sm uppercase tracking-wide">
                         Adicionar R$ 0,00
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- TELA DE CHECKOUT / PIX -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
             <p id="total-confirm" class="text-3xl text-green-700 font-black mb-8"></p>
@@ -180,7 +173,6 @@
                 const imagem = item[cImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
                 const precoNum = extrairPreco(item);
 
-                // ESTRUTURA DOS CARDS DO PRIMEIRO HTML QUE ENCAIXOU PERFEITAMENTE
                 container.innerHTML += `
                     <div onclick="configurarItem(${index})" class="food-card bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-slate-100 h-80">
                         <div class="h-44 w-full overflow-hidden shrink-0 bg-slate-100">
@@ -201,8 +193,6 @@
             });
         }
 
-        function configuringItem(index) {} // Mantido estrutura interna
-
         function configurarItem(index) {
             const item = cardapioOriginal[index];
             const chaves = Object.keys(item);
@@ -220,7 +210,7 @@
             document.getElementById('modal-img').src = img;
             document.getElementById('modal-cat').innerText = cat;
             document.getElementById('modal-nome').innerText = nome;
-            document.getElementById('modal-preco-base').innerText = `Preço unitário: R$ ${precoNum.toFixed(2).replace('.', ',')}`;
+            document.getElementById('modal-preco-base').innerText = `R$ ${precoNum.toFixed(2).replace('.', ',')}`;
             document.getElementById('modal-qtd').innerText = '1';
 
             const listaAdi = document.getElementById('adicionais-lista');
@@ -243,14 +233,15 @@
             document.getElementById('custom-modal').classList.remove('hidden');
         }
 
-        function generarHtmlAdicional(nomeAdi, valAdi, container) {
+        function gerarHtmlAdicional(nomeAdi, valAdi, container) {
+            // COMPACTADO PARA SE ADAPTAR AO GRID LADO A LADO DO MODAL VERTICAL
             container.innerHTML += `
-                <label class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100 active:bg-slate-200 cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" onchange="toggleAdicional('${nomeAdi}', ${valAdi}, this)" class="w-5 h-5 accent-[#166534] rounded">
-                        <span class="font-bold text-slate-700 text-sm">${nomeAdi}</span>
+                <label class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 active:bg-slate-200 cursor-pointer">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <input type="checkbox" onchange="toggleAdicional('${nomeAdi}', ${valAdi}, this)" class="w-4 h-4 accent-[#166534] rounded shrink-0">
+                        <span class="font-bold text-slate-700 text-xs truncate">${nomeAdi}</span>
                     </div>
-                    <span class="text-sm font-extrabold text-slate-500">+ R$ ${valAdi.toFixed(2).replace('.', ',')}</span>
+                    <span class="text-[11px] font-extrabold text-slate-500 shrink-0">+${valAdi.toFixed(0)}</span>
                 </label>
             `;
         }
