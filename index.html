@@ -86,7 +86,7 @@
                             <span id="modal-preco-base" class="text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-md inline-block"></span>
                         </div>
                     </div>
-                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/50 px-4 rounded-xl">
+                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/70 px-4 rounded-xl">
                         <p class="font-bold text-sm text-slate-700">Quantidade</p>
                         <div class="flex items-center gap-3">
                             <button onclick="alterarQtd(-1)" class="w-10 h-10 rounded-xl bg-slate-200 text-xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">-</button>
@@ -114,21 +114,22 @@
             <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-4"></p>
             
             <!-- GRADE COM OS DOIS CAMPOS DE TEXTO -->
-            <div class="w-full max-w-xl grid grid-cols-2 gap-4 mb-6 text-left">
-                <!-- Campo 1: Nome -->
-                <div id="box-identificacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300">
+            <div class="w-full max-w-xl grid grid-cols-2 gap-4 mb-6 text-left items-stretch">
+                <!-- Campo 1: Nome (Mantido Input curto) -->
+                <div id="box-identificacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
                         👤 Seu Nome <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
                     </label>
                     <input type="text" id="cliente-identificacao" readonly onclick="abrirTecladoVirtual('cliente-identificacao', 'box-identificacao')" placeholder="Toque para digitar..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
                 </div>
 
-                <!-- Campo 2: Observação (Novo!) -->
-                <div id="box-observacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300">
+                <!-- Campo 2: Observação (ATUALIZADO PARA TEXTAREA EXPANDIDO) -->
+                <div id="box-observacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
                         📝 Observação <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
                     </label>
-                    <input type="text" id="cliente-observacao" readonly onclick="abrirTecladoVirtual('cliente-observacao', 'box-observacao')" placeholder="Ex: Sem cebola, gelo..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
+                    <!-- Trocado para textarea com altura mínima de 3 linhas (h-12) e quebra de texto ativada -->
+                    <textarea id="cliente-observacao" readonly onclick="abrirTecladoVirtual('cliente-observacao', 'box-observacao')" placeholder="Ex: gostaria que esquentasse e nao colocasse molho..." class="w-full h-12 bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer resize-none overflow-hidden leading-tight"></textarea>
                 </div>
             </div>
             
@@ -249,7 +250,6 @@
         let carrinhoItens = [];
         let formaPagamentoEscolhida = "";
         
-        // VARIÁVEIS DE CONTROLE DO TECLADO
         let inputAtivoId = "";
         let boxAtivoId = "";
 
@@ -427,9 +427,7 @@
             document.getElementById('method-screen').classList.remove('hidden');
         }
 
-        // FUNÇÕES INTELIGENTES DE CONTROLE DO TECLADO TÁTIL MULTI-CAMPOS
         function abrirTecladoVirtual(inputId, boxId) {
-            // Se já tiver outro campo ativo, remove o foco dele primeiro
             if(inputAtivoId !== "") {
                 document.getElementById(inputAtivoId).classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
             }
@@ -443,7 +441,6 @@
             screen.classList.remove('justify-center');
             screen.classList.add('justify-start');
             
-            document.getElementById('espaco-teclado-reserva').classImg = '';
             document.getElementById('espaco-teclado-reserva').classList.add('h-[440px]');
             
             targetInput.classList.add('border-[#166534]', 'ring-4', 'ring-green-100');
@@ -490,7 +487,6 @@
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
             
-            // Puxa as informações dos inputs higienizados
             const identCliente = document.getElementById('cliente-identificacao').value.trim();
             const obsCliente = document.getElementById('cliente-observacao').value.trim();
             
@@ -503,8 +499,8 @@
             textoCupom += `Senha: ${numeroSenha}\n`;
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
             textoCupom += `Forma de Pagamento: ${formaPagamentoEscolhida}\n`;
-            textoCupom += linhaCliente; // Injeta o nome se houver
-            textoCupom += linhaObs;     // Injeta a observação se houver
+            textoCupom += linhaCliente; 
+            textoCupom += linhaObs;     
             textoCupom += `----------------------------------------\n`;
             textoCupom += `Qtd  Item                       Total\n`;
             textoCupom += `----------------------------------------\n`;
@@ -527,7 +523,6 @@
             setTimeout(() => {
                 window.print();
                 
-                // Reseta o carrinho, valores e limpa os dois campos de texto
                 totalGeral = 0;
                 carrinhoItens = [];
                 formaPagamentoEscolhida = "";
