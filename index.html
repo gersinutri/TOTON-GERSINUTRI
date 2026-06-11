@@ -14,22 +14,38 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* CONFIGURAÇÃO EXCLUSIVA DE IMPRESSÃO: Oculta o site e força o cupom */
+        /* CONTROLE VISUAL: Esconde o cupom na tela normal */
+        #cupom-impressao { display: none; }
+
+        /* CONFIGURAÇÃO EXCLUSIVA DE IMPRESSÃO */
         @media print {
             body, header, main, footer, #custom-modal, #payment-screen { display: none !important; }
-            #cupom-impressao { display: block !important; width: 100% !important; font-family: monospace !important; font-size: 14px !important; color: black !important; background: white !important; padding: 10px !important; }
+            #cupom-impressao { 
+                display: block !important; 
+                width: 100% !important; 
+                max-width: 80mm !important; /* Tamanho padrão de bobina térmica */
+                font-family: monospace !important; 
+                font-size: 14px !important; 
+                color: black !important; 
+                background: white !important; 
+                padding: 10px !important;
+                margin: 0 !important;
+            }
         }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
 
-    <div id="cupom-impressao" class="hidden"></div>
+    <!-- ÁREA DO CUPOM ESTRUTURADA FORA DO SISTEMA DE CLASSES DO TAILWIND -->
+    <div id="cupom-impressao"></div>
 
+    <!-- CABEÇALHO -->
     <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
         <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
         <p class="text-xs uppercase tracking-wider opacity-80 mt-1">Alimentação Saudável Inteligente</p>
     </header>
 
+    <!-- CARDÁPIO -->
     <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-2 gap-6 bg-slate-50 content-start">
         <div class="col-span-2 text-center py-20">
             <div class="animate-spin inline-block w-10 h-10 border-4 border-[#166534] border-t-transparent rounded-full mb-4"></div>
@@ -37,6 +53,7 @@
         </div>
     </main>
 
+    <!-- RODAPÉ FIXO -->
     <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
         <div class="flex items-center gap-4">
             <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -50,6 +67,7 @@
         </button>
     </footer>
 
+    <!-- POP-UP DE CUSTOMIZAÇÃO -->
     <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div class="relative h-48 shrink-0 bg-slate-100">
@@ -84,6 +102,7 @@
         </div>
     </div>
 
+    <!-- TELA DE CHECKOUT / PIX -->
     <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
         <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
         <p id="total-confirm" class="text-3xl text-green-700 font-black mb-8"></p>
@@ -92,6 +111,7 @@
         </div>
         <p class="text-blue-600 font-bold animate-pulse text-lg mb-4">Processando pagamento em tempo real...</p>
         
+        <!-- BOTÃO DE SIMULAÇÃO -->
         <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-black mb-10 text-sm uppercase tracking-wider shadow-md">
             [ Simular Pagamento e Imprimir ]
         </button>
@@ -244,7 +264,7 @@
 
         function confirmarInclusao() {
             totalGeral += itemAtual.totalCalculado;
-            carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual))); // Clonagem profunda para evitar bugs de referência
+            carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual)));
             document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             fecharModal();
         }
@@ -257,12 +277,11 @@
 
         function fecharPagamento() { document.getElementById('payment-screen').classList.add('hidden'); }
 
-        // LOGICA DE IMPRESSÃO CORRIGIDA COM DELAY (ANTI-TELA-BRANCA)
+        // AJUSTE CRÍTICO: ESCRITA E RENDERIZAÇÃO IMEDIATA
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const divCupom = document.getElementById('cupom-impressao');
             
-            // Montagem pura do texto simples (formato cupom 80mm)
             let textoCupom = `
 ========================================
               GERSI NUTRI               
@@ -288,19 +307,19 @@ TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.',',')}
 ========================================
 `;
 
-            // Insere como texto puro estruturado (pre) para manter o alinhamento da impressora
-            divCupom.innerHTML = `<pre style="margin:0; padding:0; white-space:pre-wrap;">${textoCupom}</pre>`;
+            // Removemos as tags ocultas de layout e colocamos texto puro diretamente
+            divCupom.innerHTML = `<pre style="margin:0; padding:0; font-family:monospace; font-size:14px; white-space:pre-wrap; color:black; background:white;">${textoCupom}</pre>`;
 
-            // O SEGREDO: Dá um tempo de 300ms para o navegador renderizar o texto antes de abrir o painel de impressão
+            // Aumentamos levemente o tempo para 500ms garantindo que a área de transferência do Opera processe o HTML
             setTimeout(() => {
                 window.print();
 
-                // Reseta o totem após fechar o painel de impressão
+                // Limpa o carrinho e fecha a janela após o comando
                 totalGeral = 0;
                 carrinhoItens = [];
                 document.getElementById('total-value').innerText = "R$ 0,00";
                 fecharPagamento();
-            }, 300);
+            }, 500);
         }
     </script>
 </body>
