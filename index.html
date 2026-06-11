@@ -150,7 +150,7 @@
                 <p class="text-blue-600 font-bold animate-pulse text-lg">Processando transação no terminal físico...</p>
             </div>
 
-            <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl font-black mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
+            <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
                 [ CONFIRMAR E IMPRIMIR VIA COZINHA ]
             </button>
             <button onclick="voltarParaSelecao()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
@@ -167,21 +167,26 @@
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
         function carregarCardapio() {
+            // Desativa a leitura de cabeçalhos por nome para ler estritamente por ARRAY de posições
             Papa.parse(URL_CSV, {
                 download: true,
-                header: true,
+                header: false, // Alterado para False (Lê por ordem de colunas A, B, C, D...)
                 skipEmptyLines: true,
                 complete: function(results) {
-                    cardapioOriginal = results.data;
-                    montarMenu(results.data);
+                    // Ignora a primeira linha se for o cabeçalho de texto
+                    let dadosBrutos = results.data;
+                    if(dadosBrutos[0][0].toLowerCase().trim() === 'nome') {
+                        dadosBrutos.shift(); 
+                    }
+                    cardapioOriginal = dadosBrutos;
+                    montarMenu(dadosBrutos);
                 }
             });
         }
 
-        function extrairPreco(item, chaveNome) {
-            if (!item[chaveNome]) return 0;
-            let texto = String(item[chaveNome]).trim();
-            let limpo = texto.replace('R$', '').replace(/\s/g, '').replace(',', '.');
+        function extrairPreco(texto) {
+            if (!texto) return 0;
+            let limpo = String(texto).replace('R$', '').replace(/\s/g, '').replace(',', '.');
             return parseFloat(limpo) || 0;
         }
 
@@ -189,29 +194,20 @@
             const container = document.getElementById('menu-area');
             container.innerHTML = ''; 
             dados.forEach((item, index) => {
-                const chaves = Object.keys(item);
                 
-                // LEITURA FIXA BASEADA NO SEU MAPEAMENTO DE COLUNAS EXATO
-                const cNome = chaves.find(c => c.toLowerCase().trim() === 'nome');
-                const cPreco = chaves.find(c => c.toLowerCase().trim() === 'preco');
-                const cCat = chaves.find(c => c.toLowerCase().trim() === 'categoria');
-                const cImg = chaves.find(c => c.toLowerCase().trim() === 'link da imagem' || c.toLowerCase().trim() === 'imagem');
-                const cStatus = chaves.find(c => c.toLowerCase().trim() === 'status');
+                // MAPEAMENTO MANUAL ABSOLUTO BASEADO NAS SUAS LETRAS (A, B, C, D...)
+                const nome = item[0];       // Coluna A
+                const precoTxt = item[1];   // Coluna B
+                const categoria = item[2] || 'Nutri'; // Coluna C
+                const imagem = item[3] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI'; // Coluna D
+                const statusTxt = item[6] ? item[6].toLowerCase().trim() : ''; // Coluna G (Posição 6)
 
-                if(!cNome || !item[cNome] || item[cNome].trim() === "") return;
+                if(!nome || nome.trim() === "") return;
 
-                // SISTEMA DE FILTRO: Se tiver coluna status preenchida e não for "sim", oculta o card
-                if(cStatus && item[cStatus]) {
-                    const statusTxt = item[cStatus].toLowerCase().trim();
-                    if(statusTxt !== 'sim') return; 
-                } else if (cStatus) {
-                    return; // Esconde por padrão caso a coluna exista e esteja em branco
-                }
+                // TRAVA DE ESTOQUE DA COLUNA G: Se não estiver estritamente escrito "sim", esconde da TV
+                if(statusTxt !== 'sim') return;
 
-                const nome = item[cNome];
-                const categoria = item[cCat] || 'Nutri';
-                const imagem = item[cImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
-                const precoNum = extrairPreco(item, cPreco);
+                const precoNum = extrairPreco(precoTxt);
 
                 container.innerHTML += `
                     <div onclick="configurarItem(${index})" class="food-card bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-slate-100 h-80">
@@ -235,21 +231,15 @@
 
         function configurarItem(index) {
             const item = cardapioOriginal[index];
-            const chaves = Object.keys(item);
             
-            const cNome = chaves.find(c => c.toLowerCase().trim() === 'nome');
-            const cPreco = chaves.find(c => c.toLowerCase().trim() === 'preco');
-            const cCat = chaves.find(c => c.toLowerCase().trim() === 'categoria');
-            const cImg = chaves.find(c => c.toLowerCase().trim() === 'link da imagem' || c.toLowerCase().trim() === 'imagem');
-            const cAdi = chaves.find(c => c.toLowerCase().trim() === 'adicionais');
-            const cPrcAdi = chaves.find(c => c.toLowerCase().trim() === 'precosadicionais');
+            const nome = item[0];
+            const precoTxt = item[1];
+            const cat = item[2] || 'Nutri';
+            const img = item[3] || '';
+            const adiTexto = item[4] || '';   // Coluna E
+            const prcAdiTexto = item[5] || '';// Coluna F
 
-            const nome = item[cNome];
-            const cat = item[cCat] || 'Nutri';
-            const img = item[cImg] || '';
-            const adiTexto = item[cAdi] || '';
-            const prcAdiTexto = item[cPrcAdi] || '';
-            const precoNum = extrairPreco(item, cPreco);
+            const precoNum = extrairPreco(precoTxt);
 
             itemAtual = { nome, precoBase: precoNum, qtd: 1, imagem: img, categoria: cat, adicionaisEscolhidos: {} };
 
