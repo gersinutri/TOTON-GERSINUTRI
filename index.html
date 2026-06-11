@@ -6,8 +6,6 @@
     <title>GERSI NUTRI - Totem Profissional Vertical</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- Biblioteca geradora de QR Code de alta performance -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         .hidden { display: none; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
@@ -56,13 +54,11 @@
     <div id="cupom-area-impressao"></div>
 
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-1">Alimentação Saudável Inteligente</p>
         </header>
 
-        <!-- SLIDE DE OFERTAS ESTILO MERCADO LIVRE COM CONTORNO #FAEDCD -->
         <div class="px-6 pt-6 shrink-0">
             <div id="promo-slider" class="slide-container bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 text-white shadow-xl">
                 <div class="slide-item active">
@@ -78,10 +74,8 @@
             </div>
         </div>
 
-        <!-- CARDÁPIO EM GRADE (3 COLUNAS) -->
         <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-3 gap-6 bg-slate-50 content-start"></main>
 
-        <!-- RODAPÉ FIXO -->
         <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
             <div class="flex items-center gap-4">
                 <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -95,7 +89,6 @@
             </button>
         </footer>
 
-        <!-- POP-UP DE CUSTOMIZAÇÃO -->
         <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
                 <div class="relative h-32 shrink-0 bg-slate-100">
@@ -104,7 +97,7 @@
                 <div class="p-5 overflow-y-auto flex-1 space-y-4">
                     <div class="space-y-1">
                         <span id="modal-cat" class="text-[10px] text-green-700 font-black uppercase tracking-widest block"></span>
-                        <h2 id="modal-nome" class="text-2xl font-black text-slate-800 leading-tight"></h2>
+                        <h2 id="modal-nome" class="text-2xl font-black text-slate-800 leather-tight"></h2>
                         <div class="pt-1">
                             <span id="modal-preco-base" class="text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-md inline-block"></span>
                         </div>
@@ -130,7 +123,6 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO + OBSERVAÇÃO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center transition-all duration-300 overflow-y-auto">
             <h2 id="method-title" class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
             <p id="method-desc" class="text-slate-400 text-sm mb-4">Escolha como prefere pagar o seu pedido</p>
@@ -158,7 +150,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 002-2H6a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                     </svg>
                     <span class="font-black text-xl text-slate-800">Pagar com PIX</span>
-                    <span class="text-xs text-green-600 font-bold mt-1">Aprovação Automática</span>
+                    <span class="text-xs text-green-600 font-bold mt-1">Geração Direta e Segura</span>
                 </button>
                 
                 <button onclick="escolherForma('CARTAO')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-blue-600 rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
@@ -173,16 +165,18 @@
             <div id="espaco-teclado-reserva" class="h-0 transition-all duration-300"></div>
         </div>
 
-        <!-- TELA 2: EXIBIÇÃO DE ACORDO COM A ESCOLHA -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
-            <div id="area-pix" class="hidden space-y-6 flex flex-col items-center">
+            <div id="area-pix" class="hidden space-y-4 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black"></p>
-                <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-slate-50 p-4 shadow-inner relative">
-                    <div id="pix-qr-container" class="w-full h-full flex items-center justify-center"></div>
-                    <div id="pix-loading" class="absolute inset-0 bg-slate-50 flex items-center justify-center rounded-2xl font-bold text-slate-500 text-sm">Gerando PIX...</div>
+                <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-slate-50 p-4 shadow-inner">
+                    <img src="" id="pix-qr-img" class="w-full h-full object-contain">
                 </div>
-                <p id="pix-status-text" class="text-green-600 font-bold animate-pulse text-lg">Aguardando transferência Pix...</p>
+                <p class="text-green-600 font-bold animate-pulse text-lg">Aguardando transferência Pix...</p>
+                
+                <button onclick="dispararImpressao()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-10 py-5 rounded-2xl text-lg uppercase tracking-wide shadow-xl mt-4 active:scale-95 transition-all">
+                    CONFIRMAR PAGAMENTO E IMPRIMIR
+                </button>
             </div>
 
             <div id="area-cartao" class="hidden space-y-8 flex flex-col items-center">
@@ -192,17 +186,15 @@
                     <div class="text-7xl animate-bounce mb-2">⬇️</div>
                     <span class="font-bold text-xs text-slate-600 text-center leading-tight mt-2 px-2">Siga as instruções da maquininha</span>
                 </div>
-                <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl mt-4 text-sm font-bold uppercase shadow-md">
-                    Confirmar Cartão Físico e Imprimir
+                <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-10 py-4 rounded-xl text-sm uppercase shadow-md active:scale-95 transition-all">
+                    Confirmar Transação e Imprimir
                 </button>
             </div>
 
-            <button onclick="voltarParaSelecao()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block mt-12">Alterar Forma de Pagamento</button>
+            <button onclick="voltarParaSelecao()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block mt-8">Alterar Forma de Pagamento</button>
         </div>
 
-        <!-- ESTRUTURA DO TECLADO VIRTUAL TÁTIL INTEGRADO -->
         <div id="totem-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] z-[100] flex flex-col gap-2 select-none border-t-2 border-slate-700">
-            <!-- Linha dos Números -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('1')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">1</button>
                 <button onclick="tecladoDigitar('2')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">2</button>
@@ -216,7 +208,6 @@
                 <button onclick="tecladoDigitar('0')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">0</button>
                 <button onclick="tecladoDigitar('-')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">-</button>
             </div>
-            <!-- Linha QWERTY -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('Q')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">Q</button>
                 <button onclick="tecladoDigitar('W')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">W</button>
@@ -229,7 +220,6 @@
                 <button onclick="tecladoDigitar('O')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">O</button>
                 <button onclick="tecladoDigitar('P')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">P</button>
             </div>
-            <!-- Linha ASDF -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('A')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">A</button>
                 <button onclick="tecladoDigitar('S')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">S</button>
@@ -241,7 +231,6 @@
                 <button onclick="tecladoDigitar('K')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">K</button>
                 <button onclick="tecladoDigitar('L')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">L</button>
             </div>
-            <!-- Linha ZXCV + Backspace -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('Z')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">Z</button>
                 <button onclick="tecladoDigitar('X')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">X</button>
@@ -252,7 +241,6 @@
                 <button onclick="tecladoDigitar('M')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">M</button>
                 <button onclick="tecladoApagar()" class="keyboard-key bg-orange-600 active:bg-orange-700 text-white font-black text-sm py-4 px-6 rounded-xl uppercase tracking-wider">Apagar</button>
             </div>
-            <!-- Linha Barra de Espaço + Botão Concluído -->
             <div class="flex w-full gap-2 justify-center px-8 mt-1">
                 <button onclick="tecladoDigitar(' ')" class="keyboard-key keyboard-key-wide bg-slate-800 text-white font-bold text-base py-4 rounded-xl uppercase tracking-wide">Espaço ␣</button>
                 <button onclick="fecharTecladoVirtual()" class="keyboard-key bg-[#22c55e] active:bg-[#16a34a] text-white font-black text-sm py-4 px-10 rounded-full uppercase tracking-widest">OK ✔</button>
@@ -270,14 +258,12 @@
         let boxAtivoId = "";
         let indexSlideAtivo = 0;
 
-        let paymentCheckInterval = null;
-        let currentPaymentId = null;
-
-        // Credencial Ativa Oficial do Mercado Pago
-        const MERCADO_PAGO_TOKEN = "APP_USR-4512963183077429-061118-77665467b151055938926bfe9498c043-132105105"; 
-        
-        // Rota Proxy para contornar o bloqueio CORS do navegador
-        const PROXY_CORS = "https://cors-anywhere.herokuapp.com/";
+        // Configuração Estática e Segura da Gersi Nutri
+        const CONFIG_PIX = {
+            chave: "47342129000141",       
+            beneficiario: "GERSI NUTRI",    
+            cidade: "FEIRA DE SANTANA"      
+        };
 
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
@@ -407,7 +393,7 @@
 
             const precoNum = extrairPreco(precoTxt);
 
-            itemAtual = { nome, precoBase: precoNum, qtd: 1, imagem: img, categoria: cat, adicionaisEscolhidos: {} };
+            itemAtual = { nome, precoBase: precoNum, qtd: 1, imagem: img, category: cat, adicionaisEscolhidos: {} };
 
             document.getElementById('modal-img').src = img;
             document.getElementById('modal-cat').innerText = cat;
@@ -485,131 +471,68 @@
 
         function fecharMetodoPagamento() { 
             fecharTecladoVirtual();
-            pararChecagemPix();
             document.getElementById('method-screen').classList.add('hidden'); 
+        }
+
+        function gerarStringPix(chave, beneficiario, cidade, valor) {
+            function formatarCampo(id, valorCampo) {
+                const len = String(valorCampo).length.toString().padStart(2, '0');
+                return id + len + valorCampo;
+            }
+            const infoAdicional = formatarCampo("01", chave);
+            const merchantAccount = formatarCampo("26", formatarCampo("00", "br.gov.bcb.pix") + infoAdicional);
+            const valorFormatado = valor.toFixed(2);
+            
+            let payload = "000201" +
+                          merchantAccount +
+                          "52040000" +
+                          "5303986" +
+                          formatarCampo("54", valorFormatado) +
+                          "5802BR" +
+                          formatarCampo("59", beneficiario.toUpperCase()) +
+                          formatarCampo("60", cidade.toUpperCase()) +
+                          "62070503***";
+            payload += "6304";
+            
+            let crc = 0xFFFF;
+            for (let i = 0; i < payload.length; i++) {
+                let x = ((crc >> 8) ^ payload.charCodeAt(i)) & 0xFF;
+                x ^= x >> 4;
+                crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+            }
+            return payload + crc.toString(16).toUpperCase().padStart(4, '0');
         }
 
         function escolherForma(forma) {
             fecharTecladoVirtual();
             formaPagamentoEscolhida = forma;
             document.getElementById('method-screen').classList.add('hidden');
-            
             document.getElementById('area-pix').classList.add('hidden');
             document.getElementById('area-cartao').classList.add('hidden');
 
             if(forma === 'PIX') {
                 document.getElementById('total-confirm-pix').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-                document.getElementById('pix-loading').classList.remove('hidden');
-                document.getElementById('pix-status-text').innerText = "Gerando PIX unificado...";
+                document.getElementById('pix-loading').classList.add('hidden');
                 
-                document.getElementById('area-pix').classList.remove('hidden');
-                document.getElementById('payment-screen').classList.remove('hidden');
+                // Geração estática da string padrão Banco Central
+                const textoPixCopiaECola = gerarStringPix(
+                    CONFIG_PIX.chave,
+                    CONFIG_PIX.beneficiario,
+                    CONFIG_PIX.cidade,
+                    totalGeral
+                );
 
-                criarPagamentoPixMercadoPago(totalGeral);
+                // Carrega a imagem do QR Code instantaneamente via QRServer livre de travas de segurança
+                document.getElementById('pix-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(textoPixCopiaECola)}`;
+                document.getElementById('area-pix').classList.remove('hidden');
             } else {
                 document.getElementById('total-confirm-cartao').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('area-cartao').classList.remove('hidden');
-                document.getElementById('payment-screen').classList.remove('hidden');
             }
-        }
-
-        // CORREÇÃO CIRÚRGICA: Requisição encapsulada com Proxy para quebrar a trava CORS do navegador
-        function criarPagamentoPixMercadoPago(valor) {
-            const urlRealMercadoPago = "https://api.mercadopago.com/v1/payments";
-            const urlComProxy = PROXY_CORS + urlRealMercadoPago;
-            
-            const dadosPagamento = {
-                transaction_amount: parseFloat(valor.toFixed(2)),
-                description: "Pedido Totem Gersi Nutri",
-                payment_method_id: "pix",
-                payer: {
-                    email: "totem@gersinutri.com.br",
-                    first_name: "Cliente",
-                    last_name: "Totem"
-                }
-            };
-
-            fetch(urlComProxy, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${MERCADO_PAGO_TOKEN}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dadosPagamento)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.point_of_interaction && data.point_of_interaction.transaction_data) {
-                    const copiaECola = data.point_of_interaction.transaction_data.qr_code;
-                    currentPaymentId = data.id; 
-
-                    const qrContainer = document.getElementById('pix-qr-container');
-                    qrContainer.innerHTML = '';
-                    new QRCode(qrContainer, {
-                        text: copiaECola,
-                        width: 220,
-                        height: 220,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.M
-                    });
-
-                    document.getElementById('pix-loading').classList.add('hidden');
-                    document.getElementById('pix-status-text').innerText = "Aguardando transferência Pix...";
-
-                    iniciarChecagemPix();
-                } else {
-                    alert("Erro nas credenciais ou limites da conta do Mercado Pago.");
-                    voltarParaSelecao();
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Falha de conexão com a API de pagamentos. Verifique a internet do totem.");
-                voltarParaSelecao();
-            });
-        }
-
-        function iniciarChecagemPix() {
-            pararChecagemPix(); 
-            paymentCheckInterval = setInterval(() => {
-                if (!currentPaymentId) return;
-
-                const urlRealStatus = `https://api.mercadopago.com/v1/payments/${currentPaymentId}`;
-                const urlStatusComProxy = PROXY_CORS + urlRealStatus;
-
-                fetch(urlStatusComProxy, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${MERCADO_PAGO_TOKEN}`
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "approved") {
-                        pararChecagemPix();
-                        document.getElementById('pix-status-text').innerText = "🎉 PAGO COM SUCESSO! IMPRIMINDO...";
-                        document.getElementById('pix-status-text').classList.remove('text-green-600');
-                        document.getElementById('pix-status-text').classList.add('text-emerald-500', 'text-xl');
-                        
-                        setTimeout(() => {
-                            dispararImpressao();
-                        }, 1000);
-                    }
-                })
-                .catch(err => console.log("Consultando transação...", err));
-            }, 3000);
-        }
-
-        function pararChecagemPix() {
-            if (paymentCheckInterval) {
-                clearInterval(paymentCheckInterval);
-                paymentCheckInterval = null;
-            }
+            document.getElementById('payment-screen').classList.remove('hidden');
         }
 
         function voltarParaSelecao() {
-            pararChecagemPix();
             document.getElementById('payment-screen').classList.add('hidden');
             document.getElementById('method-screen').classList.remove('hidden');
         }
@@ -618,21 +541,15 @@
             if(inputAtivoId !== "") {
                 document.getElementById(inputAtivoId).classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
             }
-
             inputAtivoId = inputId;
             boxAtivoId = boxId;
-
             const screen = document.getElementById('method-screen');
             const targetInput = document.getElementById(inputId);
-            
             screen.classList.remove('justify-center');
             screen.classList.add('justify-start');
-            
             document.getElementById('espaco-teclado-reserva').classList.add('h-[440px]');
-            
             targetInput.classList.add('border-[#166534]', 'ring-4', 'ring-green-100');
             document.getElementById('totem-keyboard-container').classList.remove('hidden');
-            
             setTimeout(() => {
                 document.getElementById(boxId).scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 50);
@@ -640,20 +557,14 @@
 
         function fecharTecladoVirtual() {
             if(inputAtivoId === "") return;
-
             const screen = document.getElementById('method-screen');
             const targetInput = document.getElementById(inputAtivoId);
-            
             targetInput.classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
-            
             document.getElementById('espaco-teclado-reserva').classList.remove('h-[440px]');
             document.getElementById('totem-keyboard-container').classList.add('hidden');
-            
             screen.classList.remove('justify-start');
             screen.classList.add('justify-center');
-            
             screen.scrollTo({ top: 0, behavior: 'smooth' });
-
             inputAtivoId = "";
             boxAtivoId = "";
         }
@@ -674,14 +585,10 @@
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
-            
             const identCliente = document.getElementById('cliente-identificacao').value.trim();
             let obsCliente = document.getElementById('cliente-observacao').value.trim();
             
-            if (obsCliente.length > 120) {
-                obsCliente = obsCliente.substring(0, 120);
-            }
-            
+            if (obsCliente.length > 120) { obsCliente = obsCliente.substring(0, 120); }
             const tableCliente = identCliente !== "" ? `Cliente: ${identCliente}\n` : "";
             const offsetObs = obsCliente !== "" ? `OBS: ${obsCliente}\n` : "";
 
@@ -699,9 +606,7 @@
 
             carrinhoItens.forEach(item => {
                 textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.totalCalculado.toFixed(2).replace('.',',')}\n`;
-                for(let adi in item.adicionaisEscolhidos) {
-                    textoCupom += `     + ${adi}\n`;
-                }
+                for(let adi in item.adicionaisEscolhidos) { textoCupom += `     + ${adi}\n`; }
             });
 
             textoCupom += `----------------------------------------\n`;
@@ -714,11 +619,9 @@
 
             setTimeout(() => {
                 window.print();
-                
                 totalGeral = 0;
                 carrinhoItens = [];
                 formaPagamentoEscolhida = "";
-                currentPaymentId = null;
                 document.getElementById('cliente-identificacao').value = "";
                 document.getElementById('cliente-observacao').value = "";
                 document.getElementById('total-value').innerText = "R$ 0,00";
