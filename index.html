@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO (NOVA) -->
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <h2 class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
             <p class="text-slate-400 text-sm mb-12">Escolha como prefere pagar o seu pedido</p>
@@ -142,16 +142,17 @@
             <div id="area-cartao" class="hidden space-y-8 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black"></p>
-                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400">
-                    <span class="text-7xl animate-bounce">⬇️</span>
-                    <span class="font-bold text-sm text-slate-600 mt-4">Siga as instruções da maquininha</span>
+                <!-- CORREÇÃO DA ANIMAÇÃO: Pulo isolado apenas no emoji da seta para ficar fluido -->
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
+                    <div class="text-7xl animate-bounce mb-2">⬇️</div>
+                    <span class="font-bold text-xs text-slate-600 text-center leading-tight mt-2 px-2">Siga as instruções da maquininha</span>
                 </div>
                 <p class="text-blue-600 font-bold animate-pulse text-lg">Processando transação no terminal físico...</p>
             </div>
 
             <!-- BOTÃO SIMULADOR DE IMPRESSÃO -->
             <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl font-black mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
-                [ Confirmar e Imprimir Via Cozinha ]
+                [ CONFIRMAR E IMPRIMIR VIA COZINHA ]
             </button>
             
             <button onclick="voltarParaSelecao()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
@@ -307,7 +308,6 @@
             fecharModal();
         }
 
-        // METODOS DE TELA DE PAGAMENTO ATUALIZADOS
         function abrirMetodoPagamento() {
             if(totalGeral <= 0) return alert("Selecione algum item primeiro!");
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -320,7 +320,6 @@
             formaPagamentoEscolhida = forma;
             document.getElementById('method-screen').classList.add('hidden');
             
-            // Oculta ambas as áreas para limpar estados anteriores
             document.getElementById('area-pix').classList.add('hidden');
             document.getElementById('area-cartao').classList.add('hidden');
 
