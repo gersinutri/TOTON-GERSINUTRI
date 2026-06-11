@@ -102,13 +102,21 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO -->
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO OPCIONAL -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <h2 class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
-            <p class="text-slate-400 text-sm mb-12">Escolha como prefere pagar o seu pedido</p>
-            <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-12"></p>
+            <p class="text-slate-400 text-sm mb-6">Escolha como prefere pagar o seu pedido</p>
+            <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8"></p>
             
-            <div class="grid grid-cols-2 gap-8 w-full max-w-xl mb-16">
+            <!-- CAMPO DE IDENTIFICAÇÃO OPCIONAL ADICIONADO -->
+            <div class="w-full max-w-xl bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8 text-left space-y-2 shadow-sm">
+                <label for="cliente-identificacao" class="block font-black text-sm text-slate-700 uppercase tracking-wide">
+                    👤 Identificação no Cupom <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
+                </label>
+                <input type="text" id="cliente-identificacao" placeholder="Digite seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-green-600 transition-all">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-8 w-full max-w-xl mb-12">
                 <!-- Botão PIX -->
                 <button onclick="escolherForma('PIX')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-green-600 rounded-3xl p-8 transition-all shadow-md active:scale-95">
                     <span class="text-6xl mb-4">📱</span>
@@ -142,7 +150,6 @@
             <div id="area-cartao" class="hidden space-y-8 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black"></p>
-                <!-- CORREÇÃO DA ANIMAÇÃO: Pulo isolado apenas no emoji da seta para ficar fluido -->
                 <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
                     <div class="text-7xl animate-bounce mb-2">⬇️</div>
                     <span class="font-bold text-xs text-slate-600 text-center leading-tight mt-2 px-2">Siga as instruções da maquininha</span>
@@ -151,7 +158,7 @@
             </div>
 
             <!-- BOTÃO SIMULADOR DE IMPRESSÃO -->
-            <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl font-black mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
+            <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
                 [ CONFIRMAR E IMPRIMIR VIA COZINHA ]
             </button>
             
@@ -342,12 +349,17 @@
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
             
+            // Puxa o dado digitado no campo de texto
+            const identCliente = document.getElementById('cliente-identificacao').value.trim();
+            const linhaCliente = identCliente !== "" ? `Cliente: ${identCliente}\n` : "";
+
             let textoCupom = `========================================\n`;
             textoCupom += `              GERSI NUTRI               \n`;
             textoCupom += `========================================\n`;
             textoCupom += `Senha: ${numeroSenha}\n`;
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
             textoCupom += `Forma de Pagamento: ${formaPagamentoEscolhida}\n`;
+            textoCupom += linhaCliente; // Injeta a linha do nome se ela existir
             textoCupom += `----------------------------------------\n`;
             textoCupom += `Qtd  Item                       Total\n`;
             textoCupom += `----------------------------------------\n`;
@@ -369,9 +381,12 @@
 
             setTimeout(() => {
                 window.print();
+                
+                // Reseta tudo incluindo o campo de texto de identificação
                 totalGeral = 0;
                 carrinhoItens = [];
                 formaPagamentoEscolhida = "";
+                document.getElementById('cliente-identificacao').value = "";
                 document.getElementById('total-value').innerText = "R$ 0,00";
                 containerCupom.innerHTML = ""; 
                 document.getElementById('payment-screen').classList.add('hidden');
