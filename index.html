@@ -6,6 +6,8 @@
     <title>GERSI NUTRI - Totem Profissional Vertical</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- Biblioteca geradora de QR Code de alta performance -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         .hidden { display: none; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
@@ -63,7 +65,6 @@
         <!-- SLIDE DE OFERTAS ESTILO MERCADO LIVRE COM CONTORNO #FAEDCD -->
         <div class="px-6 pt-6 shrink-0">
             <div id="promo-slider" class="slide-container bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 text-white shadow-xl">
-                <!-- Banner de Boas-Vindas Padrão -->
                 <div class="slide-item active">
                     <div class="max-w-[60%] text-left">
                         <span class="bg-emerald-500 text-slate-900 font-black uppercase text-[9px] px-3 py-1 rounded-full tracking-widest">Gersi Nutri</span>
@@ -136,7 +137,6 @@
             <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-4"></p>
             
             <div class="w-full max-w-xl grid grid-cols-2 gap-4 mb-6 text-left items-stretch">
-                <!-- Campo 1: Nome -->
                 <div id="box-identificacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
                         👤 Seu Nome <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
@@ -144,7 +144,6 @@
                     <input type="text" id="cliente-identificacao" maxlength="30" readonly onclick="abrirTecladoVirtual('cliente-identificacao', 'box-identificacao')" placeholder="Toque para digitar..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
                 </div>
 
-                <!-- Campo 2: Observação -->
                 <div id="box-observacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
                         📝 Observação <span class="text-slate-400 font-normal lowercase">(Máx. 3 linhas)</span>
@@ -179,8 +178,8 @@
             <div id="area-pix" class="hidden space-y-6 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black"></p>
-                <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-slate-50 p-4 shadow-inner">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=GERSI_TOTEM" id="pix-qr" class="w-full h-full object-contain">
+                <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-slate-50 p-4 shadow-inner relative">
+                    <div id="pix-qr-container" class="w-full h-full flex items-center justify-center"></div>
                 </div>
                 <p class="text-green-600 font-bold animate-pulse text-lg">Aguardando transferência Pix...</p>
             </div>
@@ -271,6 +270,15 @@
         let boxAtivoId = "";
         let indexSlideAtivo = 0;
 
+        // =========================================================================
+        // ✅ DADOS REAIS E SINCALIZADOS DA CONTA GERSI NUTRI
+        // =========================================================================
+        const CONFIG_PIX = {
+            chave: "47342129000141",       // Seu CNPJ preenchido sem caracteres especiais
+            beneficiario: "GERSI NUTRI",    // Razão Social/Nome da Conta do Banco
+            cidade: "FEIRA DE SANTANA"      // Cidade da Conta Bancária
+        };
+
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
 
         function carregarCardapio() {
@@ -316,7 +324,6 @@
 
                     htmlSlides += `
                         <div class="slide-item ${contadorOfertas === 1 ? 'active' : ''}">
-                            <!-- Bloco Esquerdo: Textos e Valores destacados -->
                             <div class="max-w-[50%] text-left flex flex-col justify-center h-full">
                                 <span class="bg-amber-400 text-slate-900 font-black uppercase text-[9px] px-2.5 py-1 rounded-md tracking-wider w-max shadow-sm">${categoria} DA SEMANA</span>
                                 <h2 class="text-xl font-black mt-2 leading-tight text-white drop-shadow truncate w-full">${nome}</h2>
@@ -329,8 +336,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Bloco Direito: Imagem do Produto Quadrada, Grande e Destacada -->
                             <div class="w-44 h-44 shrink-0 relative flex items-center justify-center bg-slate-800/80 rounded-2xl p-1.5 border border-slate-700/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
                                 <img src="${imgUrl}" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://via.placeholder.com/400x300?text=GERSI+NUTRI'">
                             </div>
@@ -430,7 +435,7 @@
             document.getElementById('custom-modal').classList.remove('hidden');
         }
 
-        function generarHtmlAdicional(nomeAdi, valAdi, container) {
+        function gerarHtmlAdicional(nomeAdi, valAdi, container) {
             container.innerHTML += `
                 <label class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 active:bg-slate-200 cursor-pointer">
                     <div class="flex items-center gap-2 overflow-hidden">
@@ -483,6 +488,38 @@
             document.getElementById('method-screen').classList.add('hidden'); 
         }
 
+        function gerarStringPix(chave, beneficiario, cidade, valor) {
+            function formatarCampo(id, valorCampo) {
+                const len = String(valorCampo).length.toString().padStart(2, '0');
+                return id + len + valorCampo;
+            }
+            
+            const infoAdicional = formatarCampo("01", chave);
+            const merchantAccount = formatarCampo("26", formatarCampo("00", "br.gov.bcb.pix") + infoAdicional);
+            const valorFormatado = valor.toFixed(2);
+            
+            let payload = "000201" +
+                          merchantAccount +
+                          "52040000" +
+                          "5303986" +
+                          formatarCampo("54", valorFormatado) +
+                          "5802BR" +
+                          formatarCampo("59", beneficiario.toUpperCase()) +
+                          formatarCampo("60", cidade.toUpperCase()) +
+                          "62070503***";
+            
+            payload += "6304";
+            
+            let crc = 0xFFFF;
+            for (let i = 0; i < payload.length; i++) {
+                let x = ((crc >> 8) ^ payload.charCodeAt(i)) & 0xFF;
+                x ^= x >> 4;
+                crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+            }
+            const crcString = crc.toString(16).toUpperCase().padStart(4, '0');
+            return payload + crcString;
+        }
+
         function escolherForma(forma) {
             fecharTecladoVirtual();
             formaPagamentoEscolhida = forma;
@@ -493,6 +530,26 @@
 
             if(forma === 'PIX') {
                 document.getElementById('total-confirm-pix').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+                
+                const qrContainer = document.getElementById('pix-qr-container');
+                qrContainer.innerHTML = '';
+
+                const textoPixCopiaECola = gerarStringPix(
+                    CONFIG_PIX.chave,
+                    CONFIG_PIX.beneficiario,
+                    CONFIG_PIX.cidade,
+                    totalGeral
+                );
+
+                new QRCode(qrContainer, {
+                    text: textoPixCopiaECola,
+                    width: 220,
+                    height: 220,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+
                 document.getElementById('area-pix').classList.remove('hidden');
             } else {
                 document.getElementById('total-confirm-cartao').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -574,7 +631,7 @@
                 obsCliente = obsCliente.substring(0, 120);
             }
             
-            const linhaCliente = identCliente !== "" ? `Cliente: ${identCliente}\n` : "";
+            const tableCliente = identCliente !== "" ? `Cliente: ${identCliente}\n` : "";
             const offsetObs = obsCliente !== "" ? `OBS: ${obsCliente}\n` : "";
 
             let textoCupom = `========================================\n`;
@@ -583,7 +640,7 @@
             textoCupom += `Senha: ${numeroSenha}\n`;
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
             textoCupom += `Forma de Pagamento: ${formaPagamentoEscolhida}\n`;
-            textoCupom += linhaCliente; 
+            textoCupom += tableCliente; 
             textoCupom += offsetObs;     
             textoCupom += `----------------------------------------\n`;
             textoCupom += `Qtd  Item                       Total\n`;
