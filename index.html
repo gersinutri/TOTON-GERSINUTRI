@@ -13,9 +13,39 @@
         .food-card:active { transform: scale(0.97); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Esconde o cupom completamente na tela do totem */
+        #cupom-area-impressao { display: none; }
+
+        /* CONFIGURAÇÃO DE IMPRESSÃO EXCLUSIVA PARA O CHROME */
+        @media print {
+            /* Esconde absolutamente tudo que é visual na tela */
+            body, header, main, footer, #custom-modal, #payment-screen, .fixed, .absolute { 
+                display: none !important; 
+            }
+            /* Força apenas o bloco do cupom a aparecer no papel */
+            #cupom-area-impressao { 
+                display: block !important; 
+                width: 100% !important; 
+                max-width: 80mm !important; 
+                font-family: monospace !important; 
+                font-size: 14px !important; 
+                color: black !important; 
+                background: white !important; 
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            pre {
+                white-space: pre-wrap !important;
+                font-family: monospace !important;
+            }
+        }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
+
+    <!-- CONTAINER DO CUPOM (FICA OCULTO NA TELA E APARECE SÓ NA IMPRESSORA) -->
+    <div id="cupom-area-impressao"></div>
 
     <!-- CABEÇALHO -->
     <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
@@ -169,7 +199,7 @@
             const item = cardapioOriginal[index];
             const chaves = Object.keys(item);
             
-            const nome = item[chaves.find(c => c.toLowerCase().trim() === 'nome')];
+            const nome = item[chaves.find(c => r => r.toLowerCase().trim() === 'nome')];
             const cat = item[chaves.find(c => c.toLowerCase().trim() === 'categoria')] || 'Nutri';
             const img = item[chaves.find(c => c.toLowerCase().trim() === 'imagem')] || '';
             const adiTexto = item[chaves.find(c => c.toLowerCase().trim() === 'adicionais')] || '';
@@ -255,11 +285,11 @@
 
         function fecharPagamento() { document.getElementById('payment-screen').classList.add('hidden'); }
 
-        // NOVA FUNÇÃO DE IMPRESSÃO VIA MICRO-JANELA ISOLADA (BLINDADA CONTRA TELA BRANCA)
+        // NOVA FUNÇÃO INTERNA (IMPRIME DIRETO NA ABA ATUAL)
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
+            const containerCupom = document.getElementById('cupom-area-impressao');
             
-            // 1. Monta o texto puro estruturado do cupom
             let textoCupom = `========================================\n`;
             textoCupom += `              GERSI NUTRI               \n`;
             textoCupom += `========================================\n`;
@@ -282,37 +312,17 @@
             textoCupom += `       PAGAMENTO CONFIRMADO VIA PIX     \n`;
             textoCupom += `========================================\n`;
 
-            // 2. Abre uma nova janela em branco na memória do navegador
-            const janelaImpressao = window.open('', '_blank', 'width=300,height=600');
-            
-            // 3. Escreve o cupom diretamente dentro dela com estilos limpos e sem Tailwind para não bugar
-            janelaImpressao.document.write(`
-                <html>
-                <head>
-                    <title>Cupom Gersi Nutri</title>
-                    <style>
-                        body { margin: 0; padding: 10px; font-family: monospace; font-size: 14px; color: black; background: white; }
-                        pre { margin: 0; white-space: pre-wrap; }
-                    </style>
-                </head>
-                <body>
-                    <pre>${textoCupom}</pre>
-                    <script>
-                        // Executa a impressão assim que a micro-janela carregar o texto
-                        window.onload = function() {
-                            window.print();
-                            window.close(); // Fecha a abinha extra automaticamente depois
-                        }
-                    <\/script>
-                </body>
-                </html>
-            `);
-            janelaImpressao.document.close();
+            // Injeta o texto dentro da div oculta do próprio site
+            containerCupom.innerHTML = `<pre style="margin:0; padding:0; font-family:monospace; font-size:14px;">${textoCupom}</pre>`;
 
-            // 4. Reseta os valores da tela principal do Totem imediatamente
+            // Dispara a impressão na mesma página (o CSS cuida de ocultar o resto)
+            window.print();
+
+            // Reseta o carrinho após fechar a janela do Chrome
             totalGeral = 0;
             carrinhoItens = [];
             document.getElementById('total-value').innerText = "R$ 0,00";
+            containerCupom.innerHTML = ""; // Limpa o cupom
             fecharPagamento();
         }
     </script>
