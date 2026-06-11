@@ -44,16 +44,13 @@
     <div id="cupom-area-impressao"></div>
 
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-1">Alimentação Saudável Inteligente</p>
         </header>
 
-        <!-- CARDÁPIO EM GRADE -->
         <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-3 gap-6 bg-slate-50 content-start"></main>
 
-        <!-- RODAPÉ FIXO -->
         <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
             <div class="flex items-center gap-4">
                 <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -67,7 +64,6 @@
             </button>
         </footer>
 
-        <!-- POP-UP DE CUSTOMIZAÇÃO -->
         <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
                 <div class="relative h-32 shrink-0 bg-slate-100">
@@ -81,7 +77,7 @@
                             <span id="modal-preco-base" class="text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-md inline-block"></span>
                         </div>
                     </div>
-                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/70 px-4 rounded-xl">
+                    <div class="border-t border-b border-slate-100 py-3 flex items-center justify-between bg-slate-50/50 px-4 rounded-xl">
                         <p class="font-bold text-sm text-slate-700">Quantidade</p>
                         <div class="flex items-center gap-3">
                             <button onclick="alterarQtd(-1)" class="w-10 h-10 rounded-xl bg-slate-200 text-xl font-bold text-slate-800 flex items-center justify-center active:bg-slate-300">-</button>
@@ -102,7 +98,6 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <h2 class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
             <p class="text-slate-400 text-sm mb-6">Escolha como prefere pagar o seu pedido</p>
@@ -112,12 +107,10 @@
                 <label for="cliente-identificacao" class="block font-black text-sm text-slate-700 uppercase tracking-wide">
                     👤 Identificação no Cupom <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
                 </label>
-                <!-- MELHORIA: Foco com borda verde suave -->
                 <input type="text" id="cliente-identificacao" placeholder="Digite seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#166534] focus:ring-2 focus:ring-green-100 transition-all">
             </div>
             
             <div class="grid grid-cols-2 gap-8 w-full max-w-xl mb-12">
-                <!-- Botão PIX com Ícone SVG de Alta Resolução -->
                 <button onclick="escolherForma('PIX')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-[#166534] rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
                     <svg class="w-16 h-16 text-green-600 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 002-2H6a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -126,7 +119,6 @@
                     <span class="text-xs text-green-600 font-bold mt-1">Desconto/Rápido</span>
                 </button>
                 
-                <!-- Botão Cartão com Ícone SVG de Alta Resolução -->
                 <button onclick="escolherForma('CARTAO')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-blue-600 rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
                     <svg class="w-16 h-16 text-blue-600 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
@@ -138,9 +130,7 @@
             <button onclick="fecharMetodoPagamento()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Voltar ao Cardápio</button>
         </div>
 
-        <!-- TELA 2: EXIBIÇÃO DE ACORDO COM A ESCOLHA -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
-            <!-- Conteúdo Dinâmico do PIX -->
             <div id="area-pix" class="hidden space-y-6 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black"></p>
@@ -150,7 +140,6 @@
                 <p class="text-green-600 font-bold animate-pulse text-lg">Aguardando transferência Pix...</p>
             </div>
 
-            <!-- Conteúdo Dinâmico do Cartão -->
             <div id="area-cartao" class="hidden space-y-8 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black"></p>
@@ -161,11 +150,9 @@
                 <p class="text-blue-600 font-bold animate-pulse text-lg">Processando transação no terminal físico...</p>
             </div>
 
-            <!-- BOTÃO SIMULADOR DE IMPRESSÃO -->
-            <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
+            <button onclick="dispararImpressao()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl font-black mt-12 mb-8 text-sm uppercase tracking-wider shadow-md">
                 [ CONFIRMAR E IMPRIMIR VIA COZINHA ]
             </button>
-            
             <button onclick="voltarParaSelecao()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
         </div>
     </div>
@@ -191,14 +178,9 @@
             });
         }
 
-        function extrairPreco(item) {
-            const chaves = Object.keys(item);
-            const cPreco = chaves.find(c => {
-                const norm = c.toLowerCase().trim().replace('ç', 'c');
-                return norm === 'preco' || norm === 'preço' || norm === 'valor';
-            });
-            if (!cPreco || !item[cPreco]) return 0;
-            let texto = String(item[cPreco]).trim();
+        function extrairPreco(item, chaveNome) {
+            if (!item[chaveNome]) return 0;
+            let texto = String(item[chaveNome]).trim();
             let limpo = texto.replace('R$', '').replace(/\s/g, '').replace(',', '.');
             return parseFloat(limpo) || 0;
         }
@@ -208,16 +190,28 @@
             container.innerHTML = ''; 
             dados.forEach((item, index) => {
                 const chaves = Object.keys(item);
+                
+                // LEITURA FIXA BASEADA NO SEU MAPEAMENTO DE COLUNAS EXATO
                 const cNome = chaves.find(c => c.toLowerCase().trim() === 'nome');
+                const cPreco = chaves.find(c => c.toLowerCase().trim() === 'preco');
                 const cCat = chaves.find(c => c.toLowerCase().trim() === 'categoria');
-                const cImg = chaves.find(c => c.toLowerCase().trim() === 'imagem');
+                const cImg = chaves.find(c => c.toLowerCase().trim() === 'link da imagem' || c.toLowerCase().trim() === 'imagem');
+                const cStatus = chaves.find(c => c.toLowerCase().trim() === 'status');
 
-                if(!item[cNome] || item[cNome].trim() === "") return;
+                if(!cNome || !item[cNome] || item[cNome].trim() === "") return;
+
+                // SISTEMA DE FILTRO: Se tiver coluna status preenchida e não for "sim", oculta o card
+                if(cStatus && item[cStatus]) {
+                    const statusTxt = item[cStatus].toLowerCase().trim();
+                    if(statusTxt !== 'sim') return; 
+                } else if (cStatus) {
+                    return; // Esconde por padrão caso a coluna exista e esteja em branco
+                }
 
                 const nome = item[cNome];
                 const categoria = item[cCat] || 'Nutri';
                 const imagem = item[cImg] || 'https://via.placeholder.com/400x300?text=GERSI+NUTRI';
-                const precoNum = extrairPreco(item);
+                const precoNum = extrairPreco(item, cPreco);
 
                 container.innerHTML += `
                     <div onclick="configurarItem(${index})" class="food-card bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-slate-100 h-80">
@@ -242,12 +236,20 @@
         function configurarItem(index) {
             const item = cardapioOriginal[index];
             const chaves = Object.keys(item);
-            const nome = item[chaves.find(c => c.toLowerCase().trim() === 'nome')];
-            const cat = item[chaves.find(c => c.toLowerCase().trim() === 'categoria')] || 'Nutri';
-            const img = item[chaves.find(c => c.toLowerCase().trim() === 'imagem')] || '';
-            const adiTexto = item[chaves.find(c => c.toLowerCase().trim() === 'adicionais')] || '';
-            const prcAdiTexto = item[chaves.find(c => c.toLowerCase().trim() === 'precosadicionais')] || '';
-            const precoNum = extrairPreco(item);
+            
+            const cNome = chaves.find(c => c.toLowerCase().trim() === 'nome');
+            const cPreco = chaves.find(c => c.toLowerCase().trim() === 'preco');
+            const cCat = chaves.find(c => c.toLowerCase().trim() === 'categoria');
+            const cImg = chaves.find(c => c.toLowerCase().trim() === 'link da imagem' || c.toLowerCase().trim() === 'imagem');
+            const cAdi = chaves.find(c => c.toLowerCase().trim() === 'adicionais');
+            const cPrcAdi = chaves.find(c => c.toLowerCase().trim() === 'precosadicionais');
+
+            const nome = item[cNome];
+            const cat = item[cCat] || 'Nutri';
+            const img = item[cImg] || '';
+            const adiTexto = item[cAdi] || '';
+            const prcAdiTexto = item[cPrcAdi] || '';
+            const precoNum = extrairPreco(item, cPreco);
 
             itemAtual = { nome, precoBase: precoNum, qtd: 1, imagem: img, categoria: cat, adicionaisEscolhidos: {} };
 
