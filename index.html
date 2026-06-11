@@ -102,31 +102,35 @@
             </div>
         </div>
 
-        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO OPCIONAL -->
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <h2 class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
             <p class="text-slate-400 text-sm mb-6">Escolha como prefere pagar o seu pedido</p>
             <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8"></p>
             
-            <!-- CAMPO DE IDENTIFICAÇÃO OPCIONAL ADICIONADO -->
             <div class="w-full max-w-xl bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-8 text-left space-y-2 shadow-sm">
                 <label for="cliente-identificacao" class="block font-black text-sm text-slate-700 uppercase tracking-wide">
                     👤 Identificação no Cupom <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
                 </label>
-                <input type="text" id="cliente-identificacao" placeholder="Digite seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-green-600 transition-all">
+                <!-- MELHORIA: Foco com borda verde suave -->
+                <input type="text" id="cliente-identificacao" placeholder="Digite seu Nome ou WhatsApp..." class="w-full bg-white border border-slate-300 rounded-xl p-4 text-base font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#166534] focus:ring-2 focus:ring-green-100 transition-all">
             </div>
             
             <div class="grid grid-cols-2 gap-8 w-full max-w-xl mb-12">
-                <!-- Botão PIX -->
-                <button onclick="escolherForma('PIX')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-green-600 rounded-3xl p-8 transition-all shadow-md active:scale-95">
-                    <span class="text-6xl mb-4">📱</span>
+                <!-- Botão PIX com Ícone SVG de Alta Resolução -->
+                <button onclick="escolherForma('PIX')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-[#166534] rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
+                    <svg class="w-16 h-16 text-green-600 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 002-2H6a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
                     <span class="font-black text-xl text-slate-800">Pagar com PIX</span>
                     <span class="text-xs text-green-600 font-bold mt-1">Desconto/Rápido</span>
                 </button>
                 
-                <!-- Botão Cartão -->
-                <button onclick="escolherForma('CARTAO')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-blue-600 rounded-3xl p-8 transition-all shadow-md active:scale-95">
-                    <span class="text-6xl mb-4">💳</span>
+                <!-- Botão Cartão com Ícone SVG de Alta Resolução -->
+                <button onclick="escolherForma('CARTAO')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-blue-600 rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
+                    <svg class="w-16 h-16 text-blue-600 mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
                     <span class="font-black text-xl text-slate-800">Cartão Débito/Crédito</span>
                     <span class="text-xs text-slate-400 font-bold mt-1">Use a maquininha</span>
                 </button>
@@ -349,7 +353,6 @@
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
             
-            // Puxa o dado digitado no campo de texto
             const identCliente = document.getElementById('cliente-identificacao').value.trim();
             const linhaCliente = identCliente !== "" ? `Cliente: ${identCliente}\n` : "";
 
@@ -359,7 +362,7 @@
             textoCupom += `Senha: ${numeroSenha}\n`;
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
             textoCupom += `Forma de Pagamento: ${formaPagamentoEscolhida}\n`;
-            textoCupom += linhaCliente; // Injeta a linha do nome se ela existir
+            textoCupom += linhaCliente;
             textoCupom += `----------------------------------------\n`;
             textoCupom += `Qtd  Item                       Total\n`;
             textoCupom += `----------------------------------------\n`;
@@ -382,7 +385,6 @@
             setTimeout(() => {
                 window.print();
                 
-                // Reseta tudo incluindo o campo de texto de identificação
                 totalGeral = 0;
                 carrinhoItens = [];
                 formaPagamentoEscolhida = "";
