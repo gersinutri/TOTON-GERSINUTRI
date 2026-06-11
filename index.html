@@ -54,11 +54,13 @@
     <div id="cupom-area-impressao"></div>
 
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-1">Alimentação Saudável Inteligente</p>
         </header>
 
+        <!-- ÁREA DO SLIDE DE OFERTAS / PROMOÇÕES -->
         <div class="px-6 pt-6 shrink-0">
             <div id="promo-slider" class="slide-container bg-gradient-to-r from-green-800 to-emerald-600 text-white">
                 <div class="slide-item active">
@@ -72,8 +74,10 @@
             </div>
         </div>
 
+        <!-- CARDÁPIO EM GRADE (3 COLUNAS) -->
         <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-3 gap-6 bg-slate-50 content-start"></main>
 
+        <!-- RODAPÉ FIXO -->
         <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
             <div class="flex items-center gap-4">
                 <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -87,6 +91,7 @@
             </button>
         </footer>
 
+        <!-- POP-UP DE CUSTOMIZAÇÃO -->
         <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
                 <div class="relative h-32 shrink-0 bg-slate-100">
@@ -121,19 +126,23 @@
             </div>
         </div>
 
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO + OBSERVAÇÃO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center transition-all duration-300 overflow-y-auto">
             <h2 id="method-title" class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
             <p id="method-desc" class="text-slate-400 text-sm mb-4">Escolha como prefere pagar o seu pedido</p>
             <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-4"></p>
             
+            <!-- GRADE COM OS DOIS CAMPOS DE TEXTO -->
             <div class="w-full max-w-xl grid grid-cols-2 gap-4 mb-6 text-left items-stretch">
+                <!-- Campo 1: Nome (maxlength=30 adicionado por segurança) -->
                 <div id="box-identificacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
                         👤 Seu Nome <span class="text-slate-400 font-normal lowercase">(Opcional)</span>
                     </label>
-                    <input type="text" id="cliente-identificacao" readonly onclick="abrirTecladoVirtual('cliente-identificacao', 'box-identificacao')" placeholder="Toque para digitar..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
+                    <input type="text" id="cliente-identificacao" maxlength="30" readonly onclick="abrirTecladoVirtual('cliente-identificacao', 'box-identificacao')" placeholder="Toque para digitar..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer">
                 </div>
 
+                <!-- Campo 2: Observação (Max. 120 caracteres / ~3 linhas) -->
                 <div id="box-observacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
                         📝 Observação <span class="text-slate-400 font-normal lowercase">(Máx. 3 linhas)</span>
@@ -163,6 +172,7 @@
             <div id="espaco-teclado-reserva" class="h-0 transition-all duration-300"></div>
         </div>
 
+        <!-- TELA 2: EXIBIÇÃO DE ACORDO COM A ESCOLHA -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <div id="area-pix" class="hidden space-y-6 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
@@ -189,7 +199,9 @@
             <button onclick="voltarParaSelecao()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
         </div>
 
+        <!-- ESTRUTURA DO TECLADO VIRTUAL TÁTIL INTEGRADO -->
         <div id="totem-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] z-[100] flex flex-col gap-2 select-none border-t-2 border-slate-700">
+            <!-- Linha dos Números -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('1')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">1</button>
                 <button onclick="tecladoDigitar('2')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">2</button>
@@ -203,6 +215,7 @@
                 <button onclick="tecladoDigitar('0')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">0</button>
                 <button onclick="tecladoDigitar('-')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">-</button>
             </div>
+            <!-- Linha QWERTY -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('Q')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">Q</button>
                 <button onclick="tecladoDigitar('W')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">W</button>
@@ -215,6 +228,7 @@
                 <button onclick="tecladoDigitar('O')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">O</button>
                 <button onclick="tecladoDigitar('P')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">P</button>
             </div>
+            <!-- Linha ASDF -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('A')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">A</button>
                 <button onclick="tecladoDigitar('S')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">S</button>
@@ -226,6 +240,7 @@
                 <button onclick="tecladoDigitar('K')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">K</button>
                 <button onclick="tecladoDigitar('L')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">L</button>
             </div>
+            <!-- Linha ZXCV + Backspace -->
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('Z')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">Z</button>
                 <button onclick="tecladoDigitar('X')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">X</button>
@@ -236,6 +251,7 @@
                 <button onclick="tecladoDigitar('M')" class="keyboard-key bg-slate-800 text-white font-bold text-xl py-4 flex-1 rounded-xl">M</button>
                 <button onclick="tecladoApagar()" class="keyboard-key bg-orange-600 active:bg-orange-700 text-white font-black text-sm py-4 px-6 rounded-xl uppercase tracking-wider">Apagar</button>
             </div>
+            <!-- Linha Barra de Espaço + Botão Concluído -->
             <div class="flex w-full gap-2 justify-center px-8 mt-1">
                 <button onclick="tecladoDigitar(' ')" class="keyboard-key keyboard-key-wide bg-slate-800 text-white font-bold text-base py-4 rounded-xl uppercase tracking-wide">Espaço ␣</button>
                 <button onclick="fecharTecladoVirtual()" class="keyboard-key bg-[#22c55e] active:bg-[#16a34a] text-white font-black text-sm py-4 px-10 rounded-xl uppercase tracking-widest">OK ✔</button>
@@ -278,7 +294,6 @@
             return parseFloat(limpo) || 0;
         }
 
-        // NOVO: Monta os banners de promoção baseados nos itens que você marcar como categoria "Oferta" ou "Combo" na planilha
         function montarSlidesDeOfertas(dados) {
             const sliderContainer = document.getElementById('promo-slider');
             let htmlSlides = '';
@@ -290,7 +305,6 @@
                 const categoria = item[2] || '';
                 const statusTxt = item[6] ? item[6].toLowerCase().trim() : '';
 
-                // Se o item estiver ativo e pertencer a categorias de promoção, cria um slide de destaque para ele
                 if(statusTxt === 'sim' && (categoria.toLowerCase().includes('oferta') || categoria.toLowerCase().includes('combo') || categoria.toLowerCase().includes('destaque'))) {
                     contadorOfertas++;
                     htmlSlides += `
@@ -306,7 +320,6 @@
                 }
             });
 
-            // Se você não tiver cadastrado nenhuma "Oferta" ou "Combo" na planilha, ele mantém o slide padrão profissional fixo
             if(contadorOfertas > 0) {
                 sliderContainer.innerHTML = htmlSlides;
                 iniciarGiroDoSlide();
@@ -321,7 +334,7 @@
                 slides[indexSlideAtivo].classList.remove('active');
                 indexSlideAtivo = (indexSlideAtivo + 1) % slides.length;
                 slides[indexSlideAtivo].classList.add('active');
-            }, 5000); // Roda e troca de oferta sozinho a cada 5 segundos
+            }, 5000);
         }
 
         function montarMenu(dados) {
@@ -474,6 +487,7 @@
             document.getElementById('method-screen').classList.remove('hidden');
         }
 
+        // CORREÇÃO DA LOGICA DE FOCO DO TECLADO
         function abrirTecladoVirtual(inputId, boxId) {
             if(inputAtivoId !== "") {
                 document.getElementById(inputAtivoId).classList.remove('border-[#166534]', 'ring-4', 'ring-green-100');
@@ -521,7 +535,10 @@
         function tecladoDigitar(caractere) {
             if(inputAtivoId === "") return;
             const input = document.getElementById(inputAtivoId);
+            
+            // Valida o limite de caracteres de forma dinâmica baseada no campo ativo
             if(input.maxLength && input.value.length >= input.maxLength) return;
+            
             input.value += caractere;
         }
 
