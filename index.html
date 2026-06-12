@@ -54,11 +54,13 @@
     <div id="cupom-area-impressao"></div>
 
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-1">Alimentação Saudável Inteligente</p>
         </header>
 
+        <!-- SLIDE DE OFERTAS ESTILO MERCADO LIVRE -->
         <div class="px-6 pt-6 shrink-0">
             <div id="promo-slider" class="slide-container bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 text-white shadow-xl">
                 <div class="slide-item active">
@@ -74,8 +76,10 @@
             </div>
         </div>
 
+        <!-- CARDÁPIO EM GRADE (3 COLUNAS) -->
         <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-3 gap-6 bg-slate-50 content-start"></main>
 
+        <!-- RODAPÉ FIXO -->
         <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
             <div class="flex items-center gap-4">
                 <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
@@ -89,6 +93,7 @@
             </button>
         </footer>
 
+        <!-- POP-UP DE CUSTOMIZAÇÃO -->
         <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
                 <div class="relative h-32 shrink-0 bg-slate-100">
@@ -123,6 +128,7 @@
             </div>
         </div>
 
+        <!-- TELA 1: SELEÇÃO DA FORMA DE PAGAMENTO + IDENTIFICAÇÃO -->
         <div id="method-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center transition-all duration-300 overflow-y-auto">
             <h2 id="method-title" class="text-4xl font-black text-slate-800 mb-1">Forma de Pagamento</h2>
             <p id="method-desc" class="text-slate-400 text-sm mb-4">Escolha como prefere pagar o seu pedido</p>
@@ -165,6 +171,7 @@
             <div id="espaco-teclado-reserva" class="h-0 transition-all duration-300"></div>
         </div>
 
+        <!-- TELA 2: EXIBIÇÃO DO PAGAMENTO -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-10 text-center">
             <div id="area-pix" class="hidden space-y-4 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
@@ -194,6 +201,7 @@
             <button onclick="cancelarEVoltar()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider block mt-8">Alterar Forma de Pagamento</button>
         </div>
 
+        <!-- TECLADO VIRTUAL -->
         <div id="totem-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] z-[100] flex flex-col gap-2 select-none border-t-2 border-slate-700">
             <div class="flex w-full gap-2 justify-center">
                 <button onclick="tecladoDigitar('1')" class="keyboard-key bg-slate-700 text-white font-bold text-xl py-4 flex-1 rounded-xl">1</button>
@@ -258,7 +266,6 @@
         let boxAtivoId = "";
         let indexSlideAtivo = 0;
         
-        // Estrutura de polling e segurança para o Mercado Pago
         let intervaloCheckPix = null;
         let paymentIdAtual = null;
 
@@ -475,7 +482,6 @@
             document.getElementById('method-screen').classList.add('hidden'); 
         }
 
-        // CHAMADA INTEGRADA DIRETAMENTE À API OFICIAL DO MERCADO PAGO DO GUTEMBERBERG
         function escolherForma(forma) {
             fecharTecladoVirtual();
             formaPagamentoEscolhida = forma;
@@ -488,7 +494,6 @@
                 document.getElementById('payment-screen').classList.remove('hidden');
                 document.getElementById('area-pix').classList.remove('hidden');
                 
-                // Dispara a criação do Pix dinâmico no Mercado Pago
                 criarPixMercadoPago(totalGeral);
             } else {
                 document.getElementById('total-confirm-cartao').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -497,10 +502,10 @@
             }
         }
 
+        // EXECUÇÃO BLINDADA: Geração de QR Code via Texto Seguro (Infallível contra bloqueios do navegador)
         function criarPixMercadoPago(valor) {
             const url = "https://api.mercadopago.com/v1/payments";
             
-            // Dados estruturados conforme exigência de segurança contra fraudes do Mercado Pago PJ/PF
             const paymentData = {
                 transaction_amount: parseFloat(valor.toFixed(2)),
                 description: "Totem Gersi Nutri - Autoatendimento",
@@ -525,24 +530,24 @@
                 body: JSON.stringify(paymentData)
             })
             .then(res => {
-                if(!res.ok) throw new Error("Erro de credenciais ou cadastro pendente.");
+                if(!res.ok) throw new Error("Erro na API.");
                 return res.json();
             })
             .then(data => {
                 if(data.point_of_interaction && data.point_of_interaction.transaction_data) {
-                    const qrCodeBase64 = data.point_of_interaction.transaction_data.qr_code_base64;
+                    // Pegamos a string limpa do Pix (Copia e Cola) enviada pelo Mercado Pago
+                    const textoCopiaECola = data.point_of_interaction.transaction_data.qr_code;
                     paymentIdAtual = data.id;
 
-                    // Exibe o QR Code dinâmico na tela do totem instantaneamente
-                    document.getElementById('pix-qr-img').src = `data:image/jpeg;base64,${qrCodeBase64}`;
+                    // Criamos a imagem do QR Code em tempo real usando uma URL segura que o navegador aceita
+                    document.getElementById('pix-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(textoCopiaECola)}`;
                     
-                    // Inicia o Polling de alta precisão (verifica se foi pago de 3 em 3 segundos)
                     iniciarVerificacaoAutomatica();
                 }
             })
             .catch(err => {
-                alert("Falha temporária na API do Mercado Pago. Por favor, avise o caixa para liberar seu pedido manualmente.");
                 console.error(err);
+                alert("Falha de comunicação na rede de pagamentos. Redirecionando...");
                 cancelarEVoltar();
             });
         }
@@ -563,15 +568,14 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    // Se o status mudar para 'approved', a mágica acontece sozinha!
                     if(data.status === 'approved') {
                         clearInterval(intervaloCheckPix);
                         paymentIdAtual = null;
-                        dispararImpressao(); // Dispara o cupom e reinicia o totem automaticamente
+                        dispararImpressao(); 
                     }
                 })
                 .catch(err => console.log("Aguardando confirmação bancária...", err));
-            }, 3000); // 3 segundos
+            }, 3000); 
         }
 
         function cancelarEVoltar() {
@@ -649,12 +653,12 @@
             textoCupom += `----------------------------------------\n`;
 
             carrinhoItens.forEach(item => {
-                textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.totalCalculado.toFixed(2).replace('.',',')}\n`;
+                textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.totalCalculado.toFixed(2).replace('.', ',')}\n`;
                 for(let adi in item.adicionaisEscolhidos) { textoCupom += `     + ${adi}\n`; }
             });
 
             textoCupom += `----------------------------------------\n`;
-            textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.',',')}\n`;
+            textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
             textoCupom += `----------------------------------------\n`;
             textoCupom += `    PAGAMENTO CONFIRMADO AUTOMATICAMENTE  \n`;
             textoCupom += `========================================\n`;
@@ -662,9 +666,8 @@
             containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
 
             setTimeout(() => {
-                window.print(); // Solta a via na impressora térmica da cozinha
+                window.print(); 
                 
-                // Reseta todas as variáveis e limpa a tela para o próximo cliente usar
                 totalGeral = 0;
                 carrinhoItens = [];
                 formaPagamentoEscolhida = "";
