@@ -248,8 +248,10 @@
                     <img src="${p[3]}" class="w-20 h-20 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
                     <div class="flex-1 min-w-0 text-left">
                         <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
-                        <h3 class="font-black text-base text-slate-800 truncate">${p[0]}</h3>
-                        <p class="text-[#166534] font-black text-xl mt-1">R$ ${p[1]}</p>
+                        <!-- Correção da quebra de linha do nome (suporta até 2 linhas completas sem cortar) -->
+                        <h3 class="font-black text-sm text-slate-800 line-clamp-2 pr-1 leading-snug min-h-[2.5rem] flex items-center">${p[0]}</h3>
+                        <!-- Correção para manter o R$ e o preço sempre grudados na mesma linha -->
+                        <p class="text-[#166534] font-black text-xl mt-0.5 whitespace-nowrap">R$ ${p[1].replace('R$', '').trim()}</p>
                     </div>
                     <button onclick="adicionar('${p[0]}', '${p[1]}')" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-md">+</button>
                 </div>
@@ -267,7 +269,7 @@
             const formatado = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('total-value').innerText = formatado;
             document.getElementById('modal-total-carrinho').innerText = formatado;
-            document.getElementById('carrinho-contador').innerText = carrinhoItens.length;
+            document.getElementById('carrinho-contador').innerText = r = carrinhoItens.length;
         }
 
         function abrirResumoCarrinho() {
