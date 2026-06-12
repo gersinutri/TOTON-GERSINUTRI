@@ -3,103 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERSI NUTRI - Totem Premium</title>
+    <title>GERSI NUTRI - Totem Profissional Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- Biblioteca Nativa para desenhar o QR Code na tela -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
         
-        /* Estilo do Menu Lateral igual ao Concorrente */
+        /* Estilo Dinâmico do Menu Lateral baseado no Concorrente */
         .sidebar-btn { 
-            transition: all 0.2s ease-in-out; 
+            transition: all 0.25s ease-in-out; 
             border-radius: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
+            width: 100%;
         }
+        /* Efeito Ativo igual ao Totem da Foto */
         .sidebar-btn.active { 
-            background-color: #ffffff; 
-            color: #166534; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background-color: #ffffff !important; 
+            color: #166534 !important; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        .slide-banner { background: #166534; border-radius: 20px; padding: 24px; color: white; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        /* Design do Banner Deslizante Computado */
+        .slide-container { position: relative; overflow: hidden; border-radius: 24px; height: 190px; width: 100%; border: 4px solid #faedcd; }
+        .slide-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: #166534; color: white; }
+        .slide-item.active { opacity: 1; z-index: 10; }
+        
         ::-webkit-scrollbar { width: 0px; }
+        #cupom-area-impressao { display: none; }
+
+        @media print {
+            #totem-conteudo-geral { display: none !important; }
+            #cupom-area-impressao { 
+                display: block !important; 
+                width: 80mm !important; 
+                font-family: monospace !important; 
+                font-size: 13px !important; 
+                color: #000000 !important; 
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            pre {
+                white-space: pre-wrap !important;
+                font-family: monospace !important;
+                font-size: 13px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarDados()">
 
-    <header class="bg-[#166534] text-white p-4 text-center font-black text-xl shadow-md z-20">GERSI NUTRI</header>
+    <div id="cupom-area-impressao"></div>
 
-    <div class="flex flex-1 overflow-hidden">
-        <nav id="sidebar" class="w-28 bg-[#15803d] flex flex-col gap-3 p-3 overflow-y-auto z-10 shadow-xl text-white">
+    <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <!-- CABEÇALHO -->
+        <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
+            <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
+            <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden relative">
+            <!-- BARRA LATERAL ESTILO CONCORRENTE -->
+            <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
+                <!-- Categorias injetadas automaticamente aqui -->
             </nav>
 
-        <main class="flex-1 p-6 overflow-y-auto bg-slate-50">
-            <div id="banner" class="slide-banner shadow-lg"></div>
+            <!-- ÁREA DE PRODUTOS E BANNER -->
+            <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
+                <!-- BANNER DINÂMICO DE OFERTAS (15% OFF) -->
+                <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6">
+                    <!-- Slides injetados aqui -->
+                </div>
+
+                <h2 id="cat-title" class="text-2xl font-black text-slate-800 mb-5 uppercase tracking-wide">Todos</h2>
+                
+                <!-- GRADE DE PRODUTOS COMPLETA -->
+                <div id="grid" class="grid grid-cols-2 gap-4 content-start flex-1">
+                    <!-- Cards injetados aqui -->
+                </div>
+            </main>
+        </div>
+
+        <!-- RODAPÉ DE CONTROLE E FINALIZAÇÃO -->
+        <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
+            <button onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl active:scale-95 transition-transform">
+                <span class="text-3xl">🛒</span>
+                <span id="carrinho-contador" class="bg-red-500 text-white font-black w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
+                <div class="text-left">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Seu Pedido</p>
+                    <p id="total-value" class="font-black text-2xl text-slate-800">R$ 0,00</p>
+                </div>
+            </button>
+            <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
+        </footer>
+
+        <!-- MODAL DO RESUMO DO CARRINHO (EXCLUSÃO ATIVA) -->
+        <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+                <div class="p-5 border-b flex justify-between items-center bg-slate-50">
+                    <h2 class="font-black text-2xl text-slate-800">Itens no Pedido</h2>
+                    <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+                <div id="lista-carrinho" class="p-5 overflow-y-auto flex-1 space-y-3 content-start"></div>
+                <div class="p-5 bg-slate-50 border-t flex justify-between items-center shrink-0">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase">Subtotal</p>
+                        <p id="modal-total-carrinho" class="text-2xl font-black text-slate-800">R$ 0,00</p>
+                    </div>
+                    <button onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs tracking-wider">Voltar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DE PAGAMENTO (PIX DINÂMICO + REDUNDÂNCIA) -->
+        <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
+            <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
+            <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
             
-            <h2 id="cat-title" class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-wide">Todos</h2>
-            <div id="grid" class="grid grid-cols-2 gap-4 content-start"></div>
-        </main>
-    </div>
-
-    <footer class="bg-white border-t p-4 flex justify-between items-center z-20 shadow-2xl">
-        <button onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 p-3 px-6 rounded-2xl active:scale-95 transition-transform">
-            <span class="text-3xl">🛒</span>
-            <span id="carrinho-contador" class="bg-red-500 text-white font-black w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
-            <div class="text-left">
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Total</p>
-                <p id="total-geral" class="font-black text-xl text-slate-800">R$ 0,00</p>
+            <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
+            
+            <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg mt-4">
+                <span>🔄</span>
+                <span id="label-status-pix">Aguardando pagamento...</span>
             </div>
-        </button>
-        <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] text-white px-12 py-4 rounded-xl font-black text-xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar</button>
-    </footer>
-
-    <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
-            <div class="p-5 border-b flex justify-between items-center bg-slate-50">
-                <h2 class="font-black text-2xl text-slate-800">Seu Carrinho</h2>
-                <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400 hover:text-slate-600">✕</button>
-            </div>
-            <div id="lista-carrinho" class="p-5 overflow-y-auto flex-1 space-y-3"></div>
+            
+            <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 text-white font-black px-8 py-4 rounded-2xl text-sm uppercase mt-4 tracking-wider shadow-md active:scale-95 transition-transform">
+                Liberar Pedido Manualmente
+            </button>
+            
+            <button onclick="fecharModal('payment-screen')" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
         </div>
     </div>
 
-    <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
-        <h2 class="text-4xl font-black text-slate-800 mb-6">Aguardando Pagamento Pix</h2>
-        <p class="text-slate-500 mb-6 text-lg">Abra o app do seu banco e escaneie o código abaixo:</p>
-        <div id="pix-qrcode-container" class="w-72 h-72 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
-        <button onclick="fecharModal('payment-screen')" class="mt-10 bg-slate-200 px-8 py-4 rounded-xl font-bold uppercase tracking-wider text-slate-700 active:scale-95 transition-transform">Voltar ao Menu</button>
-    </div>
-
     <script>
-        let cardapio = [], carrinho = [], total = 0, catAtiva = 'TODOS';
+        let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0;
 
-        const CONFIG = {
+        const CONFIG_TOTEM = {
+            token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
             cpf: "01502787592",
             titular: "GUTEMBERG B ALVES",
             cidade: "FEIRA DE SANTANA"
         };
 
-        // Mapeamento automático de ícones para as categorias ficarem profissionais
-        const iconesCategorias = {
-            'TODOS': '🍽️',
-            'PRATOS': '🍲',
-            'COMBOS': '✨',
-            'OFERTA': '🏷️',
-            'BEBIDAS': '🥤',
-            'SOBREMESAS': '🍰',
-            'SUCOS': '🍹'
+        // Dicionário de Ícones Dinâmicos à Prova de Erros de Digitação
+        const mapaIcones = {
+            'TODOS': '🍽️', 'ALMOCO': '🍲', 'ALMOÇO': '🍲', 'OFERTA': '🏷️', 'OFERTAS': '🏷️', 
+            'PROTEINA': '🍗', 'PROTEÍNA': '🍗', 'COMBO': '✨', 'COMBOS': '✨', 'JANTAR': '🥗', 
+            'BEBIDA': '🥤', 'BEBIDAS': '🥤', 'SUCO': '🍹', 'SUCOS': '🍹', 'SOBREMESA': '🍰'
         };
 
+        function normalizarTexto(texto) {
+            if (!texto) return '';
+            return texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
         function carregarDados() {
-            Papa.parse('https://docs.google.com/sheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
+            Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
                 download: true,
+                skipEmptyLines: true,
                 complete: (results) => {
-                    cardapio = results.data.filter((r, i) => i > 0 && r[0]);
+                    let dados = results.data;
+                    if(dados[0] && dados[0][0] && dados[0][0].toLowerCase().trim() === 'nome') {
+                        dados.shift();
+                    }
+                    cardapioOriginal = dados.filter(r => r[0] && r[6] && r[6].toLowerCase().trim() === 'sim');
+                    
                     renderizarSidebar();
                     renderizarBanner();
                     renderizarProdutos();
@@ -108,13 +184,15 @@
         }
 
         function renderizarSidebar() {
-            const cats = ['TODOS', ...new Set(cardapio.map(r => r[2]))];
-            document.getElementById('sidebar').innerHTML = cats.map(c => {
-                const upperC = c.toUpperCase();
-                const icone = iconesCategorias[upperC] || '🍲'; // Usa ícone padrão se não achar no mapa
+            const navegação = document.getElementById('sidebar');
+            const listaCategorias = ['TODOS', ...new Set(cardapioOriginal.map(r => r[2].trim()))];
+            
+            navegação.innerHTML = listaCategorias.map(c => {
+                const chaveNormalizada = normalizarTexto(c);
+                const emoji = mapaIcones[chaveNormalizada] || '🍲';
                 return `
                     <button onclick="filtrar('${c}')" class="sidebar-btn p-3 text-center text-[11px] uppercase font-bold ${c === catAtiva ? 'active' : ''}">
-                        <span class="text-2xl">${icone}</span>
+                        <span class="text-2xl">${emoji}</span>
                         <span class="leading-tight">${c}</span>
                     </button>
                 `;
@@ -122,24 +200,54 @@
         }
 
         function renderizarBanner() {
-            const oferta = cardapio.find(r => r[2].toUpperCase().includes('OFERTA') || r[2].toUpperCase().includes('COMBO'));
-            if(oferta) {
-                document.getElementById('banner').innerHTML = `
-                    <div>
-                        <span class="bg-amber-400 text-black text-[11px] font-black px-2 py-1 rounded-md uppercase tracking-wider">15% OFF</span>
-                        <h2 class="text-3xl font-black mt-2">${oferta[0]}</h2>
+            const slider = document.getElementById('promo-slider');
+            const itensPromo = cardapioOriginal.filter(r => {
+                const cat = normalizarTexto(r[2]);
+                return cat.includes('OFERTA') || cat.includes('COMBO');
+            });
+
+            if (itensPromo.length === 0) {
+                slider.style.display = 'none';
+                return;
+            }
+            slider.style.display = 'block';
+
+            slider.innerHTML = itensPromo.map((o, idx) => {
+                const precoNum = parseFloat(o[1].replace('R$', '').replace(/\s/g, '').replace(',', '.'));
+                const precoDe = precoNum * 1.176;
+                return `
+                    <div class="slide-item ${idx === 0 ? 'active' : ''}">
+                        <div class="text-left flex flex-col justify-center">
+                            <span class="bg-amber-400 text-black px-2.5 py-1 text-[10px] font-black uppercase rounded w-max tracking-wider">15% OFF DESTAQUE</span>
+                            <h2 class="text-2xl font-black mt-2 max-w-sm truncate">${o[0]}</h2>
+                            <p class="text-sm font-medium line-through opacity-75 mt-1">De R$ ${precoDe.toFixed(2).replace('.', ',')}</p>
+                            <p class="text-3xl font-black text-green-300">Por R$ ${o[1]}</p>
+                        </div>
+                        <img src="${o[3]}" class="w-32 h-32 rounded-xl object-cover border border-white/20 shadow-md" onerror="this.src='https://via.placeholder.com/150'">
                     </div>
-                    <p class="text-4xl font-black text-green-300">R$ ${oferta[1]}</p>
                 `;
+            }).join('');
+
+            if(itensPromo.length > 1) {
+                setInterval(() => {
+                    const slides = document.querySelectorAll('.slide-item');
+                    if(slides.length <= 1) return;
+                    slides[indexSlideAtivo].classList.remove('active');
+                    indexSlideAtivo = (indexSlideAtivo + 1) % slides.length;
+                    slides[indexSlideAtivo].classList.add('active');
+                }, 5000);
             }
         }
 
         function renderizarProdutos() {
-            const lista = catAtiva === 'TODOS' ? cardapio : cardapio.filter(r => r[2] === catAtiva);
-            document.getElementById('grid').innerHTML = lista.map(p => `
+            const grade = document.getElementById('grid');
+            const exibição = catAtiva === 'TODOS' ? cardapioOriginal : cardapioOriginal.filter(r => r[2] === catAtiva);
+            
+            grade.innerHTML = exibição.map(p => `
                 <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm relative">
-                    <img src="${p[3]}" class="w-20 h-20 rounded-xl object-cover bg-slate-50 shrink-0">
-                    <div class="flex-1 min-w-0">
+                    <img src="${p[3]}" class="w-20 h-20 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
+                    <div class="flex-1 min-w-0 text-left">
+                        <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
                         <h3 class="font-black text-base text-slate-800 truncate">${p[0]}</h3>
                         <p class="text-[#166534] font-black text-xl mt-1">R$ ${p[1]}</p>
                     </div>
@@ -149,34 +257,38 @@
         }
 
         function adicionar(nome, precoStr) {
-            const preco = parseFloat(precoStr.replace(',', '.'));
-            carrinho.push({ nome, preco });
-            total += preco;
+            const preco = parseFloat(precoStr.replace('R$', '').replace(/\s/g, '').replace(',', '.'));
+            carrinhoItens.push({ nome, preco });
+            totalGeral += preco;
             atualizarRodape();
         }
 
         function atualizarRodape() {
-            document.getElementById('total-geral').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            document.getElementById('carrinho-contador').innerText = carrinho.length;
+            const formatado = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-value').innerText = formatado;
+            document.getElementById('modal-total-carrinho').innerText = formatado;
+            document.getElementById('carrinho-contador').innerText = carrinhoItens.length;
         }
 
         function abrirResumoCarrinho() {
-            if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
             const lista = document.getElementById('lista-carrinho');
-            lista.innerHTML = carrinho.map((item, i) => `
+            if(carrinhoItens.length === 0) return alert("Seu carrinho está vazio!");
+            
+            lista.innerHTML = carrinhoItens.map((item, idx) => `
                 <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <span class="font-bold text-slate-800 text-base">${item.nome} - R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
-                    <button onclick="excluir(${i})" class="text-red-500 font-black text-xl p-1 active:scale-95 transition-transform">❌</button>
+                    <span class="font-bold text-slate-800 text-base text-left flex-1">${item.nome}</span>
+                    <span class="font-extrabold text-slate-600 px-4">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                    <button onclick="excluir(${idx})" class="text-red-500 font-black text-xl p-1 active:scale-95 transition-transform">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
-        function excluir(i) {
-            total -= carrinho[i].preco;
-            carrinho.splice(i, 1);
+        function excluir(idx) {
+            totalGeral -= carrinhoItens[idx].preco;
+            carrinhoItens.splice(idx, 1);
             atualizarRodape();
-            if(carrinho.length === 0) {
+            if(carrinhoItens.length === 0) {
                 fecharModal('cart-modal');
             } else {
                 abrirResumoCarrinho();
@@ -184,20 +296,57 @@
         }
 
         function abrirMetodoPagamento() {
-            if(total === 0) return alert("Adicione produtos ao carrinho antes de finalizar!");
+            if(totalGeral <= 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
+            fecharModal('cart-modal');
+            
+            document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('label-status-pix').innerText = "Aguardando pagamento...";
+            document.getElementById('btn-forcar-impressao').style.display = 'none';
             document.getElementById('payment-screen').classList.remove('hidden');
             
-            // Gerador de String Estática/Dinâmica Pix BR Code padrão Banco Central
-            const payload = `00020101021126580014br.gov.bcb.pix0111${CONFIG.cpf}5204000053039865404${total.toFixed(2)}5802BR5908${CONFIG.titular}6015${CONFIG.cidade}62070503***6304`;
-            
-            document.getElementById('pix-qrcode-container').innerHTML = "";
-            new QRCode(document.getElementById('pix-qrcode-container'), { 
-                text: payload, 
-                width: 240, 
-                height: 240,
-                colorDark : "#166534",
-                colorLight : "#ffffff"
+            const url = "https://api.mercadopago.com/v1/payments";
+            const payloadMP = {
+                transaction_amount: parseFloat(totalGeral.toFixed(2)),
+                description: "Totem Gersi Nutri",
+                payment_method_id: "pix",
+                payer: { email: "totem.gersinutri@gmail.com", first_name: "Cliente", last_name: "Totem", identification: { type: "CPF", number: CONFIG_TOTEM.cpf } }
+            };
+
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${CONFIG_TOTEM.token}` },
+                body: JSON.stringify(payloadMP)
+            })
+            .then(res => { if(!res.ok) throw new Error(); return res.json(); })
+            .then(data => {
+                if(data.point_of_interaction?.transaction_data) {
+                    renderizarQrCode(data.point_of_interaction.transaction_data.qr_code);
+                }
+            })
+            .catch(() => {
+                // Algoritmo Compacto de Contingência Padrão BACEN BR Code
+                function f(id, v) { return id + String(v).length.toString().padStart(2, '0') + v; }
+                const merchant = f("00", "br.gov.bcb.pix") + f("01", CONFIG_TOTEM.cpf);
+                let raw = "000201" + f("26", merchant) + "52040000" + "5303986" + f("54", totalGeral.toFixed(2)) + "5802BR" + f("59", CONFIG_TOTEM.titular) + f("60", CONFIG_TOTEM.cidade) + "62070503***" + "6304";
+                
+                let crc = 0xFFFF;
+                for (let i = 0; i < raw.length; i++) {
+                    let x = ((crc >> 8) ^ raw.charCodeAt(i)) & 0xFF;
+                    x ^= x >> 4;
+                    crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+                }
+                const stringBacen = raw + crc.toString(16).toUpperCase().padStart(4, '0');
+                
+                renderizarQrCode(stringBacen);
+                document.getElementById('label-status-pix').innerText = "Confirme o recebimento no caixa.";
+                document.getElementById('btn-forcar-impressao').style.display = 'block';
             });
+        }
+
+        function renderizarQrCode(texto) {
+            const box = document.getElementById('pix-qrcode-container');
+            box.innerHTML = "";
+            new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
         }
 
         function filtrar(c) {
@@ -208,6 +357,39 @@
         }
 
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function dispararImpressao() {
+            const numeroSenha = Math.floor(Math.random() * 90) + 10;
+            const containerCupom = document.getElementById('cupom-area-impressao');
+
+            let textoCupom = `========================================\n`;
+            textoCupom += `              GERSI NUTRI               \n`;
+            textoCupom += `========================================\n`;
+            textoCupom += `Senha: ${numeroSenha}\n`;
+            textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
+            textoCupom += `----------------------------------------\n`;
+            textoCupom += `Qtd  Item                       Total\n`;
+            textoCupom += `----------------------------------------\n`;
+
+            carrinhoItens.forEach(item => {
+                textoCupom += `1x   ${item.nome.padEnd(25, ' ')} R$ ${item.preco.toFixed(2).replace('.', ',')}\n`;
+            });
+
+            textoCupom += `----------------------------------------\n`;
+            textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
+            textoCupom += `========================================\n`;
+
+            containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
+
+            setTimeout(() => {
+                window.print(); 
+                carrinhoItens = [];
+                totalGeral = 0;
+                atualizarRodape();
+                containerCupom.innerHTML = ""; 
+                fecharModal('payment-screen');
+            }, 300);
+        }
     </script>
 </body>
 </html>
