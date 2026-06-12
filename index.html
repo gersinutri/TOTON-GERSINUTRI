@@ -123,15 +123,15 @@
             </div>
         </div>
 
-        <!-- NOVO MODAL DE CONFERÊNCIA ANTES DO PAGAMENTO -->
+        <!-- TELA DE CONFERÊNCIA COM EXCLUSÃO INTEGRADA NA MESMA TELA -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-6 border-b text-center bg-slate-50">
                     <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
-                    <p class="text-slate-400 text-sm mt-1">Veja se está tudo correto antes de pagar</p>
+                    <p class="text-slate-400 text-sm mt-1">Você pode remover itens se mudou de ideia antes de pagar</p>
                 </div>
                 <div id="lista-conferencia-itens" class="p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50">
-                    <!-- Injetado dinamicamente via JS -->
+                    <!-- Injetado dinamicamente via JS com botão de lixeira -->
                 </div>
                 <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
                     <div class="flex justify-between items-center px-2">
@@ -314,20 +314,20 @@
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4 shadow-sm relative">
                         <div class="flex items-center gap-4 min-w-0 flex-1">
                             <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
-                            <div class="min-w-0 text-left flex flex-col justify-center">
+                            <div class="min-w-0 text-left flex flex-col justify-center flex-1">
                                 <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
-                                <h3 class="font-black text-[13px] text-slate-800 line-clamp-2 pr-1 leading-tight min-h-[2.2rem] flex items-center">${p[0]}</h3>
+                                <h3 class="font-black text-[13px] text-slate-800 line-clamp-2 pr-2 leading-tight min-h-[2.2rem] flex items-center">${p[0]}</h3>
                                 <p class="text-[#166534] font-black text-xl mt-1 whitespace-nowrap">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
-                        <button onclick="adicionar('${p[0].replace(/'/g, "\\'")}', ${valorFinal})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md">+</button>
+                        <!-- Isolado na ponta direita para nunca encavalar no preço -->
+                        <button onclick="adicionar('${p[0].replace(/'/g, "\\'")}', ${valorFinal})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md ml-2">+</button>
                     </div>
                 `;
             }).join('');
         }
 
         function adicionar(nome, preco) {
-            // Verifica se o item já existe no carrinho para somar quantidade
             let encontrado = carrinhoItens.find(item => item.nome === nome);
             if (encontrado) {
                 encontrado.qtd += 1;
@@ -339,7 +339,6 @@
             totalGeral += preco;
             atualizarRodape();
 
-            // Pequena animação visual no botão do carrinho indicando que inseriu algo
             const btnCarrinho = document.getElementById('btn-carrinho-aba');
             btnCarrinho.classList.add('scale-105', 'bg-green-100');
             setTimeout(() => btnCarrinho.classList.remove('scale-105', 'bg-green-100'), 200);
@@ -366,13 +365,13 @@
                         <span class="text-xs text-slate-400 font-bold">Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <span class="font-extrabold text-slate-700 px-4 whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                    <button onclick="excluir(${idx})" class="text-red-500 font-black text-xl p-1 active:scale-95 transition-transform">❌</button>
+                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-red-500 font-black text-xl p-1 active:scale-95 transition-transform">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
-        function excluir(idx) {
+        function excluir(idx, origem) {
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd -= 1;
             carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
@@ -382,32 +381,41 @@
             }
 
             atualizarRodape();
-            if(carrinhoItens.length === 0) {
-                fecharModal('cart-modal');
-            } else {
-                abrirResumoCarrinho();
+
+            if (origem === 'CARRINHO') {
+                if(carrinhoItens.length === 0) fecharModal('cart-modal');
+                else abrirResumoCarrinho();
+            } else if (origem === 'CONFERENCIA') {
+                if(carrinhoItens.length === 0) fecharModal('review-modal');
+                else atualizarTelaConferenciaExclusiva();
             }
         }
 
-        // TELA DE CONFERÊNCIA ADICIONADA CONFORME SOLICITADO
+        // TELA DE CONFERÊNCIA COM EXCLUSÃO DIRETA NA MESMA TELA
         function abrirTelaConferencia() {
             if(carrinhoItens.length === 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
             fecharModal('cart-modal');
+            atualizarTelaConferenciaExclusiva();
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
 
+        function atualizarTelaConferenciaExclusiva() {
             const listaConferencia = document.getElementById('lista-conferencia-itens');
             document.getElementById('total-conferencia-valor').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
-            listaConferencia.innerHTML = carrinhoItens.map(item => `
+            listaConferencia.innerHTML = carrinhoItens.map((item, idx) => `
                 <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-left">
-                        <p class="font-black text-slate-800 text-base">${item.nome}</p>
-                        <p class="text-xs text-slate-400 font-bold">Quantidade: ${item.qtd}x</p>
+                    <div class="text-left flex-1 min-w-0 pr-2">
+                        <p class="font-black text-slate-800 text-base truncate">${item.qtd}x ${item.nome}</p>
+                        <p class="text-xs text-slate-400 font-bold">Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</p>
                     </div>
-                    <span class="font-black text-[#166534] text-lg">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                    <div class="flex items-center gap-4 shrink-0">
+                        <span class="font-black text-[#166534] text-lg whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                        <!-- Botão de Excluir adicionado aqui na mesma tela conforme solicitado -->
+                        <button onclick="excluir(${idx}, 'CONFERENCIA')" class="bg-red-50 text-red-500 w-9 h-9 rounded-xl flex items-center justify-center font-black active:scale-90 transition-all border border-red-100 shadow-sm">❌</button>
+                    </div>
                 </div>
             `).join('');
-
-            document.getElementById('review-modal').classList.remove('hidden');
         }
 
         function avancarParaSeletorPagamento() {
