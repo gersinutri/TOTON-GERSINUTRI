@@ -502,9 +502,10 @@
             }
         }
 
-        // EXECUÇÃO BLINDADA: Geração de QR Code via Texto Seguro (Infallível contra bloqueios do navegador)
+        // ROTA SECUNDÁRIA ENCAPSULADA CONTRA TRAVAS INTERNACIONAIS E CORS
         function criarPixMercadoPago(valor) {
-            const url = "https://api.mercadopago.com/v1/payments";
+            const urlOriginalMP = "https://api.mercadopago.com/v1/payments";
+            const proxyNacional = "https://cors-anywhere.herokuapp.com/";
             
             const paymentData = {
                 transaction_amount: parseFloat(valor.toFixed(2)),
@@ -521,7 +522,7 @@
                 }
             };
 
-            fetch(url, {
+            fetch(proxyNacional + urlOriginalMP, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -530,16 +531,15 @@
                 body: JSON.stringify(paymentData)
             })
             .then(res => {
-                if(!res.ok) throw new Error("Erro na API.");
+                if(!res.ok) throw new Error("Bloqueio de rede.");
                 return res.json();
             })
             .then(data => {
                 if(data.point_of_interaction && data.point_of_interaction.transaction_data) {
-                    // Pegamos a string limpa do Pix (Copia e Cola) enviada pelo Mercado Pago
                     const textoCopiaECola = data.point_of_interaction.transaction_data.qr_code;
                     paymentIdAtual = data.id;
 
-                    // Criamos a imagem do QR Code em tempo real usando uma URL segura que o navegador aceita
+                    // Transforma o texto puro em imagem limpa aceita pelo navegador
                     document.getElementById('pix-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(textoCopiaECola)}`;
                     
                     iniciarVerificacaoAutomatica();
@@ -547,7 +547,7 @@
             })
             .catch(err => {
                 console.error(err);
-                alert("Falha de comunicação na rede de pagamentos. Redirecionando...");
+                alert("Falha de comunicação na rede de pagamentos. Verifique se a VPN do Opera está DESLIGADA.");
                 cancelarEVoltar();
             });
         }
@@ -555,12 +555,14 @@
         function iniciarVerificacaoAutomatica() {
             if(intervaloCheckPix) clearInterval(intervaloCheckPix);
             
+            const proxyNacional = "https://cors-anywhere.herokuapp.com/";
+
             intervaloCheckPix = setInterval(() => {
                 if(!paymentIdAtual) return;
                 
                 const url = `https://api.mercadopago.com/v1/payments/${paymentIdAtual}`;
                 
-                fetch(url, {
+                fetch(proxyNacional + url, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${CONFIG_TOTEM.token}`
