@@ -94,7 +94,7 @@
 
         <!-- RODAPÉ DE CONTROLE E FINALIZAÇÃO -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
-            <button onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl active:scale-95 transition-transform">
+            <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
                 <span id="carrinho-contador" class="bg-red-500 text-white font-black w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
                 <div class="text-left">
@@ -102,7 +102,7 @@
                     <p id="total-value" class="font-black text-2xl text-slate-800">R$ 0,00</p>
                 </div>
             </button>
-            <button onclick="abrirSeletorPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
+            <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
         <!-- MODAL DO RESUMO DO CARRINHO (EXCLUSÃO ATIVA) -->
@@ -123,7 +123,30 @@
             </div>
         </div>
 
-        <!-- MODAL INTERMEDIÁRIO: SELEÇÃO DA FORMA DE PAGAMENTO -->
+        <!-- NOVO MODAL DE CONFERÊNCIA ANTES DO PAGAMENTO -->
+        <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+                <div class="p-6 border-b text-center bg-slate-50">
+                    <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
+                    <p class="text-slate-400 text-sm mt-1">Veja se está tudo correto antes de pagar</p>
+                </div>
+                <div id="lista-conferencia-itens" class="p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50">
+                    <!-- Injetado dinamicamente via JS -->
+                </div>
+                <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
+                    <div class="flex justify-between items-center px-2">
+                        <span class="font-bold text-slate-500 text-base uppercase">Total do Pedido:</span>
+                        <span id="total-conferencia-valor" class="text-3xl font-black text-[#166534]">R$ 0,00</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="fecharModal('review-modal')" class="bg-slate-200 text-slate-700 font-black py-4 rounded-xl uppercase text-sm tracking-wider active:scale-95 transition-transform">Adicionar Mais Itens</button>
+                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white font-black py-4 rounded-xl uppercase text-sm tracking-wider shadow-md active:scale-95 transition-transform">Confirmar e Pagar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
@@ -131,23 +154,20 @@
                 <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
                 
                 <div class="grid grid-cols-3 gap-4 mb-6">
-                    <!-- Opção PIX -->
                     <button onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95 group">
                         <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">📱</span>
                         <span class="font-black text-base text-slate-800">Pix</span>
                     </button>
-                    <!-- Opção Crédito -->
                     <button onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95 group">
                         <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">💳</span>
                         <span class="font-black text-base text-slate-800">Crédito</span>
                     </button>
-                    <!-- Opção Débito -->
                     <button onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95 group">
                         <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">💵</span>
                         <span class="font-black text-base text-slate-800">Débito</span>
                     </button>
                 </div>
-                <button onclick="fecharModal('method-modal')" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider">Voltar ao Menu</button>
+                <button onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider">Voltar para o resumo</button>
             </div>
         </div>
 
@@ -255,7 +275,8 @@
             slider.style.display = 'block';
 
             slider.innerHTML = itensPromo.map((o, idx) => {
-                const precoNum = parseFloat(o[1].replace('R$', '').replace(/\s/g, '').replace(',', '.'));
+                const valorLimpo = o[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
+                const precoNum = parseFloat(valorLimpo);
                 const precoDe = precoNum * 1.176;
                 return `
                     <div class="slide-item ${idx === 0 ? 'active' : ''}">
@@ -263,7 +284,7 @@
                             <span class="bg-amber-400 text-black px-2.5 py-1 text-[10px] font-black uppercase rounded w-max tracking-wider">15% OFF DESTAQUE</span>
                             <h2 class="text-2xl font-black mt-2 max-w-sm truncate">${o[0]}</h2>
                             <p class="text-sm font-medium line-through opacity-75 mt-1">De R$ ${precoDe.toFixed(2).replace('.', ',')}</p>
-                            <p class="text-3xl font-black text-green-300">Por R$ ${o[1]}</p>
+                            <p class="text-3xl font-black text-green-300">Por R$ ${precoNum.toFixed(2).replace('.', ',')}</p>
                         </div>
                         <img src="${o[3]}" class="w-32 h-32 rounded-xl object-cover border border-white/20 shadow-md" onerror="this.src='https://via.placeholder.com/150'">
                     </div>
@@ -285,32 +306,53 @@
             const grade = document.getElementById('grid');
             const exibição = catAtiva === 'TODOS' ? cardapioOriginal : cardapioOriginal.filter(r => r[2] === catAtiva);
             
-            grade.innerHTML = exibição.map(p => `
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm relative">
-                    <!-- Ajustado tamanho da imagem para w-28 h-28 (Ficou maior e mais visível) -->
-                    <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="flex-1 min-w-0 text-left">
-                        <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
-                        <h3 class="font-black text-sm text-slate-800 line-clamp-2 pr-1 leading-snug min-h-[2.5rem] flex items-center">${p[0]}</h3>
-                        <p class="text-[#166534] font-black text-xl mt-0.5 whitespace-nowrap">R$ ${p[1].replace('R$', '').trim()}</p>
+            grade.innerHTML = exibição.map(p => {
+                const valorPlanilha = p[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
+                const valorFinal = parseFloat(valorPlanilha) || 0;
+
+                return `
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4 shadow-sm relative">
+                        <div class="flex items-center gap-4 min-w-0 flex-1">
+                            <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="min-w-0 text-left flex flex-col justify-center">
+                                <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
+                                <h3 class="font-black text-[13px] text-slate-800 line-clamp-2 pr-1 leading-tight min-h-[2.2rem] flex items-center">${p[0]}</h3>
+                                <p class="text-[#166534] font-black text-xl mt-1 whitespace-nowrap">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
+                            </div>
+                        </div>
+                        <button onclick="adicionar('${p[0].replace(/'/g, "\\'")}', ${valorFinal})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md">+</button>
                     </div>
-                    <button onclick="adicionar('${p[0]}', '${p[1]}')" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-md">+</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        function adicionar(nome, precoStr) {
-            const preco = parseFloat(precoStr.replace('R$', '').replace(/\s/g, '').replace(',', '.'));
-            carrinhoItens.push({ nome, preco });
+        function adicionar(nome, preco) {
+            // Verifica se o item já existe no carrinho para somar quantidade
+            let encontrado = carrinhoItens.find(item => item.nome === nome);
+            if (encontrado) {
+                encontrado.qtd += 1;
+                encontrado.subtotal = encontrado.qtd * encontrado.preco;
+            } else {
+                carrinhoItens.push({ nome, preco, qtd: 1, subtotal: preco });
+            }
+            
             totalGeral += preco;
             atualizarRodape();
+
+            // Pequena animação visual no botão do carrinho indicando que inseriu algo
+            const btnCarrinho = document.getElementById('btn-carrinho-aba');
+            btnCarrinho.classList.add('scale-105', 'bg-green-100');
+            setTimeout(() => btnCarrinho.classList.remove('scale-105', 'bg-green-100'), 200);
         }
 
         function atualizarRodape() {
             const formatado = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('total-value').innerText = formatado;
             document.getElementById('modal-total-carrinho').innerText = formatado;
-            document.getElementById('carrinho-contador').innerText = carrinhoItens.length;
+            
+            let contagemItens = 0;
+            carrinhoItens.forEach(i => contagemItens += i.qtd);
+            document.getElementById('carrinho-contador').innerText = contagemItens;
         }
 
         function abrirResumoCarrinho() {
@@ -319,8 +361,11 @@
             
             lista.innerHTML = carrinhoItens.map((item, idx) => `
                 <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <span class="font-bold text-slate-800 text-base text-left flex-1">${item.nome}</span>
-                    <span class="font-extrabold text-slate-600 px-4">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                    <div class="text-left flex-1 min-w-0">
+                        <span class="font-bold text-slate-800 text-base block truncate">${item.qtd}x ${item.nome}</span>
+                        <span class="text-xs text-slate-400 font-bold">Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <span class="font-extrabold text-slate-700 px-4 whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
                     <button onclick="excluir(${idx})" class="text-red-500 font-black text-xl p-1 active:scale-95 transition-transform">❌</button>
                 </div>
             `).join('');
@@ -329,7 +374,13 @@
 
         function excluir(idx) {
             totalGeral -= carrinhoItens[idx].preco;
-            carrinhoItens.splice(idx, 1);
+            carrinhoItens[idx].qtd -= 1;
+            carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
+
+            if (carrinhoItens[idx].qtd <= 0) {
+                carrinhoItens.splice(idx, 1);
+            }
+
             atualizarRodape();
             if(carrinhoItens.length === 0) {
                 fecharModal('cart-modal');
@@ -338,11 +389,36 @@
             }
         }
 
-        function abrirSeletorPagamento() {
-            if(totalGeral <= 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
+        // TELA DE CONFERÊNCIA ADICIONADA CONFORME SOLICITADO
+        function abrirTelaConferencia() {
+            if(carrinhoItens.length === 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
             fecharModal('cart-modal');
+
+            const listaConferencia = document.getElementById('lista-conferencia-itens');
+            document.getElementById('total-conferencia-valor').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+
+            listaConferencia.innerHTML = carrinhoItens.map(item => `
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="text-left">
+                        <p class="font-black text-slate-800 text-base">${item.nome}</p>
+                        <p class="text-xs text-slate-400 font-bold">Quantidade: ${item.qtd}x</p>
+                    </div>
+                    <span class="font-black text-[#166534] text-lg">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
+
+        function avancarParaSeletorPagamento() {
+            fecharModal('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
+        }
+
+        function cancelarEVoltarParaConferencia() {
+            fecharModal('method-modal');
+            document.getElementById('review-modal').classList.remove('hidden');
         }
 
         function processarPagamento(metodo) {
@@ -386,7 +462,6 @@
                 }
             })
             .catch(() => {
-                // Algoritmo Compacto de Contingência Padrão BACEN BR Code
                 function f(id, v) { return id + String(v).length.toString().padStart(2, '0') + v; }
                 const merchant = f("00", "br.gov.bcb.pix") + f("01", CONFIG_TOTEM.cpf);
                 let raw = "000201" + f("26", merchant) + "52040000" + "5303986" + f("54", totalGeral.toFixed(2)) + "5802BR" + f("59", CONFIG_TOTEM.titular) + f("60", CONFIG_TOTEM.cidade) + "62070503***" + "6304";
@@ -413,7 +488,7 @@
 
         function cancelarEVoltar() {
             fecharModal('payment-screen');
-            abrirSeletorPagamento();
+            avancarParaSeletorPagamento();
         }
 
         function filtrar(c) {
@@ -440,7 +515,7 @@
             textoCupom += `----------------------------------------\n`;
 
             carrinhoItens.forEach(item => {
-                textoCupom += `1x   ${item.nome.padEnd(25, ' ')} R$ ${item.preco.toFixed(2).replace('.', ',')}\n`;
+                textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
             });
 
             textoCupom += `----------------------------------------\n`;
