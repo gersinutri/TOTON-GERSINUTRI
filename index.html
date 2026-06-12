@@ -102,7 +102,7 @@
                     <p id="total-value" class="font-black text-2xl text-slate-800">R$ 0,00</p>
                 </div>
             </button>
-            <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
+            <button onclick="abrirSeletorPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
         <!-- MODAL DO RESUMO DO CARRINHO (EXCLUSÃO ATIVA) -->
@@ -123,28 +123,71 @@
             </div>
         </div>
 
-        <!-- TELA DE PAGAMENTO (PIX DINÂMICO + REDUNDÂNCIA) -->
+        <!-- MODAL INTERMEDIÁRIO: SELEÇÃO DA FORMA DE PAGAMENTO -->
+        <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
+                <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
+                <p class="text-slate-400 text-sm mb-6">Escolha como deseja pagar o seu pedido</p>
+                <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <!-- Opção PIX -->
+                    <button onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95 group">
+                        <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">📱</span>
+                        <span class="font-black text-base text-slate-800">Pix</span>
+                    </button>
+                    <!-- Opção Crédito -->
+                    <button onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95 group">
+                        <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">💳</span>
+                        <span class="font-black text-base text-slate-800">Crédito</span>
+                    </button>
+                    <!-- Opção Débito -->
+                    <button onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95 group">
+                        <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">💵</span>
+                        <span class="font-black text-base text-slate-800">Débito</span>
+                    </button>
+                </div>
+                <button onclick="fecharModal('method-modal')" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider">Voltar ao Menu</button>
+            </div>
+        </div>
+
+        <!-- TELA DE PROCESSAMENTO FINAL (PIX OU MÁQUINA) -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
-            <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
-            <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
             
-            <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
-            
-            <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg mt-4">
-                <span>🔄</span>
-                <span id="label-status-pix">Aguardando pagamento...</span>
+            <!-- Bloco Exclusivo do Pix -->
+            <div id="area-visual-pix" class="hidden flex flex-col items-center">
+                <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
+                <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
+                <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
+                <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg mt-4">
+                    <span>🔄</span>
+                    <span id="label-status-pix">Aguardando pagamento...</span>
+                </div>
+            </div>
+
+            <!-- Bloco Exclusivo de Cartões (Crédito/Débito) -->
+            <div id="area-visual-cartao" class="hidden flex flex-col items-center">
+                <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
+                <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4 shadow-sm">
+                    <div class="text-7xl animate-bounce mb-2">⬇️</div>
+                    <span class="font-bold text-sm text-slate-600 text-center leading-tight mt-2 px-2">Siga as instruções na maquininha externa</span>
+                </div>
+                <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-12 py-4 rounded-xl text-base uppercase shadow-md active:scale-95 transition-transform mt-6 tracking-wide">
+                    Confirmar e Imprimir Cupom
+                </button>
             </div>
             
             <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 text-white font-black px-8 py-4 rounded-2xl text-sm uppercase mt-4 tracking-wider shadow-md active:scale-95 transition-transform">
                 Liberar Pedido Manualmente
             </button>
             
-            <button onclick="fecharModal('payment-screen')" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
+            <button onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
         </div>
     </div>
 
     <script>
-        let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0;
+        let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0, formaEscolhida = "";
 
         const CONFIG_TOTEM = {
             token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
@@ -153,7 +196,6 @@
             cidade: "FEIRA DE SANTANA"
         };
 
-        // Dicionário de Ícones Dinâmicos à Prova de Erros de Digitação
         const mapaIcones = {
             'TODOS': '🍽️', 'ALMOCO': '🍲', 'ALMOÇO': '🍲', 'OFERTA': '🏷️', 'OFERTAS': '🏷️', 
             'PROTEINA': '🍗', 'PROTEÍNA': '🍗', 'COMBO': '✨', 'COMBOS': '✨', 'JANTAR': '🥗', 
@@ -245,12 +287,11 @@
             
             grade.innerHTML = exibição.map(p => `
                 <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm relative">
-                    <img src="${p[3]}" class="w-20 h-20 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
+                    <!-- Ajustado tamanho da imagem para w-28 h-28 (Ficou maior e mais visível) -->
+                    <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
                     <div class="flex-1 min-w-0 text-left">
                         <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
-                        <!-- Correção da quebra de linha do nome (suporta até 2 linhas completas sem cortar) -->
                         <h3 class="font-black text-sm text-slate-800 line-clamp-2 pr-1 leading-snug min-h-[2.5rem] flex items-center">${p[0]}</h3>
-                        <!-- Correção para manter o R$ e o preço sempre grudados na mesma linha -->
                         <p class="text-[#166534] font-black text-xl mt-0.5 whitespace-nowrap">R$ ${p[1].replace('R$', '').trim()}</p>
                     </div>
                     <button onclick="adicionar('${p[0]}', '${p[1]}')" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-md">+</button>
@@ -269,7 +310,7 @@
             const formatado = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('total-value').innerText = formatado;
             document.getElementById('modal-total-carrinho').innerText = formatado;
-            document.getElementById('carrinho-contador').innerText = r = carrinhoItens.length;
+            document.getElementById('carrinho-contador').innerText = carrinhoItens.length;
         }
 
         function abrirResumoCarrinho() {
@@ -297,15 +338,34 @@
             }
         }
 
-        function abrirMetodoPagamento() {
+        function abrirSeletorPagamento() {
             if(totalGeral <= 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
             fecharModal('cart-modal');
+            document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('method-modal').classList.remove('hidden');
+        }
+
+        function processarPagamento(metodo) {
+            formaEscolhida = metodo;
+            fecharModal('method-modal');
             
-            document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-            document.getElementById('label-status-pix').innerText = "Aguardando pagamento...";
+            document.getElementById('area-visual-pix').classList.add('hidden');
+            document.getElementById('area-visual-cartao').classList.add('hidden');
             document.getElementById('btn-forcar-impressao').style.display = 'none';
             document.getElementById('payment-screen').classList.remove('hidden');
-            
+
+            if(metodo === 'PIX') {
+                document.getElementById('area-visual-pix').classList.remove('hidden');
+                document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+                dispararFluxoPix();
+            } else {
+                document.getElementById('area-visual-cartao').classList.remove('hidden');
+                document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+                document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
+            }
+        }
+
+        function dispararFluxoPix() {
             const url = "https://api.mercadopago.com/v1/payments";
             const payloadMP = {
                 transaction_amount: parseFloat(totalGeral.toFixed(2)),
@@ -351,6 +411,11 @@
             new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
         }
 
+        function cancelarEVoltar() {
+            fecharModal('payment-screen');
+            abrirSeletorPagamento();
+        }
+
         function filtrar(c) {
             catAtiva = c;
             document.getElementById('cat-title').innerText = c;
@@ -369,6 +434,7 @@
             textoCupom += `========================================\n`;
             textoCupom += `Senha: ${numeroSenha}\n`;
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
+            textoCupom += `Pagamento: ${formaEscolhida}\n`;
             textoCupom += `----------------------------------------\n`;
             textoCupom += `Qtd  Item                       Total\n`;
             textoCupom += `----------------------------------------\n`;
