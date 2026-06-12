@@ -6,6 +6,70 @@
     <title>GERSI NUTRI - Totem Profissional Vertical</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .hidden { display: none; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
+        .food-card { transition: all 0.2s ease-out; cursor: pointer; }
+        .food-card:active { transform: scale(0.97); }
+        
+        /* Nova Sidebar */
+        .cat-btn { transition: all 0.3s; border-left: 8px solid transparent; width: 100%; text-align: left; padding: 20px; color: white; background: #15803d; font-weight: 800; }
+        .cat-btn.active { background-color: white; border-left-color: #166534; color: #166534; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        #cupom-area-impressao { display: none; }
+        .slide-container { position: relative; overflow: hidden; border-radius: 28px; height: 180px; width: 100%; border: 4px solid #faedcd; }
+        .slide-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: #166534; }
+        .slide-item.active { opacity: 1; z-index: 10; }
+        .keyboard-key { transition: background-color 0.1s ease; }
+        .keyboard-key:active { background-color: #cbd5e1 !important; transform: scale(0.95); }
+        @media print { #totem-conteudo-geral { display: none !important; } #cupom-area-impressao { display: block !important; width: 80mm !important; font-family: monospace; font-size: 13px; } }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col" onload="carregarCardapio()">
+    <div id="cupom-area-impressao"></div>
+    <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <header class="bg-[#166534] text-white p-6 text-center shadow-md shrink-0">
+            <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
+        </header>
+        
+        <div class="flex flex-1 overflow-hidden">
+            <nav id="sidebar-cats" class="w-36 bg-[#15803d] flex flex-col pt-4 overflow-y-auto shrink-0"></nav>
+            <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
+                <div id="promo-slider" class="slide-container mb-6 shadow-xl"></div>
+                <div id="menu-area" class="grid grid-cols-2 gap-4 content-start"></div>
+            </main>
+        </div>
+
+        <footer class="bg-white p-6 border-t flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
+            <button onclick="abrirResumoCarrinho()" class="bg-slate-100 p-4 rounded-2xl text-2xl relative active:scale-95">🛒
+                <span id="carrinho-contador" class="absolute -top-1 -right-1 bg-red-500 text-white font-black text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+            </button>
+            <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] text-white px-12 py-5 rounded-2xl font-black text-xl uppercase">Finalizar Pedido</button>
+        </footer>
+    </div>
+    
+    <script>
+        // Use toda a sua lógica funcional original, apenas adicione esta função de filtro:
+        function renderizarSidebar(dados) {
+            const cats = ['TODOS', ...new Set(dados.map(r => r[2]))];
+            document.getElementById('sidebar-cats').innerHTML = cats.map(c => 
+                `<button onclick="filtrar('${c}')" class="cat-btn">${c}</button>`
+            ).join('');
+        }
+        function filtrar(cat) {
+            cat === 'TODOS' ? montarMenu(cardapioOriginal) : montarMenu(cardapioOriginal.filter(r => r[2] === cat));
+        }
+      <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GERSI NUTRI - Totem Profissional Vertical</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <!-- Biblioteca Nativa para desenhar o QR Code na tela -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
@@ -810,6 +874,9 @@
                 document.getElementById('payment-screen').classList.add('hidden');
             }, 400);
         }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
