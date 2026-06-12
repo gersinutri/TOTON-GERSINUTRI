@@ -79,12 +79,15 @@
         <!-- CARDÁPIO EM GRADE (3 COLUNAS) -->
         <main id="menu-area" class="flex-1 overflow-y-auto p-6 grid grid-cols-3 gap-6 bg-slate-50 content-start"></main>
 
-        <!-- RODAPÉ FIXO -->
+        <!-- RODAPÉ FIXO COMPLETO -->
         <footer class="bg-white p-6 border-t border-slate-100 flex items-center justify-between shadow-[0_-8px_30px_rgb(0,0,0,0.04)] shrink-0">
             <div class="flex items-center gap-4">
-                <div class="bg-slate-100 p-4 rounded-2xl text-2xl">🛒</div>
+                <button onclick="abrirResumoCarrinho()" class="bg-slate-100 hover:bg-slate-200 p-4 rounded-2xl text-2xl relative active:scale-95 transition-transform">
+                    🛒
+                    <span id="carrinho-contador" class="absolute -top-1 -right-1 bg-red-500 text-white font-black text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                </button>
                 <div>
-                    <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Seu Pedido</p>
+                    <button onclick="abrirResumoCarrinho()" class="text-xs text-green-700 font-bold uppercase tracking-wider underline block text-left">Ver/Editar Itens</button>
                     <p id="total-value" class="font-black text-3xl text-slate-800">R$ 0,00</p>
                 </div>
             </div>
@@ -92,6 +95,26 @@
                 Finalizar Pedido
             </button>
         </footer>
+
+        <!-- POP-UP DO RESUMO DO CARRINHO (EXCLUSÃO DE ITENS) -->
+        <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+                <div class="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
+                    <h2 class="text-2xl font-black text-slate-800">Itens no Pedido</h2>
+                    <button onclick="fecharResumoCarrinho()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+                </div>
+                <div id="carrinho-lista-itens" class="p-6 overflow-y-auto flex-1 space-y-4 content-start">
+                    <!-- Preenchido via JavaScript dinamicamente -->
+                </div>
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase">Total Atual</p>
+                        <p id="modal-cart-total" class="text-2xl font-black text-slate-800">R$ 0,00</p>
+                    </div>
+                    <button onclick="fecharResumoCarrinho()" class="bg-[#166534] text-white font-black px-8 py-3.5 rounded-xl uppercase text-sm tracking-wider">Continuar Comprando</button>
+                </div>
+            </div>
+        </div>
 
         <!-- POP-UP DE CUSTOMIZAÇÃO -->
         <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -144,7 +167,7 @@
 
                 <div id="box-observacao" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 flex flex-col justify-between">
                     <label class="block font-black text-xs text-slate-700 uppercase tracking-wide mb-1">
-                        📝 Observação <span class="text-slate-400 font-normal lowercase">(Máx. 3 lines)</span>
+                        📝 Observação <span class="text-slate-400 font-normal lowercase">(Máx. 3 linhas)</span>
                     </label>
                     <textarea id="cliente-observacao" maxlength="120" readonly onclick="abrirTecladoVirtual('cliente-observacao', 'box-observacao')" placeholder="Ex: gostaria que esquentasse e nao colocasse molho..." class="w-full h-12 bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none cursor-pointer resize-none overflow-hidden leading-tight"></textarea>
                 </div>
@@ -177,7 +200,6 @@
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black"></p>
                 
-                <!-- Onde o QR Code nativo é renderizado pixel por pixel -->
                 <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-white p-4 shadow-inner" id="pix-qrcode-container"></div>
                 
                 <div id="status-automático-container" class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg">
@@ -187,7 +209,7 @@
                 <p class="text-xs text-slate-400 max-w-sm">Escaneie o código acima. O totem fará a leitura e imprimirá seu cupom.</p>
 
                 <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 active:bg-emerald-700 text-white font-black px-8 py-4 rounded-2xl text-sm uppercase mt-4 tracking-wider shadow-md">
-                    Liberar Pedido Manulmente
+                    Liberar Pedido Manualmente
                 </button>
             </div>
 
@@ -275,7 +297,6 @@
         let paymentIdAtual = null;
         let qrcodeInstancia = null;
 
-        // Dados Oficiais do Vendedor (Gutemberg Bispo Alves)
         const CONFIG_TOTEM = {
             token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
             cpf: "01502787592",
@@ -472,13 +493,74 @@
 
         function confirmarInclusao() {
             totalGeral += itemAtual.totalCalculado;
-            document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual)));
+            atualizarInterfaceCarrinho();
             fecharModal();
+        }
+
+        // NOVO ENGINE: CONTROLES E EXCLUSÃO DE ITENS DO PEDIDO
+        function atualizarInterfaceCarrinho() {
+            document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('modal-cart-total').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            
+            // Conta a quantidade total de itens físicos no pedido
+            let contagemTotal = 0;
+            carrinhoItens.forEach(item => contagemTotal += item.qtd);
+            document.getElementById('carrinho-contador').innerText = contagemTotal;
+        }
+
+        function abrirResumoCarrinho() {
+            const containerLista = document.getElementById('carrinho-lista-itens');
+            containerLista.innerHTML = "";
+
+            if (carrinhoItens.length === 0) {
+                containerLista.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <span class="text-5xl block mb-2">🍽️</span>
+                        <p class="font-bold">Seu carrinho está vazio</p>
+                        <p class="text-xs">Escolha pratos saborosos do menu abaixo!</p>
+                    </div>
+                `;
+            } else {
+                carrinhoItens.forEach((item, index) => {
+                    let adicionaisTxt = Object.keys(item.adicionaisEscolhidos).join(', ');
+                    if(adicionaisTxt) adicionaisTxt = `<p class="text-[11px] text-green-700 font-semibold mt-0.5">+ Adicionais: ${adicionaisTxt}</p>`;
+
+                    containerLista.innerHTML += `
+                        <div class="flex items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div class="flex-1 min-w-0 text-left">
+                                <h4 class="font-bold text-slate-800 text-sm truncate">${item.qtd}x ${item.nome}</h4>
+                                ${adicionaisTxt}
+                                <p class="text-xs text-slate-500 font-extrabold mt-1">R$ ${item.totalCalculado.toFixed(2).replace('.', ',')}</p>
+                            </div>
+                            <button onclick="removerItemDoCarrinho(${index})" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center font-black active:bg-red-100 shrink-0 shadow-sm text-sm">
+                                ❌
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function fecharResumoCarrinho() { document.getElementById('cart-modal').classList.add('hidden'); }
+
+        function removerItemDoCarrinho(index) {
+            // Deduz o valor do prato excluído do montante total
+            totalGeral -= carrinhoItens[index].totalCalculado;
+            if(totalGeral < 0) totalGeral = 0;
+            
+            // Remove do array
+            carrinhoItens.splice(index, 1);
+            
+            // Atualiza os painéis e reconstrói a lista visual
+            atualizarInterfaceCarrinho();
+            abrirResumoCarrinho();
         }
 
         function abrirMetodoPagamento() {
             if(totalGeral <= 0) return alert("Selecione algum item primeiro!");
+            fecharResumoCarrinho();
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-screen').classList.remove('hidden');
         }
@@ -510,10 +592,8 @@
             }
         }
 
-        // MOTOR REVISADO DE GERAÇÃO EM EMISSÃO DE PAYLOAD COMPACTO BACEN (INFALÍVEL EM APLICATIVOS DE BANCO)
         function gerarStringPixLocalBR(chave, beneficiario, cidade, valor) {
             function f(id, v) { return id + String(v).length.toString().padStart(2, '0') + v; }
-            
             const merchantInfo = f("00", "br.gov.bcb.pix") + f("01", chave);
             const valorStr = valor.toFixed(2);
             
@@ -564,7 +644,7 @@
                 body: JSON.stringify(paymentData)
             })
             .then(res => {
-                if(!res.ok) throw new Error("Ativando redundância direta.");
+                if(!res.ok) throw new Error("Entrando em redundância direta.");
                 return res.json();
             })
             .then(data => {
@@ -578,14 +658,10 @@
                 }
             })
             .catch(err => {
-                console.log("Totem operando com redundância estável sem intermediações.", err);
-                
-                // CRIAÇÃO NATIVA: Gera o código limpo direto para o seu CPF usando a estrutura oficial do Banco Central
+                console.log("Modo contingência ativo.", err);
                 const payloadNativoBacen = gerarStringPixLocalBR(CONFIG_TOTEM.cpf, CONFIG_TOTEM.titular, CONFIG_TOTEM.cidade, valor);
-                
                 renderizarQrCodeLocal(payloadNativoBacen);
                 
-                // Notifica a tela e libera o botão para o operador do caixa validar a entrada do dinheiro
                 document.getElementById('label-status-pix').innerText = "Aguardando confirmação no caixa...";
                 document.getElementById('btn-forcar-impressao').classList.remove('hidden');
             });
@@ -729,7 +805,7 @@
                 formaPagamentoEscolhida = "";
                 document.getElementById('cliente-identificacao').value = "";
                 document.getElementById('cliente-observacao').value = "";
-                document.getElementById('total-value').innerText = "R$ 0,00";
+                atualizarInterfaceCarrinho();
                 containerCupom.innerHTML = ""; 
                 document.getElementById('payment-screen').classList.add('hidden');
             }, 400);
