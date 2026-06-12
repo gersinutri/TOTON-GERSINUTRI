@@ -3,58 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERSI NUTRI - Totem Profissional</title>
+    <title>GERSI NUTRI - Totem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f1f5f9; overflow: hidden; }
-        .cat-btn { transition: all 0.3s; border-left: 8px solid transparent; }
-        .cat-btn.active { background-color: white; border-left-color: #16a34a; color: #166534; font-weight: 900; }
-        
-        .slide-container { position: relative; overflow: hidden; border-radius: 20px; height: 180px; width: 100%; margin-bottom: 24px; border: 4px solid #faedcd; }
-        .slide-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: center; background: #166534; color: white; padding: 20px; }
-        .slide-item.active { opacity: 1; z-index: 10; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; }
+        .sidebar-btn { transition: all 0.2s; border-left: 6px solid transparent; }
+        .sidebar-btn.active { background-color: #ffffff; border-left-color: #166534; color: #166534; font-weight: 800; }
+        .slide-banner { background: #166534; border-radius: 16px; padding: 20px; color: white; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col" onload="carregarDados()">
+<body class="h-screen flex flex-col" onload="carregarDados()">
 
-    <header class="bg-[#166534] text-white p-4 shadow-lg text-center">
-        <h1 class="text-2xl font-black tracking-widest">GERSI NUTRI</h1>
-    </header>
+    <header class="bg-[#166534] text-white p-4 text-center font-black text-xl shadow-md z-20">GERSI NUTRI</header>
 
     <div class="flex flex-1 overflow-hidden">
-        <nav id="sidebar-cats" class="w-36 bg-[#15803d] text-white flex flex-col pt-4 shadow-xl shrink-0"></nav>
+        <nav id="sidebar" class="w-32 bg-slate-100 flex flex-col pt-4 overflow-y-auto"></nav>
 
         <main class="flex-1 p-6 overflow-y-auto">
-            <div id="promo-slider" class="slide-container shadow-xl"></div>
-            <h2 id="titulo-categoria" class="text-xl font-black text-slate-800 mb-4 uppercase">Todos</h2>
-            <div id="grid-produtos" class="grid grid-cols-2 gap-4 content-start"></div>
+            <div id="banner" class="slide-banner"></div>
+            <h2 id="cat-title" class="text-2xl font-black text-slate-800 mb-6 uppercase">Todos</h2>
+            <div id="grid" class="grid grid-cols-2 gap-4"></div>
         </main>
     </div>
 
-    <!-- MODAL CUSTOMIZAÇÃO -->
-    <div id="custom-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-lg p-6 space-y-4">
-            <img id="modal-img" class="w-full h-40 object-cover rounded-2xl">
-            <h2 id="modal-nome" class="text-2xl font-black"></h2>
-            <div class="flex items-center justify-between bg-slate-100 p-4 rounded-xl">
-                <button onclick="alterarQtd(-1)" class="w-10 h-10 bg-white rounded-lg font-bold">-</button>
-                <span id="modal-qtd" class="text-xl font-black">1</span>
-                <button onclick="alterarQtd(1)" class="w-10 h-10 bg-white rounded-lg font-bold">+</button>
+    <footer class="bg-white border-t p-4 flex justify-between items-center z-20 shadow-2xl">
+        <div class="flex items-center gap-4 bg-slate-100 p-3 rounded-xl">
+            <span class="text-2xl">🛒</span>
+            <span id="carrinho-contador" class="font-black text-xl">0</span>
+            <div class="text-left">
+                <p class="text-[10px] text-slate-400 font-bold uppercase">Total</p>
+                <p id="total-geral" class="font-black text-lg">R$ 0,00</p>
             </div>
-            <button onclick="confirmarInclusao()" id="btn-adicionar" class="w-full bg-[#166534] text-white py-4 rounded-xl font-black">Adicionar</button>
         </div>
-    </div>
+        <button onclick="alert('Indo para pagamento...')" class="bg-[#22c55e] text-white px-10 py-4 rounded-xl font-black text-lg uppercase shadow-lg">Finalizar</button>
+    </footer>
 
     <script>
-        let cardapio = [], carrinho = [], total = 0, catAtiva = 'TODOS', itemAtual = {};
-
+        let cardapio = [], total = 0, qtd = 0;
         function carregarDados() {
             Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
                 download: true,
                 complete: (results) => {
-                    cardapio = results.data.filter((row, idx) => idx > 0 && row[0]);
+                    cardapio = results.data.filter((r, i) => i > 0 && r[0]);
                     renderizarSidebar();
                     renderizarBanner();
                     renderizarProdutos();
@@ -62,62 +53,48 @@
             });
         }
 
+        function renderizarSidebar() {
+            const cats = ['TODOS', ...new Set(cardapio.map(r => r[2]))];
+            document.getElementById('sidebar').innerHTML = cats.map(c => 
+                `<button onclick="filtrar('${c}')" class="sidebar-btn p-4 text-xs uppercase">${c}</button>`
+            ).join('');
+        }
+
         function renderizarBanner() {
-            const slider = document.getElementById('promo-slider');
-            const ofertas = cardapio.filter(r => ['OFERTA', 'COMBO', 'DESTAQUE'].includes(r[2].toUpperCase()));
-            slider.innerHTML = ofertas.map((o, i) => `
-                <div class="slide-item ${i === 0 ? 'active' : ''}">
-                    <div>
-                        <span class="bg-amber-400 text-black px-2 py-1 text-[10px] font-black uppercase rounded">15% OFF</span>
-                        <h2 class="text-2xl font-black mt-2">${o[0]}</h2>
-                        <p class="text-lg font-bold line-through opacity-70">De R$ ${(parseFloat(o[1].replace(',', '.'))*1.176).toFixed(2)}</p>
-                        <p class="text-3xl font-black text-green-300">Por R$ ${o[1]}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderizarProdutos() {
-            const grid = document.getElementById('grid-produtos');
-            const prods = catAtiva === 'TODOS' ? cardapio : cardapio.filter(r => r[2] === catAtiva);
-            grid.innerHTML = prods.map((p, i) => `
-                <div onclick="abrirModal(${cardapio.indexOf(p)})" class="bg-white p-4 rounded-2xl shadow-sm border flex items-center gap-4 cursor-pointer">
-                    <img src="${p[3]}" class="w-20 h-20 rounded-xl object-cover">
-                    <div>
-                        <h3 class="font-black text-lg">${p[0]}</h3>
-                        <p class="text-[#166534] font-black text-xl">R$ ${p[1]}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function abrirModal(idx) {
-            itemAtual = { ...cardapio[idx], qtd: 1, preco: parseFloat(cardapio[idx][1].replace(',', '.')) };
-            document.getElementById('modal-img').src = itemAtual[3];
-            document.getElementById('modal-nome').innerText = itemAtual[0];
-            document.getElementById('modal-qtd').innerText = '1';
-            document.getElementById('custom-modal').classList.remove('hidden');
-        }
-
-        function alterarQtd(v) {
-            if (itemAtual.qtd + v > 0) {
-                itemAtual.qtd += v;
-                document.getElementById('modal-qtd').innerText = itemAtual.qtd;
+            const oferta = cardapio.find(r => r[2].toUpperCase().includes('OFERTA') || r[2].toUpperCase().includes('COMBO'));
+            if(oferta) {
+                document.getElementById('banner').innerHTML = `
+                    <div><span class="bg-amber-400 text-black text-[10px] font-black px-2 py-1 rounded">15% OFF</span>
+                    <h2 class="text-xl font-black">${oferta[0]}</h2></div>
+                    <p class="text-3xl font-black">R$ ${oferta[1]}</p>
+                `;
             }
         }
 
-        function confirmarInclusao() {
-            carrinho.push(itemAtual);
-            total += (itemAtual.preco * itemAtual.qtd);
-            document.getElementById('custom-modal').classList.add('hidden');
-            alert("Item adicionado!");
+        function renderizarProdutos(cat = 'TODOS') {
+            const lista = cat === 'TODOS' ? cardapio : cardapio.filter(r => r[2] === cat);
+            document.getElementById('grid').innerHTML = lista.map(p => `
+                <div class="bg-white p-4 rounded-xl border flex items-center gap-4">
+                    <img src="${p[3]}" class="w-16 h-16 rounded-lg object-cover">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-sm">${p[0]}</h3>
+                        <p class="text-[#166534] font-black">R$ ${p[1]}</p>
+                    </div>
+                    <button onclick="adicionar('${p[1]}')" class="bg-[#166534] text-white w-10 h-10 rounded-lg text-2xl font-black">+</button>
+                </div>
+            `).join('');
         }
 
-        function renderizarSidebar() {
-            const cats = ['TODOS', ...new Set(cardapio.map(r => r[2]))];
-            document.getElementById('sidebar-cats').innerHTML = cats.map(cat => `
-                <button onclick="catAtiva='${cat}'; renderizarProdutos()" class="cat-btn p-4 text-center text-sm uppercase">${cat}</button>
-            `).join('');
+        function adicionar(preco) {
+            total += parseFloat(preco.replace(',', '.'));
+            qtd++;
+            document.getElementById('total-geral').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('carrinho-contador').innerText = qtd;
+        }
+
+        function filtrar(c) {
+            document.getElementById('cat-title').innerText = c;
+            renderizarProdutos(c);
         }
     </script>
 </body>
