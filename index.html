@@ -6,66 +6,72 @@
     <title>GERSI NUTRI - Totem Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f1f5f9; overflow: hidden; }
         .cat-btn { transition: all 0.3s; border-left: 8px solid transparent; }
         .cat-btn.active { background-color: white; border-left-color: #16a34a; color: #166534; font-weight: 900; }
         
-        /* Estilo do Banner */
-        .slide-container { position: relative; overflow: hidden; border-radius: 20px; height: 160px; width: 100%; margin-bottom: 20px; }
-        .slide-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: center; background: #166534; color: white; padding: 20px; }
-        .slide-item.active { opacity: 1; z-index: 10; }
+        .slide-container { position: relative; overflow: hidden; border-radius: 20px; height: 200px; width: 100%; margin-bottom: 24px; background: #166534; }
+        .slide-item { position: absolute; inset: 0; display: flex; align-items: center; padding: 30px; color: white; }
         
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarDados()">
 
-    <header class="bg-[#166534] text-white p-3 shadow-lg z-10 text-center">
-        <h1 class="text-xl font-black tracking-widest">GERSI NUTRI</h1>
+    <header class="bg-[#166534] text-white p-4 shadow-lg z-10 text-center">
+        <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        <nav id="sidebar-cats" class="w-32 bg-[#15803d] text-white flex flex-col pt-4 shadow-xl shrink-0">
+        <nav id="sidebar-cats" class="w-36 bg-[#15803d] text-white flex flex-col pt-4 shadow-xl shrink-0">
         </nav>
 
-        <main class="flex-1 p-6 overflow-y-auto">
-            <!-- BANNER REINSERIDO -->
-            <div id="promo-slider" class="slide-container shadow-lg">
-                <div class="slide-item active">
+        <main class="flex-1 p-8 overflow-y-auto">
+            <div id="promo-slider" class="slide-container shadow-xl">
+                <div class="slide-item">
                     <div>
-                        <h2 class="text-2xl font-black">Ofertas da Semana</h2>
-                        <p class="text-sm opacity-90">Confira nossas seleções especiais com descontos exclusivos!</p>
+                        <h2 class="text-4xl font-black mb-2">Ofertas da Semana</h2>
+                        <p class="text-lg opacity-90">Monte seu combo saudável com nossos pratos selecionados.</p>
                     </div>
                 </div>
             </div>
 
-            <h2 id="titulo-categoria" class="text-xl font-black text-slate-800 mb-4 uppercase">Todos</h2>
-            <div id="grid-produtos" class="grid grid-cols-2 gap-4 content-start"></div>
+            <h2 id="titulo-categoria" class="text-2xl font-black text-slate-800 mb-6 uppercase">Todos</h2>
+            <div id="grid-produtos" class="grid grid-cols-2 gap-6 content-start"></div>
         </main>
     </div>
 
-    <footer class="bg-white border-t p-4 flex justify-between items-center z-20">
-        <button onclick="abrirResumoCarrinho()" class="flex items-center gap-3 bg-slate-100 px-6 py-3 rounded-2xl">
-            <span class="text-2xl">🛒</span>
-            <span id="carrinho-contador" class="bg-red-500 text-white font-black w-6 h-6 rounded-full text-xs flex items-center justify-center">0</span>
+    <footer class="bg-white border-t p-6 flex justify-between items-center z-20">
+        <button onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 px-8 py-4 rounded-2xl">
+            <span class="text-3xl">🛒</span>
+            <span id="carrinho-contador" class="bg-red-500 text-white font-black w-8 h-8 rounded-full flex items-center justify-center">0</span>
             <div class="text-left">
-                <p class="text-[10px] uppercase font-bold text-slate-400">Total</p>
-                <p id="total-geral" class="font-black text-xl text-slate-800">R$ 0,00</p>
+                <p class="text-xs uppercase font-bold text-slate-400">Total</p>
+                <p id="total-geral" class="font-black text-2xl text-slate-800">R$ 0,00</p>
             </div>
         </button>
-        <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] text-white px-10 py-4 rounded-2xl font-black text-xl uppercase shadow-lg active:scale-95">Finalizar</button>
+        <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] text-white px-16 py-6 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95">Finalizar</button>
     </footer>
 
+    <!-- MODAL CARRINHO -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
-            <div class="p-4 border-b flex justify-between items-center">
-                <h2 class="font-black text-xl">Seu Carrinho</h2>
+            <div class="p-6 border-b flex justify-between items-center">
+                <h2 class="font-black text-2xl">Seu Carrinho</h2>
                 <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl">✕</button>
             </div>
-            <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3"></div>
+            <div id="lista-carrinho" class="p-6 overflow-y-auto flex-1 space-y-4"></div>
         </div>
+    </div>
+
+    <!-- TELA PAGAMENTO -->
+    <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
+        <h2 class="text-4xl font-black text-slate-800 mb-6">Escaneie o Pix</h2>
+        <div id="pix-qrcode-container" class="w-72 h-72 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4"></div>
+        <button onclick="fecharModal('payment-screen')" class="mt-10 bg-slate-200 px-8 py-4 rounded-xl font-bold uppercase">Voltar</button>
     </div>
 
     <script>
@@ -74,6 +80,13 @@
         let total = 0;
         let catAtiva = 'TODOS';
 
+        const CONFIG = {
+            token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035",
+            cpf: "01502787592",
+            titular: "GUTEMBERG B ALVES",
+            cidade: "FEIRA DE SANTANA"
+        };
+
         function carregarDados() {
             Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
                 download: true,
@@ -81,7 +94,6 @@
                     cardapio = results.data.filter((row, idx) => idx > 0 && row[0]);
                     renderizarSidebar();
                     renderizarProdutos();
-                    iniciarBanner();
                 }
             });
         }
@@ -89,7 +101,7 @@
         function renderizarSidebar() {
             const cats = ['TODOS', ...new Set(cardapio.map(r => r[2]))];
             document.getElementById('sidebar-cats').innerHTML = cats.map(cat => `
-                <button onclick="filtrar('${cat}')" class="cat-btn ${cat === 'TODOS' ? 'active' : ''} p-4 text-center text-xs uppercase">
+                <button onclick="filtrar('${cat}')" class="cat-btn ${cat === 'TODOS' ? 'active' : ''} p-6 text-center text-sm uppercase">
                     ${cat}
                 </button>
             `).join('');
@@ -99,11 +111,11 @@
             const grid = document.getElementById('grid-produtos');
             const produtos = catAtiva === 'TODOS' ? cardapio : cardapio.filter(r => r[2] === catAtiva);
             grid.innerHTML = produtos.map((p, i) => `
-                <div onclick="adicionarAoCarrinho(${i})" class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 active:scale-95 transition-transform">
-                    <img src="${p[3]}" class="w-16 h-16 rounded-xl object-cover bg-slate-100">
+                <div onclick="adicionarAoCarrinho(${i})" class="bg-white p-6 rounded-3xl shadow-md border border-slate-100 flex items-center gap-6 active:scale-95 transition-transform cursor-pointer">
+                    <img src="${p[3]}" class="w-24 h-24 rounded-2xl object-cover bg-slate-100">
                     <div>
-                        <h3 class="font-black text-sm text-slate-800 leading-tight">${p[0]}</h3>
-                        <p class="text-[#166534] font-bold text-lg">R$ ${p[1]}</p>
+                        <h3 class="font-black text-xl text-slate-800 leading-tight">${p[0]}</h3>
+                        <p class="text-[#166534] font-black text-2xl mt-2">R$ ${p[1]}</p>
                     </div>
                 </div>
             `).join('');
@@ -128,9 +140,9 @@
         function abrirResumoCarrinho() {
             const lista = document.getElementById('lista-carrinho');
             lista.innerHTML = carrinho.map((item, i) => `
-                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-                    <span class="font-bold text-sm">${item.nome} - R$ ${item.preco.toFixed(2)}</span>
-                    <button onclick="excluir(${i})" class="text-red-500 font-black">❌</button>
+                <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl">
+                    <span class="font-black text-lg">${item.nome} - R$ ${item.preco.toFixed(2)}</span>
+                    <button onclick="excluir(${i})" class="text-red-500 font-black text-xl">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
@@ -144,9 +156,15 @@
             fecharModal('cart-modal');
         }
 
+        function abrirMetodoPagamento() {
+            if(total === 0) return alert("Carrinho vazio!");
+            document.getElementById('payment-screen').classList.remove('hidden');
+            const payload = `00020101021126580014br.gov.bcb.pix0111${CONFIG.cpf}5204000053039865404${total.toFixed(2)}5802BR5908${CONFIG.titular}6015${CONFIG.cidade}62070503***6304`;
+            document.getElementById('pix-qrcode-container').innerHTML = "";
+            new QRCode(document.getElementById('pix-qrcode-container'), { text: payload, width: 250, height: 250 });
+        }
+
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function abrirMetodoPagamento() { alert("Finalizando..."); }
-        function iniciarBanner() { setInterval(() => { /* Lógica de slide aqui */ }, 5000); }
     </script>
 </body>
 </html>
