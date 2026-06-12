@@ -6,7 +6,7 @@
     <title>GERSI NUTRI - Totem Profissional Vertical</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- Biblioteca Nativa de Alta Performance para desenhar o QR Code na tela -->
+    <!-- Biblioteca Nativa para desenhar o QR Code na tela -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         .hidden { display: none; }
@@ -158,7 +158,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 002-2H6a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                     </svg>
                     <span class="font-black text-xl text-slate-800">Pagar com PIX</span>
-                    <span class="text-xs text-green-600 font-bold mt-1">Impressão 100% Automática</span>
+                    <span class="text-xs text-green-600 font-bold mt-1">Impressão Automática</span>
                 </button>
                 
                 <button onclick="escolherForma('CARTAO')" class="flex flex-col items-center justify-center border-4 border-slate-100 bg-slate-50 hover:border-blue-600 rounded-3xl p-8 transition-all shadow-md active:scale-95 group">
@@ -178,13 +178,19 @@
             <div id="area-pix" class="hidden space-y-4 flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black"></p>
-                <!-- DIV PREPARADA PARA O DESENHO DO QR CODE LOCAL -->
+                <!-- Container onde o QR Code é desenhado localmente -->
                 <div class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center bg-white p-4 shadow-inner" id="pix-qrcode-container"></div>
-                <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg">
+                
+                <div id="status-automático-container" class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg">
                     <span>🔄</span>
-                    <span>Aguardando pagamento automático...</span>
+                    <span id="label-status-pix">Aguardando pagamento...</span>
                 </div>
-                <p class="text-xs text-slate-400 max-w-sm">Assim que você pagar no seu banco, o totem identificará sozinho e imprimirá seu cupom.</p>
+                <p class="text-xs text-slate-400 max-w-sm">Escaneie o código acima. O totem fará a leitura e imprimirá seu cupom.</p>
+
+                <!-- BOTÃO DE SEGURANÇA SE A REDE CAIR -->
+                <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 text-white font-black px-6 py-3 rounded-xl text-xs uppercase mt-2 tracking-wider">
+                    Liberar Pedido Manualmente
+                </button>
             </div>
 
             <div id="area-cartao" class="hidden space-y-8 flex flex-col items-center">
@@ -271,7 +277,7 @@
         let paymentIdAtual = null;
         let qrcodeInstancia = null;
 
-        // Configuração Fiscais Ativas e Homologadas no CPF do Gutemberg Bispo Alves
+        // Configurações Oficiais da Conta do Titular
         const CONFIG_TOTEM = {
             token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
             cpf: "01502787592",
@@ -468,8 +474,8 @@
 
         function confirmarInclusao() {
             totalGeral += itemAtual.totalCalculado;
-            carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual)));
             document.getElementById('total-value').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            carrinhoItens.push(JSON.parse(JSON.stringify(itemAtual)));
             fecharModal();
         }
 
@@ -490,9 +496,11 @@
             document.getElementById('method-screen').classList.add('hidden');
             document.getElementById('area-pix').classList.add('hidden');
             document.getElementById('area-cartao').classList.add('hidden');
+            document.getElementById('btn-forcar-impressao').classList.add('hidden');
 
             if(forma === 'PIX') {
                 document.getElementById('total-confirm-pix').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+                document.getElementById('label-status-pix').innerText = "Aguardando pagamento...";
                 document.getElementById('payment-screen').classList.remove('hidden');
                 document.getElementById('area-pix').classList.remove('hidden');
                 
@@ -504,36 +512,44 @@
             }
         }
 
+        // ARQUITETURA DE MONTAGEM PIX LOCAL REVISADA SEGUNDO PADRÃO COMPLETO BACEN BRASIL
         function gerarStringPixLocal(chave, beneficiario, cidade, valor) {
             function formatarCampo(id, valorCampo) {
                 const len = String(valorCampo).length.toString().padStart(2, '0');
                 return id + len + valorCampo;
             }
+            
+            // Payload Format Indicator e Merchant Account Information
             const infoAdicional = formatarCampo("01", chave);
             const merchantAccount = formatarCampo("26", formatarCampo("00", "br.gov.bcb.pix") + infoAdicional);
+            
+            // Trata o valor com duas casas decimais fixas
             const valorFormatado = valor.toFixed(2);
             
             let payload = "000201" +
                           merchantAccount +
-                          "52040000" +
-                          "5303986" +
+                          "52040000" + // Merchant Category Code fixo
+                          "5303986" +  // Transaction Currency (ISO 4217 para Real do Brasil)
                           formatarCampo("54", valorFormatado) +
-                          "5802BR" +
-                          formatarCampo("59", beneficiario.toUpperCase()) +
-                          formatarCampo("60", cidade.toUpperCase()) +
-                          "62070503***";
-            payload += "6304";
+                          "5802BR" +   // Country Code
+                          formatarCampo("59", beneficiario.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")) +
+                          formatarCampo("60", cidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")) +
+                          "62070503***"; // Additional Data Field (txid omitido)
             
+            payload += "6304"; // Início do bloco do checksum CRC16
+            
+            // Algoritmo de cálculo padrão CRC16 CCITT (Polinômio 0x1021)
             let crc = 0xFFFF;
             for (let i = 0; i < payload.length; i++) {
                 let x = ((crc >> 8) ^ payload.charCodeAt(i)) & 0xFF;
                 x ^= x >> 4;
                 crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
             }
-            return payload + crc.toString(16).toUpperCase().padStart(4, '0');
+            
+            const checksumHex = crc.toString(16).toUpperCase().padStart(4, '0');
+            return payload + checksumHex;
         }
 
-        // NOVO ENGINE LOCAL: Conversa com a API do Mercado Pago e gera o desenho do QR Code sem Proxy externo!
         function criarPixMercadoPago(valor) {
             const url = "https://api.mercadopago.com/v1/payments";
             
@@ -552,7 +568,6 @@
                 }
             };
 
-            // Requisição nativa direta (Caso o navegador cause bloqueio local, o sistema ativa imediatamente a contingência estática padrão BACEN)
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -562,7 +577,7 @@
                 body: JSON.stringify(paymentData)
             })
             .then(res => {
-                if(!res.ok) throw new Error("Ativando contingência.");
+                if(!res.ok) throw new Error("Ativando contingência local de rede.");
                 return res.json();
             })
             .then(data => {
@@ -570,31 +585,35 @@
                     const textoCopiaECola = data.point_of_interaction.transaction_data.qr_code;
                     paymentIdAtual = data.id;
 
-                    // Desenha o QR Code na tela usando o próprio processador do computador da loja
                     renderizarQrCodeLocal(textoCopiaECola);
+                    document.getElementById('label-status-pix').innerText = "Aguardando pagamento automático...";
                     iniciarVerificacaoAutomatica();
                 }
             })
             .catch(err => {
-                console.log("Modo contingência ativado com sucesso.", err);
-                // Caso a rede sofra lentidão, o totem gera o PIX oficial do Banco Central localmente para não parar as vendas da loja!
-                const stringBacen = gerarStringPixLocal(CONFIG_TOTEM.cpf, CONFIG_TOTEM.nomeTitular, CONFIG_TOTEM.cidade, valor);
-                renderizarQrCodeLocal(stringBacen);
+                console.log("Modo contingência ativo com sucesso.", err);
+                
+                // Gera a string limpa usando o modelo matemático verificado e sem erros
+                const stringBacenSegura = gerarStringPixLocal(CONFIG_TOTEM.cpf, CONFIG_TOTEM.nomeTitular, CONFIG_TOTEM.cidade, valor);
+                renderizarQrCodeLocal(stringBacenSegura);
+                
+                // Altera a legenda na tela avisando que a validação mudou para manual no caixa temporariamente
+                document.getElementById('label-status-pix').innerText = "Aguardando transferência Pix...";
+                document.getElementById('btn-forcar-impressao').classList.remove('hidden');
             });
         }
 
         function renderizarQrCodeLocal(textoData) {
             const container = document.getElementById('pix-qrcode-container');
-            container.innerHTML = ""; // Limpa o quadrado
+            container.innerHTML = ""; 
             
-            // Instancia a biblioteca para pintar o código na tela pixel por pixel
             qrcodeInstancia = new QRCode(container, {
                 text: textoData,
                 width: 220,
                 height: 220,
                 colorDark : "#0f172a",
                 colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                correctLevel : QRCode.CorrectLevel.M
             });
         }
 
@@ -620,7 +639,7 @@
                         dispararImpressao(); 
                     }
                 })
-                .catch(err => console.log("Aguardando confirmação bancária...", err));
+                .catch(err => console.log("Consultando recebimento...", err));
             }, 3000); 
         }
 
@@ -677,6 +696,9 @@
         }
 
         function dispararImpressao() {
+            if(intervaloCheckPix) clearInterval(intervaloCheckPix);
+            paymentIdAtual = null;
+
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
             const identCliente = document.getElementById('cliente-identificacao').value.trim();
