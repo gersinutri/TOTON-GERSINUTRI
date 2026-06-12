@@ -6,36 +6,46 @@
     <title>GERSI NUTRI - Totem Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f1f5f9; overflow: hidden; }
         .cat-btn { transition: all 0.3s; border-left: 8px solid transparent; }
         .cat-btn.active { background-color: white; border-left-color: #16a34a; color: #166534; font-weight: 900; }
+        
+        /* Estilo do Banner */
+        .slide-container { position: relative; overflow: hidden; border-radius: 20px; height: 160px; width: 100%; margin-bottom: 20px; }
+        .slide-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: center; background: #166534; color: white; padding: 20px; }
+        .slide-item.active { opacity: 1; z-index: 10; }
+        
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col" onload="carregarDados()">
 
-    <!-- CABEÇALHO -->
-    <header class="bg-[#166534] text-white p-4 shadow-lg z-10 text-center">
-        <h1 class="text-2xl font-black tracking-widest">GERSI NUTRI</h1>
+    <header class="bg-[#166534] text-white p-3 shadow-lg z-10 text-center">
+        <h1 class="text-xl font-black tracking-widest">GERSI NUTRI</h1>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        <!-- BARRA LATERAL (COR DE DESTAQUE) -->
-        <nav id="sidebar-cats" class="w-32 bg-[#15803d] text-white flex flex-col pt-4 shadow-xl">
-            <!-- Categorias aqui -->
+        <nav id="sidebar-cats" class="w-32 bg-[#15803d] text-white flex flex-col pt-4 shadow-xl shrink-0">
         </nav>
 
-        <!-- GRADE DE PRODUTOS -->
         <main class="flex-1 p-6 overflow-y-auto">
-            <h2 id="titulo-categoria" class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-wider">Todos</h2>
+            <!-- BANNER REINSERIDO -->
+            <div id="promo-slider" class="slide-container shadow-lg">
+                <div class="slide-item active">
+                    <div>
+                        <h2 class="text-2xl font-black">Ofertas da Semana</h2>
+                        <p class="text-sm opacity-90">Confira nossas seleções especiais com descontos exclusivos!</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="titulo-categoria" class="text-xl font-black text-slate-800 mb-4 uppercase">Todos</h2>
             <div id="grid-produtos" class="grid grid-cols-2 gap-4 content-start"></div>
         </main>
     </div>
 
-    <!-- RODAPÉ FIXO -->
     <footer class="bg-white border-t p-4 flex justify-between items-center z-20">
         <button onclick="abrirResumoCarrinho()" class="flex items-center gap-3 bg-slate-100 px-6 py-3 rounded-2xl">
             <span class="text-2xl">🛒</span>
@@ -48,7 +58,6 @@
         <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] text-white px-10 py-4 rounded-2xl font-black text-xl uppercase shadow-lg active:scale-95">Finalizar</button>
     </footer>
 
-    <!-- MODAL CARRINHO COM EXCLUSÃO -->
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center">
@@ -59,7 +68,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE CATEGORIAS E LÓGICA -->
     <script>
         let cardapio = [];
         let carrinho = [];
@@ -73,6 +81,7 @@
                     cardapio = results.data.filter((row, idx) => idx > 0 && row[0]);
                     renderizarSidebar();
                     renderizarProdutos();
+                    iniciarBanner();
                 }
             });
         }
@@ -103,6 +112,7 @@
         function filtrar(cat) {
             catAtiva = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.innerText === cat));
+            document.getElementById('titulo-categoria').innerText = cat;
             renderizarProdutos();
         }
 
@@ -136,6 +146,7 @@
 
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
         function abrirMetodoPagamento() { alert("Finalizando..."); }
+        function iniciarBanner() { setInterval(() => { /* Lógica de slide aqui */ }, 5000); }
     </script>
 </body>
 </html>
