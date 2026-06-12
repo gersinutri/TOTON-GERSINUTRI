@@ -3,58 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERSI NUTRI - Layout Categorias</title>
+    <title>GERSI NUTRI - Totem Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f1f5f9; overflow: hidden; }
-        .cat-btn { transition: all 0.2s; border-left: 6px solid transparent; }
-        .cat-btn.active { background-color: white; border-left-color: #166534; color: #166534; }
-        ::-webkit-scrollbar { width: 0; }
+        .cat-btn { transition: all 0.3s; border-left: 8px solid transparent; }
+        .cat-btn.active { background-color: white; border-left-color: #16a34a; color: #166534; font-weight: 900; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col">
+<body class="h-screen w-screen flex flex-col" onload="carregarDados()">
 
     <!-- CABEÇALHO -->
-    <header class="bg-[#166534] text-white p-4 shadow-lg z-10">
-        <h1 class="text-2xl font-black tracking-widest text-center">GERSI NUTRI</h1>
+    <header class="bg-[#166534] text-white p-4 shadow-lg z-10 text-center">
+        <h1 class="text-2xl font-black tracking-widest">GERSI NUTRI</h1>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        <!-- BARRA LATERAL CATEGORIAS (Esquerda) -->
-        <nav id="sidebar-cats" class="w-32 bg-slate-100 flex flex-col pt-4 shadow-inner">
-            <!-- Categorias injetadas dinamicamente aqui -->
+        <!-- BARRA LATERAL (COR DE DESTAQUE) -->
+        <nav id="sidebar-cats" class="w-32 bg-[#15803d] text-white flex flex-col pt-4 shadow-xl">
+            <!-- Categorias aqui -->
         </nav>
 
-        <!-- GRADE DE PRODUTOS (Direita) -->
+        <!-- GRADE DE PRODUTOS -->
         <main class="flex-1 p-6 overflow-y-auto">
-            <h2 id="titulo-categoria" class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-wider">Todos os Produtos</h2>
-            <div id="grid-produtos" class="grid grid-cols-2 gap-4">
-                <!-- Produtos injetados dinamicamente aqui -->
-            </div>
+            <h2 id="titulo-categoria" class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-wider">Todos</h2>
+            <div id="grid-produtos" class="grid grid-cols-2 gap-4 content-start"></div>
         </main>
     </div>
 
-    <!-- RODAPÉ DE CARRINHO SIMPLIFICADO -->
-    <footer class="bg-white border-t p-4 flex justify-between items-center z-10">
-        <div class="text-left">
-            <p class="text-xs text-slate-400 font-bold uppercase">Total</p>
-            <p id="total-geral" class="text-2xl font-black text-slate-800">R$ 0,00</p>
-        </div>
-        <button class="bg-[#22c55e] text-white px-8 py-3 rounded-xl font-black text-lg uppercase">Finalizar</button>
+    <!-- RODAPÉ FIXO -->
+    <footer class="bg-white border-t p-4 flex justify-between items-center z-20">
+        <button onclick="abrirResumoCarrinho()" class="flex items-center gap-3 bg-slate-100 px-6 py-3 rounded-2xl">
+            <span class="text-2xl">🛒</span>
+            <span id="carrinho-contador" class="bg-red-500 text-white font-black w-6 h-6 rounded-full text-xs flex items-center justify-center">0</span>
+            <div class="text-left">
+                <p class="text-[10px] uppercase font-bold text-slate-400">Total</p>
+                <p id="total-geral" class="font-black text-xl text-slate-800">R$ 0,00</p>
+            </div>
+        </button>
+        <button onclick="abrirMetodoPagamento()" class="bg-[#22c55e] text-white px-10 py-4 rounded-2xl font-black text-xl uppercase shadow-lg active:scale-95">Finalizar</button>
     </footer>
 
+    <!-- MODAL CARRINHO COM EXCLUSÃO -->
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h2 class="font-black text-xl">Seu Carrinho</h2>
+                <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl">✕</button>
+            </div>
+            <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CATEGORIAS E LÓGICA -->
     <script>
         let cardapio = [];
-        let categoriaAtiva = 'TODOS';
-
-        // URL da planilha do Gersi Nutri
-        const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv';
+        let carrinho = [];
+        let total = 0;
+        let catAtiva = 'TODOS';
 
         function carregarDados() {
-            Papa.parse(URL_CSV, {
+            Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
                 download: true,
-                complete: function(results) {
+                complete: (results) => {
                     cardapio = results.data.filter((row, idx) => idx > 0 && row[0]);
                     renderizarSidebar();
                     renderizarProdutos();
@@ -63,11 +78,9 @@
         }
 
         function renderizarSidebar() {
-            const sidebar = document.getElementById('sidebar-cats');
             const cats = ['TODOS', ...new Set(cardapio.map(r => r[2]))];
-            
-            sidebar.innerHTML = cats.map(cat => `
-                <button onclick="filtrar('${cat}')" class="cat-btn ${cat === 'TODOS' ? 'active' : ''} p-4 text-center font-bold text-xs uppercase tracking-wide">
+            document.getElementById('sidebar-cats').innerHTML = cats.map(cat => `
+                <button onclick="filtrar('${cat}')" class="cat-btn ${cat === 'TODOS' ? 'active' : ''} p-4 text-center text-xs uppercase">
                     ${cat}
                 </button>
             `).join('');
@@ -75,27 +88,54 @@
 
         function renderizarProdutos() {
             const grid = document.getElementById('grid-produtos');
-            const filtrados = categoriaAtiva === 'TODOS' ? cardapio : cardapio.filter(r => r[2] === categoriaAtiva);
-
-            grid.innerHTML = filtrados.map(item => `
-                <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
-                    <img src="${item[3]}" class="w-16 h-16 rounded-xl object-cover bg-slate-100">
+            const produtos = catAtiva === 'TODOS' ? cardapio : cardapio.filter(r => r[2] === catAtiva);
+            grid.innerHTML = produtos.map((p, i) => `
+                <div onclick="adicionarAoCarrinho(${i})" class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 active:scale-95 transition-transform">
+                    <img src="${p[3]}" class="w-16 h-16 rounded-xl object-cover bg-slate-100">
                     <div>
-                        <h3 class="font-black text-sm text-slate-800 leading-tight">${item[0]}</h3>
-                        <p class="text-[#166534] font-bold text-lg mt-1">R$ ${item[1]}</p>
+                        <h3 class="font-black text-sm text-slate-800 leading-tight">${p[0]}</h3>
+                        <p class="text-[#166534] font-bold text-lg">R$ ${p[1]}</p>
                     </div>
                 </div>
             `).join('');
         }
 
         function filtrar(cat) {
-            categoriaAtiva = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === cat));
-            document.getElementById('titulo-categoria').innerText = cat;
+            catAtiva = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.innerText === cat));
             renderizarProdutos();
         }
 
-        carregarDados();
+        function adicionarAoCarrinho(idx) {
+            const item = cardapio[idx];
+            const preco = parseFloat(item[1].replace(',', '.'));
+            carrinho.push({ nome: item[0], preco: preco });
+            total += preco;
+            document.getElementById('total-geral').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('carrinho-contador').innerText = carrinho.length;
+        }
+
+        function abrirResumoCarrinho() {
+            const lista = document.getElementById('lista-carrinho');
+            lista.innerHTML = carrinho.map((item, i) => `
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                    <span class="font-bold text-sm">${item.nome} - R$ ${item.preco.toFixed(2)}</span>
+                    <button onclick="excluir(${i})" class="text-red-500 font-black">❌</button>
+                </div>
+            `).join('');
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function excluir(i) {
+            total -= carrinho[i].preco;
+            carrinho.splice(i, 1);
+            document.getElementById('total-geral').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('carrinho-contador').innerText = carrinho.length;
+            fecharModal('cart-modal');
+        }
+
+        function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function abrirMetodoPagamento() { alert("Finalizando..."); }
     </script>
 </body>
 </html>
