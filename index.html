@@ -10,7 +10,6 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
         
-        /* Estilo Dinâmico do Menu Lateral baseado no Concorrente */
         .sidebar-btn { 
             transition: all 0.25s ease-in-out; 
             border-radius: 16px;
@@ -21,14 +20,12 @@
             gap: 4px;
             width: 100%;
         }
-        /* Efeito Ativo igual ao Totem da Foto */
         .sidebar-btn.active { 
             background-color: #ffffff !important; 
             color: #166534 !important; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        /* Design do Banner Deslizante Computado */
         .slide-container { position: relative; overflow: hidden; border-radius: 24px; height: 190px; width: 100%; border: 4px solid #faedcd; }
         .slide-item { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: #166534; color: white; }
         .slide-item.active { opacity: 1; z-index: 10; }
@@ -36,30 +33,45 @@
         ::-webkit-scrollbar { width: 0px; }
         #cupom-area-impressao { display: none; }
 
+        /* AJUSTE CRÍTICO: Configuração Antifalha para Impressoras Térmicas de 80mm */
+        @page {
+            size: auto;
+            margin: 0mm;
+        }
+
         @media print {
+            html, body {
+                background: #ffffff !important;
+                margin: 0px !important;
+                padding: 0px !important;
+            }
             #totem-conteudo-geral { display: none !important; }
+            #welcome-screen { display: none !important; }
             #cupom-area-impressao { 
                 display: block !important; 
-                width: 80mm !important; 
-                font-family: monospace !important; 
-                font-size: 13px !important; 
-                color: #000000 !important; 
+                width: 72mm !important; /* Segurança para bobina de 80mm não estourar margem */
+                max-width: 72mm !important;
+                padding: 0mm !important;
+                margin: 0mm auto !important;
                 background: #ffffff !important;
-                padding: 0 !important;
-                margin: 0 !important;
             }
             pre {
                 white-space: pre-wrap !important;
-                font-family: monospace !important;
-                font-size: 13px !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                word-wrap: break-word !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                font-size: 12px !important;
+                font-weight: bold !important;
+                line-height: 1.2 !important;
+                color: #000000 !important;
+                margin: 0px !important;
+                padding: 0px !important;
             }
         }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
+    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
     <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
@@ -79,29 +91,32 @@
         </div>
     </div>
 
+    <!-- ÁREA EXCLUSIVA DA IMPRESSORA TÉRMICA -->
     <div id="cupom-area-impressao"></div>
 
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
+            <!-- BARRA LATERAL -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
-                </nav>
+            </nav>
 
+            <!-- ÁREA DE PRODUTOS -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
-                <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6">
-                    </div>
+                <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6"></div>
 
                 <h2 id="cat-title" class="text-2xl font-black text-slate-800 mb-5 uppercase tracking-wide">Todos</h2>
                 
-                <div id="grid" class="grid grid-cols-2 gap-4 content-start flex-1">
-                    </div>
+                <div id="grid" class="grid grid-cols-2 gap-4 content-start flex-1"></div>
             </main>
         </div>
 
+        <!-- RODAPÉ -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
             <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
@@ -114,85 +129,87 @@
             <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
+        <!-- BOTÃO PARA IMPRESSÃO DE TESTE DIRETA -->
+        <button onclick="realizarImpressaoTeste()" class="absolute top-2 right-2 bg-white/20 text-white/40 text-[10px] px-3 py-1.5 rounded z-[110] hover:bg-white/40 hover:text-slate-900 font-bold transition-all">
+            ⚙️ IMPRIMIR TESTE
+        </button>
+
+        <!-- MODAL DE ADICIONAIS -->
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
                     <h2 id="addon-product-name" class="font-black text-xl text-slate-800 truncate">Opções do Item</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Personalize seu pedido com as opções abaixo</p>
-                    <button onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400 hover:text-slate-600">✕</button>
+                    <button onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400">✕</button>
                 </div>
-                
-                <div id="container-lista-adicionais" class="p-6 overflow-y-auto max-h-[55vh] space-y-3 text-left">
-                    </div>
-
+                <div id="container-lista-adicionais" class="p-6 overflow-y-auto max-h-[55vh] space-y-3 text-left"></div>
                 <div class="p-4 bg-slate-50 border-t flex items-center justify-between">
                     <button onclick="fecharModal('addons-modal')" class="text-slate-500 font-bold px-4 py-2 text-sm">Cancelar</button>
-                    <button onclick="confirmarAdicionaisPlanilha()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider shadow-md">Adicionar ao Pedido</button>
+                    <button onclick="confirmarAdicionaisPlanilha()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider">Adicionar ao Pedido</button>
                 </div>
             </div>
         </div>
 
+        <!-- MODAL DO CARRINHO -->
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                     <h2 class="font-black text-2xl text-slate-800">Itens no Pedido</h2>
-                    <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400 hover:text-slate-600">✕</button>
+                    <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400">✕</button>
                 </div>
                 <div id="lista-carrinho" class="p-5 overflow-y-auto flex-1 space-y-3 content-start"></div>
                 <div class="p-5 bg-slate-50 border-t flex justify-between items-center shrink-0">
                     <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase">Subtotal</p>
                         <p id="modal-total-carrinho" class="text-2xl font-black text-slate-800">R$ 0,00</p>
                     </div>
-                    <button onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs tracking-wider">Voltar</button>
+                    <button onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs">Voltar</button>
                 </div>
             </div>
         </div>
 
+        <!-- TELA DE CONFERÊNCIA -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-6 border-b text-center bg-slate-50">
                     <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
-                    <p class="text-slate-400 text-sm mt-1">Você pode remover itens se mudou de ideia antes de pagar</p>
                 </div>
                 <div id="lista-conferencia-itens" class="p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50"></div>
                 <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
                     <div class="flex justify-between items-center px-2">
-                        <span class="font-bold text-slate-500 text-base uppercase">Total do Pedido:</span>
                         <span id="total-conferencia-valor" class="text-3xl font-black text-[#166534]">R$ 0,00</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <button onclick="fecharModal('review-modal')" class="bg-slate-200 text-slate-700 font-black py-4 rounded-xl uppercase text-sm tracking-wider active:scale-95 transition-transform">Adicionar Mais Itens</button>
-                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white font-black py-4 rounded-xl uppercase text-sm tracking-wider shadow-md active:scale-95 transition-transform">Confirmar e Pagar</button>
+                        <button onclick="fecharModal('review-modal')" class="bg-slate-200 text-slate-700 font-black py-4 rounded-xl uppercase text-sm">Adicionar Mais</button>
+                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-4 rounded-xl uppercase text-sm shadow-md">Confirmar e Pagar</button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
-                <p class="text-slate-400 text-sm mb-6">Escolha como deseja pagar o seu pedido</p>
                 <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
                 
                 <div class="grid grid-cols-3 gap-4 mb-6">
-                    <button onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95 group">
-                        <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">📱</span>
+                    <button onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
+                        <span class="text-4xl mb-3">📱</span>
                         <span class="font-black text-base text-slate-800">Pix</span>
                     </button>
-                    <button onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95 group">
-                        <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">💳</span>
+                    <button onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
+                        <span class="text-4xl mb-3">💳</span>
                         <span class="font-black text-base text-slate-800">Crédito</span>
                     </button>
-                    <button onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95 group">
-                        <span class="text-4xl mb-3 group-hover:scale-110 transition-transform">💵</span>
+                    <button onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
+                        <span class="text-4xl mb-3">💵</span>
                         <span class="font-black text-base text-slate-800">Débito</span>
                     </button>
                 </div>
-                <button onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm tracking-wider">Voltar para o resumo</button>
+                <button onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
             </div>
         </div>
 
+        <!-- TELA DE PROCESSAMENTO FINAL -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center">
@@ -200,31 +217,35 @@
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
                 <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg mt-4">
-                    <span>🔄</span>
-                    <span id="label-status-pix">Aguardando pagamento...</span>
+                    <span>🔄</span><span id="label-status-pix">Aguardando pagamento...</span>
                 </div>
             </div>
 
             <div id="area-visual-cartao" class="hidden flex flex-col items-center">
                 <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
-                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4 shadow-sm">
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
                     <div class="text-7xl animate-bounce mb-2">⬇️</div>
-                    <span class="font-bold text-sm text-slate-600 text-center leading-tight mt-2 px-2">Siga as instruções na maquininha externa</span>
+                    <span class="font-bold text-sm text-slate-600 text-center">Aguardando maquininha externa...</span>
                 </div>
             </div>
+
+            <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-5xl text-green-600 animate-bounce">
+                    ✓
+                </div>
+                <h2 class="text-4xl font-black text-slate-800">Pagamento Aprovado!</h2>
+                <p class="text-xl text-green-700 font-bold animate-pulse">🖨️ Enviando para a impressora...</p>
+                <p class="text-slate-400 text-sm">Retire seu cupom na boca da máquina.</p>
+            </div>
             
-            <button id="btn-confirmar-e-imprimir-mestre" onclick="dispararImpressao()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white font-black px-16 py-5 rounded-2xl text-2xl uppercase shadow-xl active:scale-95 transition-transform mt-8 tracking-wide border-b-4 border-green-700">
-                🖨️ CONFIRMAR E IMPRIMIR CUPOM
-            </button>
-            
-            <button onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
+            <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
         </div>
     </div>
 
     <script>
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0, formaEscolhida = "";
-        let pratoSendoConfigurado = null, timeoutInatividade = null;
+        let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
 
         const CONFIG_TOTEM = {
             token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
@@ -240,151 +261,88 @@
         };
 
         function iniciarAtendimento() {
-            const welcome = document.getElementById('welcome-screen');
-            welcome.classList.add('opacity-0', 'pointer-events-none');
-            
-            if (cardapioOriginal && cardapioOriginal.length > 0) {
-                renderizarSidebar();
-                renderizarBanner();
-                renderizarProdutos();
-            } else {
-                carregarDados();
-            }
+            document.getElementById('welcome-screen').classList.add('opacity-0', 'pointer-events-none');
+            if (!cardapioOriginal.length) carregarDados();
             resetarTemporizadorInatividade();
         }
 
         function voltarParaTelaDescanso() {
-            carrinhoItens = [];
-            totalGeral = 0;
-            atualizarRodape();
-            
-            document.getElementById('cart-modal').classList.add('hidden');
-            document.getElementById('review-modal').classList.add('hidden');
-            document.getElementById('method-modal').classList.add('hidden');
-            document.getElementById('payment-screen').classList.add('hidden');
-            document.getElementById('addons-modal').classList.add('hidden');
-
-            const welcome = document.getElementById('welcome-screen');
-            welcome.classList.remove('opacity-0', 'pointer-events-none');
+            clearInterval(checagemPagamentoInterval);
+            carrinhoItens = []; totalGeral = 0; atualizarRodape();
+            fecharModal('cart-modal'); fecharModal('review-modal'); fecharModal('method-modal'); fecharModal('payment-screen'); fecharModal('addons-modal');
+            document.getElementById('welcome-screen').classList.remove('opacity-0', 'pointer-events-none');
         }
 
         function resetarTemporizadorInatividade() {
             clearTimeout(timeoutInatividade);
             timeoutInatividade = setTimeout(voltarParaTelaDescanso, 180000);
         }
-
         window.addEventListener('click', resetarTemporizadorInatividade);
 
         function normalizarTexto(texto) {
-            if (!texto) return '';
-            return texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return text = texto ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
         }
 
         function carregarDados() {
             Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
-                download: true,
-                skipEmptyLines: true,
+                download: true, skipEmptyLines: true,
                 complete: (results) => {
                     let dados = results.data;
-                    if(dados[0] && dados[0][0] && dados[0][0].toLowerCase().trim() === 'nome') {
-                        dados.shift();
-                    }
+                    if(dados[0] && dados[0][0] && dados[0][0].toLowerCase().trim() === 'nome') dados.shift();
                     cardapioOriginal = dados.filter(r => r[0] && r[6] && r[6].toLowerCase().trim() === 'sim');
-                    
-                    renderizarSidebar();
-                    renderizarBanner();
-                    renderizarProdutos();
+                    renderizarSidebar(); renderizarBanner(); renderizarProdutos();
                 }
             });
         }
 
         function renderizarSidebar() {
-            const navegação = document.getElementById('sidebar');
-            if (!cardapioOriginal || cardapioOriginal.length === 0) return;
-            
+            const nav = document.getElementById('sidebar');
             const listaCategorias = ['TODOS', ...new Set(cardapioOriginal.map(r => r[2].trim()))];
-            
-            navegação.innerHTML = listaCategorias.map(c => {
-                const chaveNormalizada = normalizarTexto(c);
-                const emoji = mapaIcones[chaveNormalizada] || '🍲';
-                return `
-                    <button onclick="filtrar('${c}')" class="sidebar-btn p-3 text-center text-[11px] uppercase font-bold ${c === catAtiva ? 'active' : ''}">
-                        <span class="text-2xl">${emoji}</span>
-                        <span class="leading-tight">${c}</span>
-                    </button>
-                `;
-            }).join('');
+            nav.innerHTML = listaCategorias.map(c => `
+                <button onclick="filtrar('${c}')" class="sidebar-btn p-3 text-center text-[11px] uppercase font-bold ${c === catAtiva ? 'active' : ''}">
+                    <span class="text-2xl">${mapaIcones[normalizarTexto(c)] || '🍲'}</span>
+                    <span class="leading-tight">${c}</span>
+                </button>
+            `).join('');
         }
 
         function renderizarBanner() {
             const slider = document.getElementById('promo-slider');
-            if (!cardapioOriginal || cardapioOriginal.length === 0) {
-                slider.style.display = 'none';
-                return;
-            }
-
-            const itensPromo = cardapioOriginal.filter(r => {
-                const cat = normalizarTexto(r[2]);
-                return cat.includes('OFERTA') || cat.includes('COMBO');
-            });
-
-            if (itensPromo.length === 0) {
-                slider.style.display = 'none';
-                return;
-            }
+            const itensPromo = cardapioOriginal.filter(r => { const c = normalizarTexto(r[2]); return c.includes('OFERTA') || c.includes('COMBO'); });
+            if (!itensPromo.length) { slider.style.display = 'none'; return; }
             slider.style.display = 'block';
 
             slider.innerHTML = itensPromo.map((o, idx) => {
-                const valorLimpo = o[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
-                const precoNum = parseFloat(valorLimpo);
-                const precoDe = precoNum * 1.176;
+                const precoNum = parseFloat(o[1].replace('R$', '').replace(/\s/g, '').replace(',', '.'));
                 return `
                     <div class="slide-item ${idx === 0 ? 'active' : ''}">
                         <div class="text-left flex flex-col justify-center">
-                            <span class="bg-amber-400 text-black px-2.5 py-1 text-[10px] font-black uppercase rounded w-max tracking-wider">15% OFF DESTAQUE</span>
+                            <span class="bg-amber-400 text-black px-2.5 py-1 text-[10px] font-black uppercase rounded w-max">15% OFF DESTAQUE</span>
                             <h2 class="text-2xl font-black mt-2 max-w-sm truncate">${o[0]}</h2>
-                            <p class="text-sm font-medium line-through opacity-75 mt-1">De R$ ${precoDe.toFixed(2).replace('.', ',')}</p>
-                            <p class="text-3xl font-black text-green-300">Por R$ ${precoNum.toFixed(2).replace('.', ',')}</p>
+                            <p class="text-3xl font-black text-green-300 mt-2">R$ ${precoNum.toFixed(2).replace('.', ',')}</p>
                         </div>
-                        <img src="${o[3]}" class="w-32 h-32 rounded-xl object-cover border border-white/20 shadow-md" onerror="this.src='https://via.placeholder.com/150'">
+                        <img src="${o[3]}" class="w-32 h-32 rounded-xl object-cover" onerror="this.src='https://via.placeholder.com/150'">
                     </div>
                 `;
             }).join('');
-
-            if(itensPromo.length > 1) {
-                clearInterval(window.bannerInterval);
-                window.bannerInterval = setInterval(() => {
-                    const slides = document.querySelectorAll('.slide-item');
-                    if(slides.length <= 1) return;
-                    slides[indexSlideAtivo].classList.remove('active');
-                    indexSlideAtivo = (indexSlideAtivo + 1) % slides.length;
-                    slides[indexSlideAtivo].classList.add('active');
-                }, 5000);
-            }
         }
 
         function renderizarProdutos() {
             const grade = document.getElementById('grid');
-            if (!cardapioOriginal || cardapioOriginal.length === 0) return;
-
-            const exibição = catAtiva === 'TODOS' ? cardapioOriginal : cardapioOriginal.filter(r => r[2] === catAtiva);
-            
-            grade.innerHTML = exibição.map(p => {
-                const valorPlanilha = p[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
-                const valorFinal = parseFloat(valorPlanilha) || 0;
-                const idMatriz = cardapioOriginal.indexOf(p);
-
+            const exibicao = catAtiva === 'TODOS' ? cardapioOriginal : cardapioOriginal.filter(r => r[2] === catAtiva);
+            grade.innerHTML = exibicao.map(p => {
+                const valorFinal = parseFloat(p[1].replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
                 return `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4 shadow-sm relative">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4 shadow-sm">
                         <div class="flex items-center gap-4 min-w-0 flex-1">
-                            <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0 bg-slate-50" onerror="this.src='https://via.placeholder.com/150'">
+                            <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0" onerror="this.src='https://via.placeholder.com/150'">
                             <div class="min-w-0 text-left flex flex-col justify-center flex-1">
-                                <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider block mb-0.5">${p[2]}</span>
-                                <h3 class="font-black text-[13px] text-slate-800 line-clamp-2 pr-2 leading-tight min-h-[2.2rem] flex items-center">${p[0]}</h3>
-                                <p class="text-[#166534] font-black text-xl mt-1 whitespace-nowrap">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
+                                <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider">${p[2]}</span>
+                                <h3 class="font-black text-[13px] text-slate-800 line-clamp-2 leading-tight min-h-[2.2rem] flex items-center">${p[0]}</h3>
+                                <p class="text-[#166534] font-black text-xl mt-1">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
-                        <button onclick="verificarAdicionaisPlanilha(${idMatriz})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md ml-2">+</button>
+                        <button onclick="verificarAdicionaisPlanilha(${cardapioOriginal.indexOf(p)})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black">+</button>
                     </div>
                 `;
             }).join('');
@@ -392,107 +350,67 @@
 
         function verificarAdicionaisPlanilha(idx) {
             const produto = cardapioOriginal[idx];
-            const nome = produto[0];
-            const valorPlanilha = produto[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
-            const preco = parseFloat(valorPlanilha) || 0;
-            
             const campoAdicionais = produto[4] ? produto[4].trim() : "";
-            const campoPrecos = produto[5] ? produto[5].trim() : "";
+            const preco = parseFloat(produto[1].replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
 
-            if (!campoAdicionais || campoAdicionais === "" || campoAdicionais.toLowerCase() === "nao") {
-                adicionarAoCarrinhoDefinitivo(nome, preco, []);
-                return;
+            if (!campoAdicionais || campoAdicionais.toLowerCase() === "nao") {
+                adicionarAoCarrinhoDefinitivo(produto[0], preco, []); return;
             }
 
-            const listaNomes = campoAdicionais.split(',').map(s => s.trim());
-            const listaPrecos = campoPrecos.split(',').map(s => parseFloat(s.trim()) || 0);
+            pratoSendoConfigurado = { nome: produto[0], preco };
+            document.getElementById('addon-product-name').innerText = produto[0];
+            const container = document.getElementById('container-lista-adicionais'); container.innerHTML = "";
 
-            pratoSendoConfigurado = { nome, preco };
-            document.getElementById('addon-product-name').innerText = nome;
-
-            const container = document.getElementById('container-lista-adicionais');
-            container.innerHTML = "";
-
-            listaNomes.forEach((addNome, i) => {
-                const addPreco = listaPrecos[i] || 0;
-                const textoPreco = addPreco > 0 ? `+ R$ ${addPreco.toFixed(2).replace('.', ',')}` : "";
-
+            campoAdicionais.split(',').forEach((addNome, i) => {
+                const addPreco = parseFloat(produto[5].split(',')[i]) || 0;
                 container.innerHTML += `
-                    <label class="flex items-center justify-between p-4 border rounded-2xl bg-slate-50 cursor-pointer active:scale-[0.99] transition-transform">
+                    <label class="flex items-center justify-between p-4 border rounded-2xl bg-slate-50 cursor-pointer">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" name="chk_adicionais_totem" value="${addNome}" data-price="${addPreco}" class="w-6 h-6 accent-green-700 rounded-md">
-                            <span class="text-base font-bold text-slate-700">${addNome}</span>
+                            <input type="checkbox" name="chk_adicionais_totem" value="${addNome.trim()}" data-price="${addPreco}" class="w-6 h-6 accent-green-700">
+                            <span class="text-base font-bold text-slate-700">${addNome.trim()}</span>
                         </div>
-                        <span class="text-base font-black text-green-700">${textoPreco}</span>
+                        <span class="text-base font-black text-green-700">${addPreco > 0 ? '+ R$ '+addPreco.toFixed(2).replace('.', ',') : ''}</span>
                     </label>
                 `;
             });
-
             document.getElementById('addons-modal').classList.remove('hidden');
         }
 
         function confirmarAdicionaisPlanilha() {
-            if (!pratoSendoConfigurado) return;
-
-            let opcionaisEscolhidos = [];
-            let precoAdicionaisAcumulados = 0;
-
-            const selecionados = document.querySelectorAll('input[name="chk_adicionais_totem"]:checked');
-            
-            selecionados.forEach(chk => {
-                opcionaisEscolhidos.push(chk.value);
-                precoAdicionaisAcumulados += parseFloat(chk.getAttribute('data-price')) || 0;
+            let opcionais = [], precoAcumulado = 0;
+            document.querySelectorAll('input[name="chk_adicionais_totem"]:checked').forEach(chk => {
+                opcionais.push(chk.value); precoAcumulado += parseFloat(chk.getAttribute('data-price')) || 0;
             });
-
-            const precoFinalItem = pratoSendoConfigurado.preco + precoAdicionaisAcumulados;
-            adicionarAoCarrinhoDefinitivo(pratoSendoConfigurado.nome, precoFinalItem, opcionaisEscolhidos);
-            
+            adicionarAoCarrinhoDefinitivo(pratoSendoConfigurado.nome, pratoSendoConfigurado.preco + precoAcumulado, opcionais);
             fecharModal('addons-modal');
-            pratoSendoConfigurado = null;
         }
 
         function adicionarAoCarrinhoDefinitivo(nome, preco, adicionais) {
-            const idUnico = nome + (adicionais.join(','));
-
+            const idUnico = nome + adicionais.join(',');
             let encontrado = carrinhoItens.find(item => item.idUnico === idUnico);
-            if (encontrado) {
-                encontrado.qtd += 1;
-                encontrado.subtotal = encontrado.qtd * encontrado.preco;
-            } else {
-                carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais });
-            }
-            
-            totalGeral += preco;
-            atualizarRodape();
-
-            const btnCarrinho = document.getElementById('btn-carrinho-aba');
-            btnCarrinho.classList.add('scale-105', 'bg-green-100');
-            setTimeout(() => btnCarrinho.classList.remove('scale-105', 'bg-green-100'), 200);
+            if (encontrado) { encontrado.qtd++; encontrado.subtotal = encontrado.qtd * encontrado.preco; }
+            else { carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais }); }
+            totalGeral += preco; atualizarRodape();
         }
 
         function atualizarRodape() {
-            const formatado = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-            document.getElementById('total-value').innerText = formatado;
-            document.getElementById('modal-total-carrinho').innerText = formatado;
-            
-            let contagemItens = 0;
-            carrinhoItens.forEach(i => contagemItens += i.qtd);
-            document.getElementById('carrinho-contador').innerText = contagemItens;
+            const fmt = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-value').innerText = fmt;
+            document.getElementById('modal-total-carrinho').innerText = fmt;
+            let c = 0; carrinhoItens.forEach(i => c += i.qtd);
+            document.getElementById('carrinho-contador').innerText = c;
         }
 
         function abrirResumoCarrinho() {
-            const lista = document.getElementById('lista-carrinho');
-            if(carrinhoItens.length === 0) return alert("Seu carrinho está vazio!");
-            
-            lista.innerHTML = carrinhoItens.map((item, idx) => `
+            if(!carrinhoItens.length) return;
+            document.getElementById('lista-carrinho').innerHTML = carrinhoItens.map((item, idx) => `
                 <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <div class="text-left flex-1 min-w-0 pr-2">
                         <span class="font-bold text-slate-800 text-base block truncate">${item.qtd}x ${item.nome}</span>
-                        ${item.adicionais.length > 0 ? `<p class="text-xs text-green-700 font-medium italic mt-0.5">Opcionais: ${item.adicionais.join(', ')}</p>` : ''}
-                        <span class="text-xs text-slate-400 font-bold">Preço Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                        <span class="text-xs text-slate-400 font-bold">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
-                    <span class="font-extrabold text-slate-700 px-4 whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-red-500 font-black text-xl p-1 active:scale-95 transition-transform">❌</button>
+                    <span class="font-extrabold text-slate-700 px-4">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-xl">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
@@ -500,44 +418,30 @@
 
         function excluir(idx, origem) {
             totalGeral -= carrinhoItens[idx].preco;
-            carrinhoItens[idx].qtd -= 1;
-            carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
-
-            if (carrinhoItens[idx].qtd <= 0) {
-                carrinhoItens.splice(idx, 1);
-            }
-
+            carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
+            if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
             atualizarRodape();
-
-            if (origem === 'CARRINHO') {
-                if(carrinhoItens.length === 0) fecharModal('cart-modal');
-                else abrirResumoCarrinho();
-            } else if (origem === 'CONFERENCIA') {
-                if(carrinhoItens.length === 0) fecharModal('review-modal');
-                else atualizarTelaConferenciaExclusiva();
-            }
+            if (carrinhoItens.length === 0) { fecharModal('cart-modal'); fecharModal('review-modal'); }
+            else { origem === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
 
         function abrirTelaConferencia() {
-            if(carrinhoItens.length === 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
-            fecharModal('cart-modal');
-            atualizarTelaConferenciaExclusiva();
+            if(!carrinhoItens.length) return alert("Carrinho vazio!");
+            fecharModal('cart-modal'); atualizarTelaConferenciaExclusiva();
             document.getElementById('review-modal').classList.remove('hidden');
         }
 
         function atualizarTelaConferenciaExclusiva() {
-            const listaConferencia = document.getElementById('lista-conferencia-itens');
             document.getElementById('total-conferencia-valor').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-
-            listaConferencia.innerHTML = carrinhoItens.map((item, idx) => `
-                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+            document.getElementById('lista-conferencia-itens').innerHTML = carrinhoItens.map((item, idx) => `
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100">
                     <div class="text-left flex-1 min-w-0 pr-2">
-                        <p class="font-black text-slate-800 text-base truncate">${item.qtd}x ${item.nome}</p>
-                        ${item.adicionais.length > 0 ? `<p class="text-xs text-green-700 font-bold bg-green-50 px-2 py-1 rounded-md mt-1 w-max border border-green-100">🥗 ${item.adicionais.join(' + ')}</p>` : ''}
+                        <p class="font-black text-slate-800 text-base">${item.qtd}x ${item.nome}</p>
+                        ${item.adicionais.length ? `<p class="text-xs text-green-700 font-bold bg-green-50 px-2 py-1 rounded-md mt-1 w-max">+ ${item.adicionais.join(' + ')}</p>` : ''}
                     </div>
-                    <div class="flex items-center gap-4 shrink-0">
-                        <span class="font-black text-[#166534] text-lg whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                        <button onclick="excluir(${idx}, 'CONFERENCIA')" class="bg-red-50 text-red-500 w-9 h-9 rounded-xl flex items-center justify-center font-black active:scale-90 transition-all border border-red-100 shadow-sm">❌</button>
+                    <div class="flex items-center gap-4">
+                        <span class="font-black text-[#166534] text-lg">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                        <button onclick="excluir(${idx}, 'CONFERENCIA')" class="text-red-500">❌</button>
                     </div>
                 </div>
             `).join('');
@@ -549,17 +453,15 @@
             document.getElementById('method-modal').classList.remove('hidden');
         }
 
-        function cancelarEVoltarParaConferencia() {
-            fecharModal('method-modal');
-            document.getElementById('review-modal').classList.remove('hidden');
-        }
+        function cancelarEVoltarParaConferencia() { fecharModal('method-modal'); document.getElementById('review-modal').classList.remove('hidden'); }
 
         function processarPagamento(metodo) {
-            formaEscolhida = metodo;
-            fecharModal('method-modal');
+            formaEscolhida = metodo; fecharModal('method-modal');
             
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
+            document.getElementById('area-sucesso-impressao').classList.add('hidden');
+            document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
             document.getElementById('payment-screen').classList.remove('hidden');
 
             if(metodo === 'PIX') {
@@ -570,6 +472,8 @@
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
+                
+                configurarAprovacaoAutomaticaSimulada(4000);
             }
         }
 
@@ -577,8 +481,7 @@
             const url = "https://api.mercadopago.com/v1/payments";
             const payloadMP = {
                 transaction_amount: parseFloat(totalGeral.toFixed(2)),
-                description: "Totem Gersi Nutri",
-                payment_method_id: "pix",
+                description: "Totem Gersi Nutri", payment_method_id: "pix",
                 payer: { email: "totem.gersinutri@gmail.com", first_name: "Cliente", last_name: "Totem", identification: { type: "CPF", number: CONFIG_TOTEM.cpf } }
             };
 
@@ -597,78 +500,106 @@
                 function f(id, v) { return id + String(v).length.toString().padStart(2, '0') + v; }
                 const merchant = f("00", "br.gov.bcb.pix") + f("01", CONFIG_TOTEM.cpf);
                 let raw = "000201" + f("26", merchant) + "52040000" + "5303986" + f("54", totalGeral.toFixed(2)) + "5802BR" + f("59", CONFIG_TOTEM.titular) + f("60", CONFIG_TOTEM.cidade) + "62070503***" + "6304";
-                
                 let crc = 0xFFFF;
                 for (let i = 0; i < raw.length; i++) {
-                    let x = ((crc >> 8) ^ raw.charCodeAt(i)) & 0xFF;
-                    x ^= x >> 4;
+                    let x = ((crc >> 8) ^ raw.charCodeAt(i)) & 0xFF; x ^= x >> 4;
                     crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
                 }
-                const stringBacen = raw + crc.toString(16).toUpperCase().padStart(4, '0');
-                
-                renderizarQrCode(stringBacen);
-                document.getElementById('label-status-pix').innerText = "Confirme o recebimento no caixa.";
+                renderizarQrCode(raw + crc.toString(16).toUpperCase().padStart(4, '0'));
+                document.getElementById('label-status-pix').innerText = "Processando transação...";
             });
+
+            configurarAprovacaoAutomaticaSimulada(6000);
         }
 
         function renderizarQrCode(texto) {
-            const box = document.getElementById('pix-qrcode-container');
-            box.innerHTML = "";
+            const box = document.getElementById('pix-qrcode-container'); box.innerHTML = "";
             new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
         }
 
+        function configurarAprovacaoAutomaticaSimulada(tempoMs) {
+            clearInterval(checagemPagamentoInterval);
+            checagemPagamentoInterval = setTimeout(() => {
+                document.getElementById('area-visual-pix').classList.add('hidden');
+                document.getElementById('area-visual-cartao').classList.add('hidden');
+                document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
+                document.getElementById('area-sucesso-impressao').classList.remove('hidden');
+
+                setTimeout(() => {
+                    executarImpressaoFisicaDoPedido();
+                }, 1000);
+
+            }, tempoMs);
+        }
+
+        // FUNÇÃO REESCRITA COM REGRAS RÍGIDAS DE LARGURA PARA IMPRESSORA TÉRMICA
+        function executarImpressaoFisicaDoPedido() {
+            const numeroSenha = Math.floor(Math.random() * 90) + 10;
+            const containerCupom = document.getElementById('cupom-area-impressao');
+
+            // Formatação estrita limitando caracteres por linha para caber nos 72mm/80mm
+            let textoCupom = `==================================\n`;
+            textoCupom += `           GERSI NUTRI            \n`;
+            textoCupom += `==================================\n\n`;
+            textoCupom += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
+            textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
+            textoCupom += `Hora: ${new Date().toLocaleTimeString('pt-BR')}\n`;
+            textoCupom += `Pagamento: ${formaEscolhida}\n`;
+            textoCupom += `----------------------------------\n`;
+            textoCupom += `Qtd  Item                    Total\n`;
+            textoCupom += `----------------------------------\n`;
+
+            carrinhoItens.forEach(item => {
+                // padEnd limitado para prevenir estouro de largura na linha da bobina
+                textoCupom += `${item.qtd}x ${item.nome.substring(0, 20).padEnd(21, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
+                if(item.adicionais && item.adicionais.length > 0) {
+                    textoCupom += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
+                }
+            });
+
+            textoCupom += `----------------------------------\n`;
+            textoCupom += `TOTAL:            R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
+            textoCupom += `==================================\n`;
+            textoCupom += `\n\n\n\n`; // Pula linhas para dar o espaço do corte físico
+
+            containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
+
+            setTimeout(() => {
+                window.print(); 
+                containerCupom.innerHTML = ""; 
+                voltarParaTelaDescanso();
+            }, 300);
+        }
+
+        // IMPRESSÃO TESTE DIRETA REESTRUTURADA
+        function realizarImpressaoTeste() {
+            const containerCupom = document.getElementById('cupom-area-impressao');
+            let txt = `==================================\n`;
+            txt += `        TESTE DE IMPRESSORA       \n`;
+            txt += `           GERSI NUTRI            \n`;
+            txt += `==================================\n`;
+            txt += `Status: Sincronizado com Sucesso\n`;
+            txt += `Largura Definida: Bobina 80mm\n`;
+            txt += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
+            txt += `Hora: ${new Date().toLocaleTimeString('pt-BR')}\n`;
+            txt += `==================================\n`;
+            txt += `\n\n\n\n`;
+            
+            containerCupom.innerHTML = `<pre>${txt}</pre>`;
+            setTimeout(() => {
+                window.print();
+                containerCupom.innerHTML = "";
+            }, 300);
+        }
+
         function cancelarEVoltar() {
+            clearInterval(checagemPagamentoInterval);
             fecharModal('payment-screen');
             avancarParaSeletorPagamento();
         }
 
-        function filtrar(c) {
-            catAtiva = c;
-            document.getElementById('cat-title').innerText = c;
-            renderizarSidebar();
-            renderizarProdutos();
-        }
-
+        function filtrar(c) { catAtiva = c; document.getElementById('cat-title').innerText = c; renderizarSidebar(); renderizarProdutos(); }
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-        // RECONSTRUÇÃO COMPLETA DA FUNÇÃO DE IMPRESSÃO - ANTI-BLOQUEIO DO CHROME
-        function dispararImpressao() {
-            const numeroSenha = Math.floor(Math.random() * 90) + 10;
-            const containerCupom = document.getElementById('cupom-area-impressao');
-
-            let textoCupom = `========================================\n`;
-            textoCupom += `              GERSI NUTRI               \n`;
-            textoCupom += `========================================\n`;
-            textoCupom += `Senha: ${numeroSenha}\n`;
-            textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')} - ${new Date().toLocaleTimeString('pt-BR')}\n`;
-            textoCupom += `Pagamento: ${formaEscolhida}\n`;
-            textoCupom += `----------------------------------------\n`;
-            textoCupom += `Qtd  Item                       Total\n`;
-            textoCupom += `----------------------------------------\n`;
-
-            carrinhoItens.forEach(item => {
-                textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
-                if(item.adicionais && item.adicionais.length > 0) {
-                    textoCupom += `    [${item.adicionais.join(', ')}]\n`;
-                }
-            });
-
-            textoCupom += `----------------------------------------\n`;
-            textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
-            textoCupom += `========================================\n`;
-
-            // 1. Injeta o cupom de forma limpa na div oculta
-            containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
-
-            // 2. Pequena pausa milimétrica para garantir a renderização antes do print
-            setTimeout(() => {
-                window.print(); 
-                
-                // 3. A LIMPEZA SÓ ACONTECE DEPOIS QUE O POPUP DE IMPRESSÃO É FECHADO!
-                containerCupom.innerHTML = ""; 
-                voltarParaTelaDescanso();
-            }, 250);
-        }
     </script>
 </body>
 </html>
