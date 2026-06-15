@@ -288,10 +288,10 @@
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
 
-        // Configuração central limpa e padronizada para o BR Code do Banco Central
+        // Configuração Oficial Cadastrada: CNPJ Gersi Nutri
         const CONFIG_TOTEM = {
-            cpf: "01502787592",
-            titular: "GUTEMBERG B ALVES",
+            cnpj: "47342129000141",
+            titular: "GERSI NUTRI",
             cidade: "FEIRA DE SANTANA"
         };
 
@@ -454,7 +454,7 @@
                         <span class="text-xs text-slate-400 font-bold">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <span class="font-extrabold text-slate-700 px-4">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                    <button onclick="excluir(${item, idx}, 'CARRINHO')" class="text-xl">❌</button>
+                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-xl">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
@@ -513,7 +513,7 @@
             if(metodo === 'PIX') {
                 document.getElementById('area-visual-pix').classList.remove('hidden');
                 document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-                gerarPixDiretoSemErro();
+                gerarPixCnpjComercial();
             } else {
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -523,30 +523,28 @@
             }
         }
 
-        // NOVO GERADOR BR CODE ESTÁTICO DE ALTA CONFIABILIDADE (SEM DEPENDÊNCIA DE API)
-        function gerarPixDiretoSemErro() {
-            // Função auxiliar de formatação padrão EMV: ID + Tamanho com 2 dígitos + Conteúdo
+        // COORDENAÇÃO DE MONTAGEM DO PIX CNPJ EM CONFORMIDADE TOTAL COM O BANCO CENTRAL
+        function gerarPixCnpjComercial() {
             function formatarBloco(id, conteudo) {
                 const tamanho = String(conteudo.length).padStart(2, '0');
                 return id + tamanho + conteudo;
             }
 
-            // 1. Informações da conta e chave (CPF)
-            const informacaoChave = formatarBloco("00", "br.gov.bcb.pix") + formatarBloco("01", CONFIG_TOTEM.cpf);
+            // Conta comercial estruturada a partir da chave CNPJ limpa
+            const informacaoChave = formatarBloco("00", "br.gov.bcb.pix") + formatarBloco("01", CONFIG_TOTEM.cnpj);
             
-            // 2. Montagem dos dados base organizados por IDs globais do Bacen
-            let stringBase = "000201"                                                // Payload Format Indicator
-                + formatarBloco("26", informacaoChave)                               // Merchant Account Information
-                + "52040000"                                                         // Merchant Category Code (Default)
-                + "5303986"                                                          // Transaction Currency (BRL - 986)
-                + formatarBloco("54", totalGeral > 0 ? totalGeral.toFixed(2) : "10.00") // Transaction Amount
-                + "5802BR"                                                           // Country Code
-                + formatarBloco("59", CONFIG_TOTEM.titular)                          // Merchant Name
-                + formatarBloco("60", CONFIG_TOTEM.cidade)                           // Merchant City
-                + "62070503***"                                                      // Additional Data Field (Sem ID específico)
-                + "6304";                                                            // CRC16 Indicator
+            let stringBase = "000201" 
+                + formatarBloco("26", informacaoChave) 
+                + "52040000" 
+                + "5303986" 
+                + formatarBloco("54", totalGeral > 0 ? totalGeral.toFixed(2) : "10.00") 
+                + "5802BR" 
+                + formatarBloco("59", CONFIG_TOTEM.titular) 
+                + formatarBloco("60", CONFIG_TOTEM.cidade) 
+                + "62070503***" 
+                + "6304";
 
-            // 3. Cálculo exato do dígito verificador CRC16 CCITT
+            // Processamento do CRC16 Sem risco de quebra de caracteres
             let crc = 0xFFFF;
             for (let i = 0; i < stringBase.length; i++) {
                 let x = ((crc >> 8) ^ stringBase.charCodeAt(i)) & 0xFF;
@@ -554,14 +552,12 @@
                 crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
             }
             
-            // 4. Junção da string com o CRC final em hexadecimal maiúsculo com 4 casas
-            const pixCopiaColaFinal = stringBase + crc.toString(16).toUpperCase().padStart(4, '0');
+            const copiaColaOficial = stringBase + crc.toString(16).toUpperCase().padStart(4, '0');
             
-            // Renderiza o QR Code limpo e perfeito na interface
             const box = document.getElementById('pix-qrcode-container'); 
             box.innerHTML = "";
             new QRCode(box, { 
-                text: pixCopiaColaFinal, 
+                text: copiaColaOficial, 
                 width: 230, 
                 height: 230, 
                 colorDark : "#166534", 
