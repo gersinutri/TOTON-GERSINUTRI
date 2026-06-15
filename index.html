@@ -32,7 +32,6 @@
         
         ::-webkit-scrollbar { width: 0px; }
 
-        /* Estratégia de posicionamento estável para a área da impressora */
         #cupom-area-impressao {
             position: absolute;
             left: -9999px;
@@ -47,7 +46,6 @@
             margin: 0mm;
         }
 
-        /* Configurações estritas para o spooler de impressão/PDF */
         @media print {
             html, body {
                 background: #ffffff !important;
@@ -221,7 +219,7 @@
         </div>
 
         <!-- TELA DE PROCESSAMENTO FINAL -->
-        <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
+        <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
@@ -241,16 +239,23 @@
                 </div>
             </div>
 
-            <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4">
-                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-5xl text-green-600 animate-bounce">
+            <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
                     ✓
                 </div>
-                <h2 class="text-4xl font-black text-slate-800">Pagamento Aprovado!</h2>
-                <p class="text-xl text-green-700 font-bold animate-pulse">🖨️ Gerando cupom fiscal em PDF...</p>
-                <p class="text-slate-400 text-sm">Aguarde o fechamento automático da transação.</p>
+                <h2 class="text-3xl font-black text-slate-800">Pagamento Aprovado!</h2>
+                <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Gerando cupom fiscal em PDF...</p>
+                
+                <!-- ESPELHO VISUAL DO CUPOM TÉRMICO NA TELA PARA CONFERÊNCIA -->
+                <div class="w-[72mm] bg-amber-50 border-2 border-amber-200 rounded-xl p-4 shadow-inner text-left mx-auto my-2">
+                    <p class="text-[10px] text-amber-600 font-bold uppercase tracking-wider mb-2 text-center">👁️ Prévia da Impressão (Bobina 80mm)</p>
+                    <div id="espelho-cupom-tela" class="font-mono text-xs text-slate-800 whitespace-pre leading-tight bg-white p-2 rounded border border-amber-100"></div>
+                </div>
+
+                <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
             </div>
             
-            <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
+            <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
         </div>
     </div>
 
@@ -427,13 +432,13 @@
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
-        function excluir(idx, origem) {
+        function excluir(idx, origins) {
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
             atualizarRodape();
             if (carrinhoItens.length === 0) { fecharModal('cart-modal'); fecharModal('review-modal'); }
-            else { origem === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
+            else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
 
         function abrirTelaConferencia() {
@@ -528,25 +533,29 @@
             new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
         }
 
-        function configurarAprovacaoAutomaticaSimulada(tempoMs) {
+        function configuringAprovacaoAutomaticaSimulada(tempoMs) {
             clearInterval(checagemPagamentoInterval);
             checagemPagamentoInterval = setTimeout(() => {
                 document.getElementById('area-visual-pix').classList.add('hidden');
                 document.getElementById('area-visual-cartao').classList.add('hidden');
                 document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
+                
+                // Monta o texto do cupom antes de exibir para injetar no espelho visual da tela
+                montarTextoCupomDinamico();
+                
                 document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
                 setTimeout(() => {
                     executarImpressaoFisicaDoPedido();
-                }, 800);
+                }, 4000); // Aumentado para 4 segundos para você ler com calma na tela antes de fechar
 
             }, tempoMs);
         }
 
-        function ejecutarImpressaoFisicaDoPedido() {
+        // ROTINA PARA CONSTRUIR O TEXTO DO CUPOM
+        function montarTextoCupomDinamico() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
-            const containerCupom = document.getElementById('cupom-area-impressao');
-
+            
             let textoCupom = `==================================\n`;
             textoCupom += `           GERSI NUTRI            \n`;
             textoCupom += `==================================\n\n`;
@@ -562,7 +571,7 @@
                 textoCupom += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
             } else {
                 carrinhoItens.forEach(item => {
-                    textoCupom += `${item.qtd}x ${item.nome.substring(0, 20).padEnd(21, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
+                    textoCupom += `${item.qtd}x ${item.nome.substring(0, 18).padEnd(19, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
                     if(item.adicionais && item.adicionais.length > 0) {
                         textoCupom += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
                     }
@@ -574,13 +583,17 @@
             textoCupom += `==================================\n`;
             textoCupom += `\n\n\n\n\n`; 
 
-            containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
+            // Alimenta a div invisível da impressora
+            document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupom}</pre>`;
+            
+            // Alimenta o espelho visual cinza que aparece na tela do Opera
+            document.getElementById('espelho-cupom-tela').innerText = textoCupom;
+        }
 
-            setTimeout(() => {
-                window.print(); 
-                containerCupom.innerHTML = ""; 
-                voltarParaTelaDescanso();
-            }, 250);
+        function executarImpressaoFisicaDoPedido() {
+            window.print(); 
+            document.getElementById('cupom-area-impressao').innerHTML = ""; 
+            voltarParaTelaDescanso();
         }
 
         function cancelarEVoltar() {
