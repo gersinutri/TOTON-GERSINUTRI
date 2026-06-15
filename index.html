@@ -65,7 +65,7 @@
     <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
-        <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10 animate-fade-in">
+        <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10">
             <!-- Puxando a arte oficial salva localmente de forma estável -->
             <div class="w-72 h-72 bg-white rounded-full flex items-center justify-center border-4 border-amber-400/20 p-2 shadow-2xl backdrop-blur-sm">
                 <img id="totem-logo-oficial" src="logo-gersi.png" alt="Logo Gersi Nutri" class="w-full h-full object-cover rounded-full" onerror="this.src='https://via.placeholder.com/300?text=Gersi+Nutri'">
@@ -313,6 +313,8 @@
 
         function renderizarSidebar() {
             const navegação = document.getElementById('sidebar');
+            if (!cardapioOriginal || cardapioOriginal.length === 0) return;
+            
             const listaCategorias = ['TODOS', ...new Set(cardapioOriginal.map(r => r[2].trim()))];
             
             navegação.innerHTML = listaCategorias.map(c => {
@@ -329,6 +331,11 @@
 
         function renderizarBanner() {
             const slider = document.getElementById('promo-slider');
+            if (!cardapioOriginal || cardapioOriginal.length === 0) {
+                slider.style.display = 'none';
+                return;
+            }
+
             const itensPromo = cardapioOriginal.filter(r => {
                 const cat = normalizarTexto(r[2]);
                 return cat.includes('OFERTA') || cat.includes('COMBO');
@@ -371,6 +378,8 @@
 
         function renderizarProdutos() {
             const grade = document.getElementById('grid');
+            if (!cardapioOriginal || cardapioOriginal.length === 0) return;
+
             const exibição = catAtiva === 'TODOS' ? cardapioOriginal : cardapioOriginal.filter(r => r[2] === catAtiva);
             
             grade.innerHTML = exibição.map(p => {
@@ -547,7 +556,7 @@
             `).join('');
         }
 
-        function avancarParaSeletorPagamento() {
+        function avanzarParaSeletorPagamento() {
             fecharModal('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
