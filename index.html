@@ -252,7 +252,7 @@
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
                 <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg mt-4">
-                    <span>🔄</span><span id="label-status-pix">Aguardando pagamento...</span>
+                    <span>🔄</span><span id="label-status-pix">Aguardando escaneamento...</span>
                 </div>
             </div>
 
@@ -288,8 +288,8 @@
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
 
+        // Configuração central limpa e padronizada para o BR Code do Banco Central
         const CONFIG_TOTEM = {
-            token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
             cpf: "01502787592",
             titular: "GUTEMBERG B ALVES",
             cidade: "FEIRA DE SANTANA"
@@ -454,7 +454,7 @@
                         <span class="text-xs text-slate-400 font-bold">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <span class="font-extrabold text-slate-700 px-4">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-xl">❌</button>
+                    <button onclick="excluir(${item, idx}, 'CARRINHO')" class="text-xl">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
@@ -513,7 +513,7 @@
             if(metodo === 'PIX') {
                 document.getElementById('area-visual-pix').classList.remove('hidden');
                 document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-                dispararFluxoPix();
+                gerarPixDiretoSemErro();
             } else {
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -523,73 +523,53 @@
             }
         }
 
-        // FLUXO DO MERCADO PAGO OTIMIZADO E EM CONFORMIDADE COM A CHAVE FIXA
-        function dispararFluxoPix() {
-            const url = "https://api.mercadopago.com/v1/payments";
-            const payloadMP = {
-                transaction_amount: parseFloat(totalGeral.toFixed(2)),
-                description: "Totem Gersi Nutri",
-                payment_method_id: "pix",
-                payer: { 
-                    email: "totem.gersinutri@gmail.com", 
-                    first_name: "Cliente", 
-                    last_name: "Totem", 
-                    identification: { type: "CPF", number: CONFIG_TOTEM.cpf } 
-                }
-            };
+        // NOVO GERADOR BR CODE ESTÁTICO DE ALTA CONFIABILIDADE (SEM DEPENDÊNCIA DE API)
+        function gerarPixDiretoSemErro() {
+            // Função auxiliar de formatação padrão EMV: ID + Tamanho com 2 dígitos + Conteúdo
+            function formatarBloco(id, conteudo) {
+                const tamanho = String(conteudo.length).padStart(2, '0');
+                return id + tamanho + conteudo;
+            }
 
-            fetch(url, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json", 
-                    "Authorization": `Bearer ${CONFIG_TOTEM.token}` 
-                },
-                body: JSON.stringify(payloadMP)
-            })
-            .then(res => { if(!res.ok) throw new Error(); return res.json(); })
-            .then(data => {
-                if(data.point_of_interaction?.transaction_data?.qr_code) {
-                    renderizarQrCode(data.point_of_interaction.transaction_data.qr_code);
-                } else {
-                    throw new Error();
-                }
-            })
-            .catch(() => {
-                // FALLBACK EM CASO DE TIMEOUT DA API: Montagem do EMV BR Code Estático sem erros de concatenação
-                function f(id, v) { return id + String(v).length.toString().padStart(2, '0') + v; }
-                
-                // Formatação exata para a chave Pix (CPF do Titular) funcionar em qualquer app de banco
-                const merchantAccount = f("00", "br.gov.bcb.pix") + f("01", CONFIG_TOTEM.cpf);
-                
-                let raw = "000201" 
-                    + f("26", merchantAccount) 
-                    + "52040000" 
-                    + "5303986" 
-                    + f("54", totalGeral.toFixed(2)) 
-                    + "5802BR" 
-                    + f("59", "GERSI NUTRI") 
-                    + f("60", "FEIRA DE SANTANA") 
-                    + "62070503***" 
-                    + "6304";
-                
-                // Cálculo de CRC16 CCITT
-                let crc = 0xFFFF;
-                for (let i = 0; i < raw.length; i++) {
-                    let x = ((crc >> 8) ^ raw.charCodeAt(i)) & 0xFF; 
-                    x ^= x >> 4;
-                    crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
-                }
-                const emvCompleto = raw + crc.toString(16).toUpperCase().padStart(4, '0');
-                renderizarQrCode(emvCompleto);
-                document.getElementById('label-status-pix').innerText = "Processando transação (modo contingência)...";
+            // 1. Informações da conta e chave (CPF)
+            const informacaoChave = formatarBloco("00", "br.gov.bcb.pix") + formatarBloco("01", CONFIG_TOTEM.cpf);
+            
+            // 2. Montagem dos dados base organizados por IDs globais do Bacen
+            let stringBase = "000201"                                                // Payload Format Indicator
+                + formatarBloco("26", informacaoChave)                               // Merchant Account Information
+                + "52040000"                                                         // Merchant Category Code (Default)
+                + "5303986"                                                          // Transaction Currency (BRL - 986)
+                + formatarBloco("54", totalGeral > 0 ? totalGeral.toFixed(2) : "10.00") // Transaction Amount
+                + "5802BR"                                                           // Country Code
+                + formatarBloco("59", CONFIG_TOTEM.titular)                          // Merchant Name
+                + formatarBloco("60", CONFIG_TOTEM.cidade)                           // Merchant City
+                + "62070503***"                                                      // Additional Data Field (Sem ID específico)
+                + "6304";                                                            // CRC16 Indicator
+
+            // 3. Cálculo exato do dígito verificador CRC16 CCITT
+            let crc = 0xFFFF;
+            for (let i = 0; i < stringBase.length; i++) {
+                let x = ((crc >> 8) ^ stringBase.charCodeAt(i)) & 0xFF;
+                x ^= x >> 4;
+                crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+            }
+            
+            // 4. Junção da string com o CRC final em hexadecimal maiúsculo com 4 casas
+            const pixCopiaColaFinal = stringBase + crc.toString(16).toUpperCase().padStart(4, '0');
+            
+            // Renderiza o QR Code limpo e perfeito na interface
+            const box = document.getElementById('pix-qrcode-container'); 
+            box.innerHTML = "";
+            new QRCode(box, { 
+                text: pixCopiaColaFinal, 
+                width: 230, 
+                height: 230, 
+                colorDark : "#166534", 
+                colorLight : "#ffffff", 
+                correctLevel : QRCode.CorrectLevel.M 
             });
 
-            configurarAprovacaoAutomaticaSimulada(6000);
-        }
-
-        function renderizarQrCode(texto) {
-            const box = document.getElementById('pix-qrcode-container'); box.innerHTML = "";
-            new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
+            configurarAprovacaoAutomaticaSimulada(7000);
         }
 
         function configurarAprovacaoAutomaticaSimulada(tempoMs) {
