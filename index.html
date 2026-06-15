@@ -6,7 +6,6 @@
     <title>GERSI NUTRI - Totem Profissional Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- Biblioteca Nativa para desenhar o QR Code na tela -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
@@ -64,35 +63,26 @@
     <div id="cupom-area-impressao"></div>
 
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <!-- BARRA LATERAL ESTILO CONCORRENTE -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
-                <!-- Categorias injetadas automaticamente aqui -->
-            </nav>
+                </nav>
 
-            <!-- ÁREA DE PRODUTOS E BANNER -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
-                <!-- BANNER DINÂMICO DE OFERTAS (15% OFF) -->
                 <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6">
-                    <!-- Slides injetados aqui -->
-                </div>
+                    </div>
 
                 <h2 id="cat-title" class="text-2xl font-black text-slate-800 mb-5 uppercase tracking-wide">Todos</h2>
                 
-                <!-- GRADE DE PRODUTOS COMPLETA -->
                 <div id="grid" class="grid grid-cols-2 gap-4 content-start flex-1">
-                    <!-- Cards injetados aqui -->
-                </div>
+                    </div>
             </main>
         </div>
 
-        <!-- RODAPÉ DE CONTROLE E FINALIZAÇÃO -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
             <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
@@ -105,7 +95,71 @@
             <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
-        <!-- MODAL DO RESUMO DO CARRINHO (EXCLUSÃO ATIVA) -->
+        <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
+                <div class="p-5 border-b bg-slate-50 text-center relative">
+                    <h2 id="addon-product-name" class="font-black text-xl text-slate-800 truncate">Configurar Opções</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Escolha os acompanhamentos do seu prato</p>
+                    <button onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto max-h-[50vh] space-y-5 text-left">
+                    <div>
+                        <label class="block font-black text-sm text-slate-700 uppercase tracking-wide mb-2">1. Escolha a Base (Obrigatório):</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center gap-3 p-3 border rounded-xl bg-slate-50 cursor-pointer">
+                                <input type="radio" name="base_carb" value="Arroz Integral" checked class="w-5 h-5 accent-green-700">
+                                <span class="text-sm font-bold text-slate-700">Arroz Integral</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border rounded-xl bg-slate-50 cursor-pointer">
+                                <input type="radio" name="base_carb" value="Purê de Batata Doce" class="w-5 h-5 accent-green-700">
+                                <span class="text-sm font-bold text-slate-700">Purê Batata Doce</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-black text-sm text-slate-700 uppercase tracking-wide mb-2">2. Acompanhamento (Obrigatório):</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center gap-3 p-3 border rounded-xl bg-slate-50 cursor-pointer">
+                                <input type="radio" name="base_acomp" value="Feijão Carioca" checked class="w-5 h-5 accent-green-700">
+                                <span class="text-sm font-bold text-slate-700">Feijão Carioca</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border rounded-xl bg-slate-50 cursor-pointer">
+                                <input type="radio" name="base_acomp" value="Legumes Grelhados" class="w-5 h-5 accent-green-700">
+                                <span class="text-sm font-bold text-slate-700">Legumes Grelhados</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-black text-sm text-slate-700 uppercase tracking-wide mb-2">3. Deseja Opcionais Extras?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between p-3 border rounded-xl bg-slate-50 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="extra-ovo" value="Ovo Frito Extra" data-price="2.00" class="w-5 h-5 accent-green-700">
+                                    <span class="text-sm font-bold text-slate-700">Ovo Frito Extra</span>
+                                </div>
+                                <span class="text-sm font-black text-green-700">+ R$ 2,00</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 border rounded-xl bg-slate-50 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="extra-frango" value="Proteína Extra (Frango)" data-price="6.00" class="w-5 h-5 accent-green-700">
+                                    <span class="text-sm font-bold text-slate-700">Proteína Extra (Frango)</span>
+                                </div>
+                                <span class="text-sm font-black text-green-700">+ R$ 6,00</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 border-t flex items-center justify-between">
+                    <button onclick="fecharModal('addons-modal')" class="text-slate-500 font-bold px-4 py-2 text-sm">Cancelar</button>
+                    <button onclick="confirmarAdicionaisDoPrato()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider shadow-md">Adicionar ao Pedido</button>
+                </div>
+            </div>
+        </div>
+
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -123,7 +177,6 @@
             </div>
         </div>
 
-        <!-- TELA DE CONFERÊNCIA COM EXCLUSÃO INTEGRADA NA MESMA TELA -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-6 border-b text-center bg-slate-50">
@@ -131,8 +184,7 @@
                     <p class="text-slate-400 text-sm mt-1">Você pode remover itens se mudou de ideia antes de pagar</p>
                 </div>
                 <div id="lista-conferencia-itens" class="p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50">
-                    <!-- Injetado dinamicamente via JS com botão de lixeira -->
-                </div>
+                    </div>
                 <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
                     <div class="flex justify-between items-center px-2">
                         <span class="font-bold text-slate-500 text-base uppercase">Total do Pedido:</span>
@@ -146,7 +198,6 @@
             </div>
         </div>
 
-        <!-- MODAL: SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
@@ -171,10 +222,8 @@
             </div>
         </div>
 
-        <!-- TELA DE PROCESSAMENTO FINAL (PIX OU MÁQUINA) -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
             
-            <!-- Bloco Exclusivo do Pix -->
             <div id="area-visual-pix" class="hidden flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
@@ -185,7 +234,6 @@
                 </div>
             </div>
 
-            <!-- Bloco Exclusivo de Cartões (Crédito/Débito) -->
             <div id="area-visual-cartao" class="hidden flex flex-col items-center">
                 <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
@@ -208,6 +256,7 @@
 
     <script>
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0, formaEscolhida = "";
+        let pratoSendoConfigurado = null;
 
         const CONFIG_TOTEM = {
             token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
@@ -224,7 +273,7 @@
 
         function normalizarTexto(texto) {
             if (!texto) return '';
-            return texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return text = texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
 
         function carregarDados() {
@@ -292,7 +341,8 @@
             }).join('');
 
             if(itensPromo.length > 1) {
-                setInterval(() => {
+                clearInterval(window.bannerInterval);
+                window.bannerInterval = setInterval(() => {
                     const slides = document.querySelectorAll('.slide-item');
                     if(slides.length <= 1) return;
                     slides[indexSlideAtivo].classList.remove('active');
@@ -309,6 +359,7 @@
             grade.innerHTML = exibição.map(p => {
                 const valorPlanilha = p[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
                 const valorFinal = parseFloat(valorPlanilha) || 0;
+                const idMatriz = cardapioOriginal.indexOf(p);
 
                 return `
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4 shadow-sm relative">
@@ -320,20 +371,70 @@
                                 <p class="text-[#166534] font-black text-xl mt-1 whitespace-nowrap">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
-                        <!-- Isolado na ponta direita para nunca encavalar no preço -->
-                        <button onclick="adicionar('${p[0].replace(/'/g, "\\'")}', ${valorFinal})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md ml-2">+</button>
+                        <button onclick="verificarAdicionais(${idMatriz})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md ml-2">+</button>
                     </div>
                 `;
             }).join('');
         }
 
-        function adicionar(nome, preco) {
-            let encontrado = carrinhoItens.find(item => item.nome === nome);
+        // CONTROLADOR DE ADICIONAIS POR INDEX SEGURO
+        function verificarAdicionais(idx) {
+            const produto = cardapioOriginal[idx];
+            const nome = produto[0];
+            const valorPlanilha = produto[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
+            const preco = parseFloat(valorPlanilha) || 0;
+            const categoria = produto[2];
+
+            const catNormal = normalizarTexto(categoria);
+            if (catNormal.includes('ALMOCO') || catNormal.includes('PROTEINA') || catNormal.includes('JANTAR') || catNormal.includes('COMBO')) {
+                pratoSendoConfigurado = { nome, preco };
+                document.getElementById('addon-product-name').innerText = nome;
+                document.getElementById('extra-ovo').checked = false;
+                document.getElementById('extra-frango').checked = false;
+                document.getElementById('addons-modal').classList.remove('hidden');
+            } else {
+                adicionarAoCarrinhoDefinitivo(nome, preco, []);
+            }
+        }
+
+        function confirmarAdicionaisDoPrato() {
+            if (!pratoSendoConfigurado) return;
+
+            let opcionaisEscolhidos = [];
+            let precoAdicionais = 0;
+
+            const carb = document.querySelector('input[name="base_carb"]:checked').value;
+            const acomp = document.querySelector('input[name="base_acomp"]:checked').value;
+            opcionaisEscolhidos.push(carb, acomp);
+
+            const chkOvo = document.getElementById('extra-ovo');
+            if (chkOvo.checked) {
+                opcionaisEscolhidos.push(chkOvo.value);
+                precoAdicionais += parseFloat(chkOvo.getAttribute('data-price'));
+            }
+
+            const chkFrango = document.getElementById('extra-frango');
+            if (chkFrango.checked) {
+                opcionaisEscolhidos.push(chkFrango.value);
+                precoAdicionais += parseFloat(chkFrango.getAttribute('data-price'));
+            }
+
+            const precoFinalItem = pratoSendoConfigurado.preco + precoAdicionais;
+            adicionarAoCarrinhoDefinitivo(pratoSendoConfigurado.nome, precoFinalItem, opcionaisEscolhidos);
+            
+            fecharModal('addons-modal');
+            pratoSendoConfigurado = null;
+        }
+
+        function adicionarAoCarrinhoDefinitivo(nome, preco, adicionais) {
+            const idUnico = nome + (adicionais.join(','));
+
+            let encontrado = carrinhoItens.find(item => item.idUnico === idUnico);
             if (encontrado) {
                 encontrado.qtd += 1;
                 encontrado.subtotal = encontrado.qtd * encontrado.preco;
             } else {
-                carrinhoItens.push({ nome, preco, qtd: 1, subtotal: preco });
+                carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais });
             }
             
             totalGeral += preco;
@@ -360,8 +461,9 @@
             
             lista.innerHTML = carrinhoItens.map((item, idx) => `
                 <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <div class="text-left flex-1 min-w-0">
+                    <div class="text-left flex-1 min-w-0 pr-2">
                         <span class="font-bold text-slate-800 text-base block truncate">${item.qtd}x ${item.nome}</span>
+                        ${item.adicionais.length > 0 ? `<p class="text-xs text-green-700 font-medium italic mt-0.5">Obs: ${item.adicionais.join(', ')}</p>` : ''}
                         <span class="text-xs text-slate-400 font-bold">Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <span class="font-extrabold text-slate-700 px-4 whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
@@ -391,7 +493,6 @@
             }
         }
 
-        // TELA DE CONFERÊNCIA COM EXCLUSÃO DIRETA NA MESMA TELA
         function abrirTelaConferencia() {
             if(carrinhoItens.length === 0) return alert("Adicione produtos ao seu pedido antes de finalizar!");
             fecharModal('cart-modal');
@@ -407,11 +508,10 @@
                 <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <div class="text-left flex-1 min-w-0 pr-2">
                         <p class="font-black text-slate-800 text-base truncate">${item.qtd}x ${item.nome}</p>
-                        <p class="text-xs text-slate-400 font-bold">Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</p>
+                        ${item.adicionais.length > 0 ? `<p class="text-xs text-green-700 font-bold bg-green-50 px-2 py-1 rounded-md mt-1 w-max border border-green-100">🥗 ${item.adicionais.join(' + ')}</p>` : ''}
                     </div>
                     <div class="flex items-center gap-4 shrink-0">
                         <span class="font-black text-[#166534] text-lg whitespace-nowrap">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                        <!-- Botão de Excluir adicionado aqui na mesma tela conforme solicitado -->
                         <button onclick="excluir(${idx}, 'CONFERENCIA')" class="bg-red-50 text-red-500 w-9 h-9 rounded-xl flex items-center justify-center font-black active:scale-90 transition-all border border-red-100 shadow-sm">❌</button>
                     </div>
                 </div>
@@ -524,6 +624,9 @@
 
             carrinhoItens.forEach(item => {
                 textoCupom += `${item.qtd}x   ${item.nome.padEnd(25, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
+                if(item.adicionais && item.adicionais.length > 0) {
+                    textoCupom += `    [${item.adicionais.join(', ')}]\n`;
+                }
             });
 
             textoCupom += `----------------------------------------\n`;
