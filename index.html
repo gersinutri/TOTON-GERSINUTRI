@@ -31,37 +31,54 @@
         .slide-item.active { opacity: 1; z-index: 10; }
         
         ::-webkit-scrollbar { width: 0px; }
-        #cupom-area-impressao { display: none; }
 
-        /* AJUSTE CRÍTICO: Configuração Antifalha para Impressoras Térmicas de 80mm */
+        /* NOVA ESTRATÉGIA: Invisível na tela normal, sem usar display:none */
+        #cupom-area-impressao {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
         @page {
             size: auto;
             margin: 0mm;
         }
 
+        /* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO - PREVINE PÁGINA EM BRANCO */
         @media print {
             html, body {
                 background: #ffffff !important;
                 margin: 0px !important;
                 padding: 0px !important;
+                height: auto !important;
             }
-            #totem-conteudo-geral { display: none !important; }
-            #welcome-screen { display: none !important; }
+            /* Esconde absolutamente tudo que é da tela do totem */
+            #totem-conteudo-geral, #welcome-screen, .fixed, footer, header, main, nav { 
+                display: none !important; 
+            }
+            /* Força a exibição da área do cupom */
             #cupom-area-impressao { 
-                display: block !important; 
-                width: 72mm !important; /* Segurança para bobina de 80mm não estourar margem */
+                display: block !important;
+                position: static !important;
+                width: 72mm !important;
                 max-width: 72mm !important;
+                height: auto !important;
+                overflow: visible !important;
+                margin: 0px auto !important;
                 padding: 0mm !important;
-                margin: 0mm auto !important;
                 background: #ffffff !important;
             }
             pre {
+                display: block !important;
                 white-space: pre-wrap !important;
                 word-wrap: break-word !important;
                 font-family: 'Courier New', Courier, monospace !important;
-                font-size: 12px !important;
+                font-size: 13px !important;
                 font-weight: bold !important;
-                line-height: 1.2 !important;
+                line-height: 1.3 !important;
                 color: #000000 !important;
                 margin: 0px !important;
                 padding: 0px !important;
@@ -71,7 +88,8 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
-    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
+    <div id="cupom-area-impressao"></div>
+
     <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
@@ -91,22 +109,16 @@
         </div>
     </div>
 
-    <!-- ÁREA EXCLUSIVA DA IMPRESSORA TÉRMICA -->
-    <div id="cupom-area-impressao"></div>
-
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <!-- BARRA LATERAL -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
             </nav>
 
-            <!-- ÁREA DE PRODUTOS -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
                 <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6"></div>
 
@@ -116,7 +128,6 @@
             </main>
         </div>
 
-        <!-- RODAPÉ -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
             <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
@@ -129,12 +140,10 @@
             <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
-        <!-- BOTÃO PARA IMPRESSÃO DE TESTE DIRETA -->
-        <button onclick="realizarImpressaoTeste()" class="absolute top-2 right-2 bg-white/20 text-white/40 text-[10px] px-3 py-1.5 rounded z-[110] hover:bg-white/40 hover:text-slate-900 font-bold transition-all">
-            ⚙️ IMPRIMIR TESTE
+        <button onclick="realizarImpressaoTeste()" class="absolute top-2 right-2 bg-red-600 text-white text-[11px] px-4 py-2 rounded-xl z-[110] hover:bg-red-700 font-black tracking-wide shadow-md transition-all">
+            ⚙️ FORÇAR IMPRESSÃO TESTE
         </button>
 
-        <!-- MODAL DE ADICIONAIS -->
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
@@ -149,7 +158,6 @@
             </div>
         </div>
 
-        <!-- MODAL DO CARRINHO -->
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -166,7 +174,6 @@
             </div>
         </div>
 
-        <!-- TELA DE CONFERÊNCIA -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-6 border-b text-center bg-slate-50">
@@ -185,7 +192,6 @@
             </div>
         </div>
 
-        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
@@ -209,7 +215,6 @@
             </div>
         </div>
 
-        <!-- TELA DE PROCESSAMENTO FINAL -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center">
@@ -235,8 +240,8 @@
                     ✓
                 </div>
                 <h2 class="text-4xl font-black text-slate-800">Pagamento Aprovado!</h2>
-                <p class="text-xl text-green-700 font-bold animate-pulse">🖨️ Enviando para a impressora...</p>
-                <p class="text-slate-400 text-sm">Retire seu cupom na boca da máquina.</p>
+                <p class="text-xl text-green-700 font-bold animate-pulse">🖨️ Gerando cupom fiscal em PDF...</p>
+                <p class="text-slate-400 text-sm">Aguarde o download ou fechamento automático.</p>
             </div>
             
             <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
@@ -244,7 +249,7 @@
     </div>
 
     <script>
-        let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0, formaEscolhida = "";
+        let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
 
         const CONFIG_TOTEM = {
@@ -280,7 +285,7 @@
         window.addEventListener('click', resetarTemporizadorInatividade);
 
         function normalizarTexto(texto) {
-            return text = texto ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+            return texto ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
         }
 
         function carregarDados() {
@@ -473,7 +478,7 @@
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
                 
-                configurarAprovacaoAutomaticaSimulada(4000);
+                configurarAprovacaoAutomaticaSimulada(3000);
             }
         }
 
@@ -509,7 +514,7 @@
                 document.getElementById('label-status-pix').innerText = "Processando transação...";
             });
 
-            configurarAprovacaoAutomaticaSimulada(6000);
+            configurarAprovacaoAutomaticaSimulada(5000);
         }
 
         function renderizarQrCode(texto) {
@@ -527,17 +532,16 @@
 
                 setTimeout(() => {
                     executarImpressaoFisicaDoPedido();
-                }, 1000);
+                }, 800);
 
             }, tempoMs);
         }
 
-        // FUNÇÃO REESCRITA COM REGRAS RÍGIDAS DE LARGURA PARA IMPRESSORA TÉRMICA
+        // MONTAGEM DO CONTEÚDO FORÇADO - GARANTE CONTEÚDO DISPONÍVEL NO CANVAS DE PRINT
         function executarImpressaoFisicaDoPedido() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
 
-            // Formatação estrita limitando caracteres por linha para caber nos 72mm/80mm
             let textoCupom = `==================================\n`;
             textoCupom += `           GERSI NUTRI            \n`;
             textoCupom += `==================================\n\n`;
@@ -549,47 +553,53 @@
             textoCupom += `Qtd  Item                    Total\n`;
             textoCupom += `----------------------------------\n`;
 
-            carrinhoItens.forEach(item => {
-                // padEnd limitado para prevenir estouro de largura na linha da bobina
-                textoCupom += `${item.qtd}x ${item.nome.substring(0, 20).padEnd(21, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
-                if(item.adicionais && item.adicionais.length > 0) {
-                    textoCupom += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
-                }
-            });
+            if(carrinhoItens.length === 0) {
+                // Se disparado sem itens (Modo de segurança ou Teste vindo de fluxo limpo)
+                textoCupom += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
+            } else {
+                carrinhoItens.forEach(item => {
+                    textoCupom += `${item.qtd}x ${item.nome.substring(0, 20).padEnd(21, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
+                    if(item.adicionais && item.adicionais.length > 0) {
+                        textoCupom += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
+                    }
+                });
+            }
 
             textoCupom += `----------------------------------\n`;
-            textoCupom += `TOTAL:            R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
+            textoCupom += `TOTAL:            R$ ${totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00'}\n`;
             textoCupom += `==================================\n`;
-            textoCupom += `\n\n\n\n`; // Pula linhas para dar o espaço do corte físico
+            textoCupom += `\n\n\n\n\n`; 
 
             containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
 
+            // O comando de impressão nativo é chamado com o DOM reconstruído
             setTimeout(() => {
                 window.print(); 
                 containerCupom.innerHTML = ""; 
                 voltarParaTelaDescanso();
-            }, 300);
+            }, 250);
         }
 
-        // IMPRESSÃO TESTE DIRETA REESTRUTURADA
+        // FUNÇÃO DE IMPRESSÃO TESTE REESCRITA COM INJEÇÃO FORÇADA
         function realizarImpressaoTeste() {
             const containerCupom = document.getElementById('cupom-area-impressao');
             let txt = `==================================\n`;
-            txt += `        TESTE DE IMPRESSORA       \n`;
+            txt += `     SISTEMA DE IMPRESSÃO OK      \n`;
             txt += `           GERSI NUTRI            \n`;
             txt += `==================================\n`;
-            txt += `Status: Sincronizado com Sucesso\n`;
-            txt += `Largura Definida: Bobina 80mm\n`;
+            txt += `Status: Forçado com Sucesso\n`;
+            txt += `Modo Virtual: Ativo (PDF/Bobina)\n`;
             txt += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
             txt += `Hora: ${new Date().toLocaleTimeString('pt-BR')}\n`;
             txt += `==================================\n`;
-            txt += `\n\n\n\n`;
+            txt += `\n\n\n\n\n`;
             
             containerCupom.innerHTML = `<pre>${txt}</pre>`;
+            
             setTimeout(() => {
                 window.print();
                 containerCupom.innerHTML = "";
-            }, 300);
+            }, 250);
         }
 
         function cancelarEVoltar() {
