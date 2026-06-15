@@ -59,7 +59,29 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col" onload="carregarDados()">
+<body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
+
+    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
+    <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
+        <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
+        
+        <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10 animate-fade-in">
+            <!-- Puxando a arte oficial salva localmente de forma estável -->
+            <div class="w-72 h-72 bg-white rounded-full flex items-center justify-center border-4 border-amber-400/20 p-2 shadow-2xl backdrop-blur-sm">
+                <img id="totem-logo-oficial" src="logo-gersi.png" alt="Logo Gersi Nutri" class="w-full h-full object-cover rounded-full" onerror="this.src='https://via.placeholder.com/300?text=Gersi+Nutri'">
+            </div>
+
+            <div>
+                <h1 class="text-white text-5xl font-black tracking-widest uppercase">GERSI NUTRI</h1>
+                <p class="text-amber-300 text-xl uppercase tracking-widest font-bold mt-2">sua vida mais saudável</p>
+            </div>
+
+            <!-- Botão pulsante chamando o cliente para tocar na tela -->
+            <div class="bg-amber-400 text-slate-900 font-black text-2xl px-14 py-6 rounded-3xl uppercase tracking-widest shadow-2xl animate-pulse transform hover:scale-105 transition-all mt-4 border-b-8 border-amber-600">
+                👉 TOQUE PARA INICIAR 👈
+            </div>
+        </div>
+    </div>
 
     <div id="cupom-area-impressao"></div>
 
@@ -223,7 +245,7 @@
 
     <script>
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', indexSlideAtivo = 0, formaEscolhida = "";
-        let pratoSendoConfigurado = null;
+        let pratoSendoConfigurado = null, timeoutInatividade = null;
 
         const CONFIG_TOTEM = {
             token: "APP_USR-7833534594273574-061121-6a6bd4303bfa61cf9401736caec000a4-239459035", 
@@ -237,6 +259,34 @@
             'PROTEINA': '🍗', 'PROTEÍNA': '🍗', 'COMBO': '✨', 'COMBOS': '✨', 'JANTAR': '🥗', 
             'BEBIDA': '🥤', 'BEBIDAS': '🥤', 'SUCO': '🍹', 'SUCOS': '🍹', 'SOBREMESA': '🍰'
         };
+
+        function iniciarAtendimento() {
+            const welcome = document.getElementById('welcome-screen');
+            welcome.classList.add('opacity-0', 'pointer-events-none');
+            resetarTemporizadorInatividade();
+        }
+
+        function voltarParaTelaDescanso() {
+            carrinhoItens = [];
+            totalGeral = 0;
+            atualizarRodape();
+            
+            document.getElementById('cart-modal').classList.add('hidden');
+            document.getElementById('review-modal').classList.add('hidden');
+            document.getElementById('method-modal').classList.add('hidden');
+            document.getElementById('payment-screen').classList.add('hidden');
+            document.getElementById('addons-modal').classList.add('hidden');
+
+            const welcome = document.getElementById('welcome-screen');
+            welcome.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function resetarTemporizadorInatividade() {
+            clearTimeout(timeoutInatividade);
+            timeoutInatividade = setTimeout(voltarParaTelaDescanso, 180000);
+        }
+
+        window.addEventListener('click', resetarTemporizadorInatividade);
 
         function normalizarTexto(texto) {
             if (!texto) return '';
@@ -344,7 +394,6 @@
             }).join('');
         }
 
-        // LEITOR AUTOMÁTICO DE ADICIONAIS DAS COLUNAS E e F DA PLANILHA
         function verificarAdicionaisPlanilha(idx) {
             const produto = cardapioOriginal[idx];
             const nome = produto[0];
@@ -354,13 +403,11 @@
             const campoAdicionais = produto[4] ? produto[4].trim() : "";
             const campoPrecos = produto[5] ? produto[5].trim() : "";
 
-            // Se a linha da planilha não tiver nenhum adicional cadastrado na Coluna E
             if (!campoAdicionais || campoAdicionais === "" || campoAdicionais.toLowerCase() === "nao") {
                 adicionarAoCarrinhoDefinitivo(nome, preco, []);
                 return;
             }
 
-            // Quebra as strings em Arrays usando a vírgula como separador automático
             const listaNomes = campoAdicionais.split(',').map(s => s.trim());
             const listaPrecos = campoPrecos.split(',').map(s => parseFloat(s.trim()) || 0);
 
@@ -370,10 +417,8 @@
             const container = document.getElementById('container-lista-adicionais');
             container.innerHTML = "";
 
-            // Monta as opções dinamicamente baseando-se nos itens da tabela
             listaNomes.forEach((addNome, i) => {
                 const addPreco = listaPrecos[i] || 0;
-                // Exibe o preço se maior que 0, se for 0 fica vazio (sem a palavra Grátis)
                 const textoPreco = addPreco > 0 ? `+ R$ ${addPreco.toFixed(2).replace('.', ',')}` : "";
 
                 container.innerHTML += `
@@ -457,7 +502,7 @@
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
-        function excluir(idx,起源) {
+        function excluir(idx, origem) {
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd -= 1;
             carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
@@ -468,10 +513,10 @@
 
             atualizarRodape();
 
-            if (起源 === 'CARRINHO') {
+            if (origem === 'CARRINHO') {
                 if(carrinhoItens.length === 0) fecharModal('cart-modal');
                 else abrirResumoCarrinho();
-            } else if (起源 === 'CONFERENCIA') {
+            } else if (origem === 'CONFERENCIA') {
                 if(carrinhoItens.length === 0) fecharModal('review-modal');
                 else atualizarTelaConferenciaExclusiva();
             }
@@ -621,11 +666,9 @@
 
             setTimeout(() => {
                 window.print(); 
-                carrinhoItens = [];
-                totalGeral = 0;
-                atualizarRodape();
                 containerCupom.innerHTML = ""; 
                 fecharModal('payment-screen');
+                voltarParaTelaDescanso();
             }, 300);
         }
     </script>
