@@ -84,7 +84,7 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
-    <!-- ÁREA DESTINADA AO ARQUIVO DE IMPRESSÃO / PDF -->
+    <!-- ÁREA OCULTA DO SISTEMA DE IMPRESSÃO -->
     <div id="cupom-area-impressao"></div>
 
     <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
@@ -219,9 +219,9 @@
         </div>
 
         <!-- TELA DE PROCESSAMENTO FINAL -->
-        <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
+        <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-start p-6 text-center overflow-y-auto">
             
-            <div id="area-visual-pix" class="hidden flex flex-col items-center">
+            <div id="area-visual-pix" class="hidden flex flex-col items-center mt-4">
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
@@ -230,7 +230,7 @@
                 </div>
             </div>
 
-            <div id="area-visual-cartao" class="hidden flex flex-col items-center">
+            <div id="area-visual-cartao" class="hidden flex flex-col items-center mt-4">
                 <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
                 <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
@@ -239,20 +239,19 @@
                 </div>
             </div>
 
-            <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md">
+            <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md mt-4 mx-auto">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
                     ✓
                 </div>
                 <h2 class="text-3xl font-black text-slate-800">Pagamento Aprovado!</h2>
-                <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Gerando cupom fiscal em PDF...</p>
-                
-                <!-- ESPELHO VISUAL DO CUPOM TÉRMICO NA TELA PARA CONFERÊNCIA -->
-                <div class="w-[72mm] bg-amber-50 border-2 border-amber-200 rounded-xl p-4 shadow-inner text-left mx-auto my-2">
-                    <p class="text-[10px] text-amber-600 font-bold uppercase tracking-wider mb-2 text-center">👁️ Prévia da Impressão (Bobina 80mm)</p>
-                    <div id="espelho-cupom-tela" class="font-mono text-xs text-slate-800 whitespace-pre leading-tight bg-white p-2 rounded border border-amber-100"></div>
-                </div>
-
+                <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Enviando cupom para impressão...</p>
                 <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
+            </div>
+
+            <!-- ESPELHO VISUAL FIXO DA BOBINA TÉRMICA DE 80MM (Aparece junto com a transação) -->
+            <div id="bloco-previa-totem" class="w-[78mm] bg-zinc-100 border-2 border-zinc-300 rounded-2xl p-4 shadow-lg text-left mx-auto mt-6 mb-4">
+                <p class="text-[10px] text-zinc-500 font-black uppercase tracking-wider mb-2 text-center">👁️ PRÉVIA REAL DA IMPRESSÃO (BOBINA 80MM)</p>
+                <div id="espelho-cupom-tela" class="font-mono text-[11px] text-slate-900 whitespace-pre leading-tight bg-white p-3 rounded border border-zinc-200 shadow-inner"></div>
             </div>
             
             <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
@@ -480,6 +479,9 @@
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
             document.getElementById('payment-screen').classList.remove('hidden');
 
+            // CRÍTICO: Monta o cupom no exato momento da escolha para a prévia aparecer IMEDIATAMENTE
+            montarTextoCupomDinamico();
+
             if(metodo === 'PIX') {
                 document.getElementById('area-visual-pix').classList.remove('hidden');
                 document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -489,7 +491,7 @@
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
                 
-                configurarAprovacaoAutomaticaSimulada(3000);
+                configurarAprovacaoAutomaticaSimulada(4000);
             }
         }
 
@@ -525,7 +527,7 @@
                 document.getElementById('label-status-pix').innerText = "Processando transação...";
             });
 
-            configurarAprovacaoAutomaticaSimulada(5000);
+            configurarAprovacaoAutomaticaSimulada(6000);
         }
 
         function renderizarQrCode(texto) {
@@ -533,26 +535,23 @@
             new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
         }
 
-        function configuringAprovacaoAutomaticaSimulada(tempoMs) {
+        // CORREÇÃO DO NOME DA FUNÇÃO (ESTAVA COM ERRO DE DIGITAÇÃO NO CÓDIGO ANTERIOR)
+        function configurarAprovacaoAutomaticaSimulada(tempoMs) {
             clearInterval(checagemPagamentoInterval);
             checagemPagamentoInterval = setTimeout(() => {
                 document.getElementById('area-visual-pix').classList.add('hidden');
                 document.getElementById('area-visual-cartao').classList.add('hidden');
                 document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
-                
-                // Monta o texto do cupom antes de exibir para injetar no espelho visual da tela
-                montarTextoCupomDinamico();
-                
                 document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
                 setTimeout(() => {
                     executarImpressaoFisicaDoPedido();
-                }, 4000); // Aumentado para 4 segundos para você ler com calma na tela antes de fechar
+                }, 4000); // Janela fica aberta tempo suficiente para você ver e salvar o PDF
 
             }, tempoMs);
         }
 
-        // ROTINA PARA CONSTRUIR O TEXTO DO CUPOM
+        // MONTAGEM DO TEXTO ESTÁVEL DO CUPOM
         function montarTextoCupomDinamico() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             
@@ -583,10 +582,10 @@
             textoCupom += `==================================\n`;
             textoCupom += `\n\n\n\n\n`; 
 
-            // Alimenta a div invisível da impressora
+            // Alimenta a div oculta que vai pro arquivo PDF/Impressora
             document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupom}</pre>`;
             
-            // Alimenta o espelho visual cinza que aparece na tela do Opera
+            // Desenha na tela para você ler
             document.getElementById('espelho-cupom-tela').innerText = textoCupom;
         }
 
