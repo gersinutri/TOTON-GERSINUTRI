@@ -194,6 +194,7 @@
         </div>
 
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center p-10 text-center">
+            
             <div id="area-visual-pix" class="hidden flex flex-col items-center">
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
@@ -216,8 +217,8 @@
                 </button>
             </div>
             
-            <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 text-white font-black px-8 py-4 rounded-2xl text-sm uppercase mt-4 tracking-wider shadow-md active:scale-95 transition-transform">
-                Liberar Pedido Manualmente
+            <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 text-white font-black px-8 py-4 rounded-2xl text-sm uppercase mt-4 tracking-wider shadow-md active:scale-95 transition-transform mx-auto">
+                Liberar Pedido Manualmente (Imprimir)
             </button>
             
             <button onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
@@ -241,18 +242,15 @@
             'BEBIDA': '🥤', 'BEBIDAS': '🥤', 'SUCO': '🍹', 'SUCOS': '🍹', 'SOBREMESA': '🍰'
         };
 
-        // ALTERAÇÃO CRÍTICA: Força a renderização ao iniciar o atendimento
         function iniciarAtendimento() {
             const welcome = document.getElementById('welcome-screen');
             welcome.classList.add('opacity-0', 'pointer-events-none');
             
-            // Força remontar tudo para garantir que não apareça em branco
             if (cardapioOriginal && cardapioOriginal.length > 0) {
                 renderizarSidebar();
                 renderizarBanner();
                 renderizarProdutos();
             } else {
-                // Se por acaso os dados ainda não tiverem chegado, tenta ler novamente
                 carregarDados();
             }
             resetarTemporizadorInatividade();
@@ -296,7 +294,6 @@
                     }
                     cardapioOriginal = dados.filter(r => r[0] && r[6] && r[6].toLowerCase().trim() === 'sim');
                     
-                    // Renderiza preventivamente em segundo plano
                     renderizarSidebar();
                     renderizarBanner();
                     renderizarProdutos();
@@ -639,11 +636,7 @@
 
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function disparoImpressaoFicticia() {
-            // Mantido por compatibilidade
-            dispararImpressao();
-        }
-
+        // CORREÇÃO E ESTABILIZAÇÃO DA IMPRESSÃO FÍSICA
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
@@ -669,14 +662,18 @@
             textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
             textoCupom += `========================================\n`;
 
+            // 1. Alimenta a área oculta de impressão com o texto formatado
             containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
 
+            // 2. Aguarda 500ms para garantir que o navegador processou o texto e abre o gerenciador de impressão
             setTimeout(() => {
                 window.print(); 
+                
+                // 3. Limpa e reinicia o Totem após fechar a janela de impressão
                 containerCupom.innerHTML = ""; 
                 fecharModal('payment-screen');
                 voltarParaTelaDescanso();
-            }, 300);
+            }, 500);
         }
     </script>
 </body>
