@@ -212,13 +212,10 @@
                     <div class="text-7xl animate-bounce mb-2">⬇️</div>
                     <span class="font-bold text-sm text-slate-600 text-center leading-tight mt-2 px-2">Siga as instruções na maquininha externa</span>
                 </div>
-                <button onclick="dispararImpressao()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-12 py-4 rounded-xl text-base uppercase shadow-md active:scale-95 transition-transform mt-6 tracking-wide">
-                    Confirmar e Imprimir Cupom
-                </button>
             </div>
             
-            <button id="btn-forcar-impressao" onclick="dispararImpressao()" class="hidden bg-emerald-600 text-white font-black px-8 py-4 rounded-2xl text-sm uppercase mt-4 tracking-wider shadow-md active:scale-95 transition-transform mx-auto">
-                Liberar Pedido Manualmente (Imprimir)
+            <button id="btn-confirmar-e-imprimir-mestre" onclick="dispararImpressao()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white font-black px-16 py-5 rounded-2xl text-2xl uppercase shadow-xl active:scale-95 transition-transform mt-8 tracking-wide border-b-4 border-green-700">
+                🖨️ CONFIRMAR E IMPRIMIR CUPOM
             </button>
             
             <button onclick="cancelarEVoltar()" class="mt-8 text-slate-400 font-bold underline uppercase text-sm tracking-wider block">Alterar Forma de Pagamento</button>
@@ -563,7 +560,6 @@
             
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
-            document.getElementById('btn-forcar-impressao').style.display = 'none';
             document.getElementById('payment-screen').classList.remove('hidden');
 
             if(metodo === 'PIX') {
@@ -612,7 +608,6 @@
                 
                 renderizarQrCode(stringBacen);
                 document.getElementById('label-status-pix').innerText = "Confirme o recebimento no caixa.";
-                document.getElementById('btn-forcar-impressao').style.display = 'block';
             });
         }
 
@@ -636,7 +631,7 @@
 
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        // CORREÇÃO E ESTABILIZAÇÃO DA IMPRESSÃO FÍSICA
+        // RECONSTRUÇÃO COMPLETA DA FUNÇÃO DE IMPRESSÃO - ANTI-BLOQUEIO DO CHROME
         function dispararImpressao() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
             const containerCupom = document.getElementById('cupom-area-impressao');
@@ -662,18 +657,17 @@
             textoCupom += `TOTAL DO PEDIDO:        R$ ${totalGeral.toFixed(2).replace('.', ',')}\n`;
             textoCupom += `========================================\n`;
 
-            // 1. Alimenta a área oculta de impressão com o texto formatado
+            // 1. Injeta o cupom de forma limpa na div oculta
             containerCupom.innerHTML = `<pre>${textoCupom}</pre>`;
 
-            // 2. Aguarda 500ms para garantir que o navegador processou o texto e abre o gerenciador de impressão
+            // 2. Pequena pausa milimétrica para garantir a renderização antes do print
             setTimeout(() => {
                 window.print(); 
                 
-                // 3. Limpa e reinicia o Totem após fechar a janela de impressão
+                // 3. A LIMPEZA SÓ ACONTECE DEPOIS QUE O POPUP DE IMPRESSÃO É FECHADO!
                 containerCupom.innerHTML = ""; 
-                fecharModal('payment-screen');
                 voltarParaTelaDescanso();
-            }, 500);
+            }, 250);
         }
     </script>
 </body>
