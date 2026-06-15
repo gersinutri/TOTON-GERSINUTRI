@@ -338,7 +338,6 @@
                                 <p class="text-[#166534] font-black text-xl mt-1 whitespace-nowrap">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
-                        <!-- Protegido contra sobreposição através do isolamento via flex row -->
                         <button onclick="verificarAdicionaisPlanilha(${idMatriz})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-md ml-2">+</button>
                     </div>
                 `;
@@ -348,14 +347,14 @@
         // LEITOR AUTOMÁTICO DE ADICIONAIS DAS COLUNAS E e F DA PLANILHA
         function verificarAdicionaisPlanilha(idx) {
             const produto = cardapioOriginal[idx];
-            const nome = pName = produto[0];
+            const nome = produto[0];
             const valorPlanilha = produto[1].replace('R$', '').replace(/\s/g, '').replace(',', '.');
             const preco = parseFloat(valorPlanilha) || 0;
             
             const campoAdicionais = produto[4] ? produto[4].trim() : "";
             const campoPrecos = produto[5] ? produto[5].trim() : "";
 
-            // Se a linha da planilha não tiver nenhum adicional cadastrado na Coluna E, insere direto no carrinho
+            // Se a linha da planilha não tiver nenhum adicional cadastrado na Coluna E
             if (!campoAdicionais || campoAdicionais === "" || campoAdicionais.toLowerCase() === "nao") {
                 adicionarAoCarrinhoDefinitivo(nome, preco, []);
                 return;
@@ -371,10 +370,11 @@
             const container = document.getElementById('container-lista-adicionais');
             container.innerHTML = "";
 
-            // Monta as opções dinamicamente baseando-se exatamente nos itens inseridos na tabela
+            // Monta as opções dinamicamente baseando-se nos itens da tabela
             listaNomes.forEach((addNome, i) => {
                 const addPreco = listaPrecos[i] || 0;
-                const textoPreco = addPreco > 0 ? `+ R$ ${addPreco.toFixed(2).replace('.', ',')}` : "Grátis";
+                // Exibe o preço se maior que 0, se for 0 fica vazio (sem a palavra Grátis)
+                const textoPreco = addPreco > 0 ? `+ R$ ${addPreco.toFixed(2).replace('.', ',')}` : "";
 
                 container.innerHTML += `
                     <label class="flex items-center justify-between p-4 border rounded-2xl bg-slate-50 cursor-pointer active:scale-[0.99] transition-transform">
@@ -457,7 +457,7 @@
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
-        function excluir(idx, origem) {
+        function excluir(idx,起源) {
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd -= 1;
             carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
@@ -468,10 +468,10 @@
 
             atualizarRodape();
 
-            if (origem === 'CARRINHO') {
+            if (起源 === 'CARRINHO') {
                 if(carrinhoItens.length === 0) fecharModal('cart-modal');
                 else abrirResumoCarrinho();
-            } else if (origem === 'CONFERENCIA') {
+            } else if (起源 === 'CONFERENCIA') {
                 if(carrinhoItens.length === 0) fecharModal('review-modal');
                 else atualizarTelaConferenciaExclusiva();
             }
