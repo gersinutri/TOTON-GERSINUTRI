@@ -84,10 +84,8 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
-    <!-- ÁREA OCULTA DO SISTEMA DE IMPRESSÃO -->
     <div id="cupom-area-impressao"></div>
 
-    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
     <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
@@ -107,20 +105,16 @@
         </div>
     </div>
 
-    <!-- ESTRUTURA PRINCIPAL DO TOTEM -->
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <!-- BARRA LATERAL -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
             </nav>
 
-            <!-- ÁREA DE PRODUTOS -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
                 <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6"></div>
 
@@ -130,7 +124,6 @@
             </main>
         </div>
 
-        <!-- RODAPÉ -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
             <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
@@ -143,7 +136,6 @@
             <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
-        <!-- MODAL DE ADICIONAIS -->
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
@@ -158,7 +150,6 @@
             </div>
         </div>
 
-        <!-- MODAL DO CARRINHO -->
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -175,13 +166,36 @@
             </div>
         </div>
 
-        <!-- TELA DE CONFERÊNCIA -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-                <div class="p-6 border-b text-center bg-slate-50">
+            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+                <div class="p-5 border-b text-center bg-slate-50">
                     <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
                 </div>
-                <div id="lista-conferencia-itens" class="p-6 overflow-y-auto flex-1 space-y-3 bg-slate-50/50"></div>
+                
+                <div class="overflow-y-auto flex-1 p-6 space-y-5 bg-slate-50/50">
+                    <div id="lista-conferencia-itens" class="space-y-3"></div>
+                    
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 space-y-4 shadow-sm text-left">
+                        <h4 class="font-black text-slate-700 text-sm uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
+                                <input type="text" id="cliente-contato" placeholder="Ex: (75) 99999-9999" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
+                            <textarea id="cliente-observacao" rows="3" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none" maxlength="120"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
                     <div class="flex justify-between items-center px-2">
                         <span id="total-conferencia-valor" class="text-3xl font-black text-[#166534]">R$ 0,00</span>
@@ -194,7 +208,6 @@
             </div>
         </div>
 
-        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
@@ -218,7 +231,6 @@
             </div>
         </div>
 
-        <!-- TELA DE PROCESSAMENTO FINAL -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-start p-6 text-center overflow-y-auto">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center mt-4">
@@ -248,7 +260,6 @@
                 <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
             </div>
 
-            <!-- ESPELHO VISUAL FIXO DA BOBINA TÉRMICA DE 80MM (Aparece junto com a transação) -->
             <div id="bloco-previa-totem" class="w-[78mm] bg-zinc-100 border-2 border-zinc-300 rounded-2xl p-4 shadow-lg text-left mx-auto mt-6 mb-4">
                 <p class="text-[10px] text-zinc-500 font-black uppercase tracking-wider mb-2 text-center">👁️ PRÉVIA REAL DA IMPRESSÃO (BOBINA 80MM)</p>
                 <div id="espelho-cupom-tela" class="font-mono text-[11px] text-slate-900 whitespace-pre leading-tight bg-white p-3 rounded border border-zinc-200 shadow-inner"></div>
@@ -277,6 +288,10 @@
 
         function iniciarAtendimento() {
             document.getElementById('welcome-screen').classList.add('opacity-0', 'pointer-events-none');
+            // Limpa inputs anteriores para segurança do próximo cliente
+            document.getElementById('cliente-nome').value = "";
+            document.getElementById('cliente-contato').value = "";
+            document.getElementById('cliente-observacao').value = "";
             if (!cardapioOriginal.length) carregarDados();
             resetarTemporizadorInatividade();
         }
@@ -479,7 +494,6 @@
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
             document.getElementById('payment-screen').classList.remove('hidden');
 
-            // CRÍTICO: Monta o cupom no exato momento da escolha para a prévia aparecer IMEDIATAMENTE
             montarTextoCupomDinamico();
 
             if(metodo === 'PIX') {
@@ -535,7 +549,6 @@
             new QRCode(box, { text: texto, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
         }
 
-        // CORREÇÃO DO NOME DA FUNÇÃO (ESTAVA COM ERRO DE DIGITAÇÃO NO CÓDIGO ANTERIOR)
         function configurarAprovacaoAutomaticaSimulada(tempoMs) {
             clearInterval(checagemPagamentoInterval);
             checagemPagamentoInterval = setTimeout(() => {
@@ -546,14 +559,17 @@
 
                 setTimeout(() => {
                     executarImpressaoFisicaDoPedido();
-                }, 4000); // Janela fica aberta tempo suficiente para você ver e salvar o PDF
+                }, 4000);
 
             }, tempoMs);
         }
 
-        // MONTAGEM DO TEXTO ESTÁVEL DO CUPOM
+        // MONTAGEM DO TEXTO ESTÁVEL DO CUPOM COM DADOS DO CLIENTE E OBSERVAÇÃO
         function montarTextoCupomDinamico() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
+            const nomeCli = document.getElementById('cliente-nome').value.trim() || 'NAO INFORMADO';
+            const contatoCli = document.getElementById('cliente-contato').value.trim() || 'NAO INFORMADO';
+            const obsCli = document.getElementById('cliente-observacao').value.trim();
             
             let textoCupom = `==================================\n`;
             textoCupom += `           GERSI NUTRI            \n`;
@@ -562,6 +578,9 @@
             textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
             textoCupom += `Hora: ${new Date().toLocaleTimeString('pt-BR')}\n`;
             textoCupom += `Pagamento: ${formaEscolhida}\n`;
+            textoCupom += `----------------------------------\n`;
+            textoCupom += `CLIENTE: ${nomeCli.toUpperCase()}\n`;
+            textoCupom += `CONTATO: ${contatoCli}\n`;
             textoCupom += `----------------------------------\n`;
             textoCupom += `Qtd  Item                    Total\n`;
             textoCupom += `----------------------------------\n`;
@@ -578,18 +597,19 @@
             }
 
             textoCupom += `----------------------------------\n`;
+            if (obsCli) {
+                textoCupom += `OBSERVACOES:\n${obsCli}\n`;
+                textoCupom += `----------------------------------\n`;
+            }
             textoCupom += `TOTAL:            R$ ${totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00'}\n`;
             textoCupom += `==================================\n`;
             textoCupom += `\n\n\n\n\n`; 
 
-            // Alimenta a div oculta que vai pro arquivo PDF/Impressora
             document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupom}</pre>`;
-            
-            // Desenha na tela para você ler
             document.getElementById('espelho-cupom-tela').innerText = textoCupom;
         }
 
-        function executarImpressaoFisicaDoPedido() {
+        function ejecutarImpressaoFisicaDoPedido() {
             window.print(); 
             document.getElementById('cupom-area-impressao').innerHTML = ""; 
             voltarParaTelaDescanso();
