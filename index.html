@@ -224,17 +224,17 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
-                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" readonly onclick="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" onmousedown="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
-                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" readonly onclick="ativarTecladoVirtual(this, 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
+                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" onmousedown="ativarTecladoVirtual(this, 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
-                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." readonly onclick="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
+                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." onmousedown="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
                         </div>
                     </div>
                 </div>
@@ -379,24 +379,26 @@
             });
         }
 
-        /* LÓGICA DO TECLADO VIRTUAL PREMIUM E INTEGRADO */
-        function activarTecladoVirtual(inputElement, layoutTipo) {
+        /* LÓGICA DO TECLADO VIRTUAL PREVENTIVA DE FOCO DO NAVEGADOR */
+        function ativarTecladoVirtual(inputElement, layoutTipo) {
             inputSelecionadoParaDigitar = inputElement;
+            
+            // Força o preventDefault para não abrir o teclado nativo do sistema operacional do totem
+            event.preventDefault();
+
             const container = document.getElementById('virtual-keyboard-container');
             const grid = document.getElementById('keyboard-layout-grid');
             container.classList.remove('hidden');
             grid.innerHTML = "";
 
             if (layoutTipo === 'num') {
-                // Layout focado em números e DDD para o Celular do Cliente
                 grid.className = "grid grid-cols-3 gap-2 max-w-xs mx-auto";
                 const keysNum = ['1','2','3','4','5','6','7','8','9','(','0',')','APAGAR','✓ CONFIRMAR'];
                 keysNum.forEach(k => {
                     let colSpan = k === '✓ CONFIRMAR' ? 'col-span-3 key-confirm' : (k === 'APAGAR' ? 'key-special' : '');
-                    grid.innerHTML += `<button onclick="capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
+                    grid.innerHTML += `<button onmousedown="capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
                 });
             } else {
-                // Layout Alfanumérico Completo QWERTY para Nome e Observações da Cozinha
                 grid.className = "grid grid-cols-10 gap-1.5 max-w-xl mx-auto";
                 const linhasQwerty = [
                     ['1','2','3','4','5','6','7','8','9','0'],
@@ -406,24 +408,25 @@
                     ['ESPAÇO', '✓ CONFIRMAR']
                 ];
 
-                linhasQwerty.forEach((linha, idxL) => {
+                linhasQwerty.forEach((linha) => {
                     linha.forEach(k => {
                         let colSpan = "";
                         if (k === 'ESPAÇO') colSpan = "col-span-4 key-special";
                         else if (k === '✓ CONFIRMAR') colSpan = "col-span-6 key-confirm";
                         else if (k === 'APAGAR' || k === 'CEBOLA') colSpan = "key-special";
                         
-                        // Atalho divertido e inteligente para ajudar a cozinha da Gersi Nutri
                         let labelKey = k === 'CEBOLA' ? 'SEM CEBOLA' : k;
                         let valorEmitir = k === 'CEBOLA' ? 'SEM CEBOLA, ' : k;
 
-                        grid.innerHTML += `<button onclick="capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
+                        grid.innerHTML += `<button onmousedown="capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
                     });
                 });
             }
+            inputElement.focus();
         }
 
         function capturarCliqueTeclado(valor) {
+            event.preventDefault(); // Impede perda de foco do input
             if (!inputSelecionadoParaDigitar) return;
             resetarTemporizadorInatividade();
 
@@ -436,10 +439,10 @@
             } else if (valor === 'ESPAÇO') {
                 inputSelecionadoParaDigitar.value += " ";
             } else {
-                // Checa o limite do maxlength definido no HTML
                 if (inputSelecionadoParaDigitar.maxLength && textoAtual.length >= inputSelecionadoParaDigitar.maxLength) return;
                 inputSelecionadoParaDigitar.value += valor;
             }
+            montarTextoCupomDinamico(); // Atualiza a prévia da impressão em tempo real ao digitar
         }
 
         function fecharTecladoVirtual() {
