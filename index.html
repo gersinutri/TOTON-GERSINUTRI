@@ -41,6 +41,37 @@
             overflow: hidden;
         }
 
+        /* Estilização Profissional das Teclas do Teclado Virtual */
+        .key-btn {
+            background-color: #ffffff;
+            color: #1e293b;
+            font-weight: bold;
+            font-size: 18px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            touch-action: manipulation;
+            transition: background 0.1s;
+        }
+        .key-btn:active {
+            background-color: #cbd5e1;
+        }
+        .key-special {
+            background-color: #e2e8f0;
+            font-size: 14px;
+        }
+        .key-confirm {
+            background-color: #22c55e;
+            color: white;
+            font-size: 15px;
+        }
+        .key-confirm:active {
+            background-color: #16a34a;
+        }
+
         @page {
             size: auto;
             margin: 0mm;
@@ -167,42 +198,42 @@
         </div>
 
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-                <div class="p-5 border-b text-center bg-slate-50">
-                    <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
+            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
+                <div class="p-4 border-b text-center bg-slate-50 shrink-0">
+                    <h3 class="text-xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
                 </div>
                 
-                <div class="overflow-y-auto flex-1 p-6 space-y-5 bg-slate-50/50">
+                <div id="review-modal-scroll-area" class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 transition-all duration-300">
                     <div id="lista-conferencia-itens" class="space-y-3"></div>
                     
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 space-y-4 shadow-sm text-left">
-                        <h4 class="font-black text-slate-700 text-sm uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-3 shadow-sm text-left">
+                        <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
-                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" inputmode="none" onclick="ativarTecladoVirtual('cliente-nome', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
-                                <input type="text" id="cliente-contato" placeholder="Ex: (75) 99999-9999" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
+                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" inputmode="none" onclick="ativarTecladoVirtual('cliente-contato', 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
-                            <textarea id="cliente-observacao" rows="3" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none" maxlength="120"></textarea>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
+                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." inputmode="none" onclick="ativarTecladoVirtual('cliente-observacao', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
-                    <div class="flex justify-between items-center px-2">
-                        <span id="total-conferencia-valor" class="text-3xl font-black text-[#166534]">R$ 0,00</span>
+                <div class="p-5 bg-white border-t flex flex-col gap-3 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                    <div class="flex justify-between items-center px-1">
+                        <span id="total-conferencia-valor" class="text-2xl font-black text-[#166534]">R$ 0,00</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="fecharModal('review-modal')" class="bg-slate-200 text-slate-700 font-black py-4 rounded-xl uppercase text-sm">Adicionar Mais</button>
-                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-4 rounded-xl uppercase text-sm shadow-md">Confirmar e Pagar</button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="fecharModalEKeyboard('review-modal')" class="bg-slate-200 text-slate-700 font-black py-3.5 rounded-xl uppercase text-xs">Adicionar Mais</button>
+                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-3.5 rounded-xl uppercase text-xs shadow-md">Confirmar e Pagar</button>
                     </div>
                 </div>
             </div>
@@ -237,28 +268,29 @@
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-4"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
-                
-                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="mt-6 bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-bounce">
-                    🟢 JÁ PAGUEI / EMITIR CUPOM
-                </button>
-                
-                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no celular.</p>
             </div>
 
             <div id="area-visual-cartao" class="hidden flex flex-col items-center mt-4">
                 <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
-                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4 bg-white shadow-inner">
                     <div class="text-7xl animate-bounce mb-2">⬇️</div>
                     <span class="font-bold text-sm text-slate-600 text-center">Aguardando maquininha externa...</span>
                 </div>
+            </div>
+
+            <div id="bloco-acao-confirmacao" class="flex flex-col items-center mt-4 w-full">
+                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
+                    🟢 JÁ PAGUEI / EMITIR CUPOM
+                </button>
+                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no balcão / celular.</p>
             </div>
 
             <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md mt-4 mx-auto">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
                     ✓
                 </div>
-                <h2 class="text-3xl font-black text-slate-800">Pagamento Aprovado!</h2>
+                <h2 class="text-3xl font-black text-slate-800">Pagamento Confirmado!</h2>
                 <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Enviando cupom para impressão...</p>
                 <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
             </div>
@@ -270,11 +302,16 @@
             
             <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
         </div>
+
+        <div id="virtual-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 p-4 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] border-t-4 border-slate-700 z-[999] transition-all duration-300">
+            <div id="keyboard-layout-grid" class="grid gap-2 max-w-xl mx-auto"></div>
+        </div>
     </div>
 
     <script>
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
+        let idInputAtivoGlobal = null;
 
         const CONFIG_TOTEM = {
             cnpj: "47342129000141",
@@ -293,6 +330,7 @@
             document.getElementById('cliente-nome').value = "";
             document.getElementById('cliente-contato').value = "";
             document.getElementById('cliente-observacao').value = "";
+            fecharTecladoVirtual();
             if (!cardapioOriginal.length) carregarDados();
             resetarTemporizadorInatividade();
         }
@@ -300,7 +338,7 @@
         function voltarParaTelaDescanso() {
             clearInterval(checagemPagamentoInterval);
             carrinhoItens = []; totalGeral = 0; atualizarRodape();
-            fecharModal('cart-modal'); fecharModal('review-modal'); fecharModal('method-modal'); fecharModal('payment-screen'); fecharModal('addons-modal');
+            fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); fecharModalEKeyboard('method-modal'); fecharModalEKeyboard('payment-screen'); fecharModalEKeyboard('addons-modal');
             document.getElementById('welcome-screen').classList.remove('opacity-0', 'pointer-events-none');
         }
 
@@ -324,6 +362,96 @@
                     renderizarSidebar(); renderizarBanner(); renderizarProdutos();
                 }
             });
+        }
+
+        function ativarTecladoVirtual(idInput, layoutTipo) {
+            idInputAtivoGlobal = idInput;
+            const inputElement = document.getElementById(idInput);
+
+            const container = document.getElementById('virtual-keyboard-container');
+            const grid = document.getElementById('keyboard-layout-grid');
+            const areaScroll = document.getElementById('review-modal-scroll-area');
+            
+            container.classList.remove('hidden');
+            grid.innerHTML = "";
+
+            areaScroll.style.paddingBottom = "280px";
+
+            document.getElementById('cliente-nome').classList.remove('border-green-600', 'bg-white');
+            document.getElementById('cliente-contato').classList.remove('border-green-600', 'bg-white');
+            document.getElementById('cliente-observacao').classList.remove('border-green-600', 'bg-white');
+            inputElement.classList.add('border-green-600', 'bg-white');
+
+            if (layoutTipo === 'num') {
+                grid.className = "grid grid-cols-3 gap-2 max-w-xs mx-auto";
+                const keysNum = ['1','2','3','4','5','6','7','8','9','(','0',')','APAGAR','✓ CONFIRMAR'];
+                keysNum.forEach(k => {
+                    let colSpan = k === '✓ CONFIRMAR' ? 'col-span-3 key-confirm' : (k === 'APAGAR' ? 'key-special' : '');
+                    grid.innerHTML += `<button onclick="capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
+                });
+            } else {
+                grid.className = "grid grid-cols-10 gap-1.5 max-w-xl mx-auto";
+                const linhasQwerty = [
+                    ['1','2','3','4','5','6','7','8','9','0'],
+                    ['Q','W','E','R','T','Y','U','I','O','P'],
+                    ['A','S','D','F','G','H','J','K','L','CEBOLA'],
+                    ['Z','X','C','V','B','N','M',',','.','APAGAR'],
+                    ['ESPAÇO', '✓ CONFIRMAR']
+                ];
+
+                linhasQwerty.forEach((linha) => {
+                    linha.forEach(k => {
+                        let colSpan = "";
+                        if (k === 'ESPAÇO') colSpan = "col-span-4 key-special";
+                        else if (k === '✓ CONFIRMAR') colSpan = "col-span-6 key-confirm";
+                        else if (k === 'APAGAR' || k === 'CEBOLA') colSpan = "key-special";
+                        
+                        let labelKey = k === 'CEBOLA' ? 'SEM CEBOLA' : k;
+                        let valorEmitir = k === 'CEBOLA' ? 'SEM CEBOLA, ' : k;
+
+                        grid.innerHTML += `<button onclick="capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
+                    });
+                });
+            }
+            
+            setTimeout(() => { inputElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+        }
+
+        function capturarCliqueTeclado(valor) {
+            if (!idInputAtivoGlobal) return;
+            resetarTemporizadorInatividade();
+
+            const campoAlvo = document.getElementById(idInputAtivoGlobal);
+            let textoAtual = campoAlvo.value;
+
+            if (valor === 'APAGAR') {
+                campoAlvo.value = textoAtual.slice(0, -1);
+            } else if (valor === '✓ CONFIRMAR') {
+                fecharTecladoVirtual();
+            } else if (valor === 'ESPAÇO') {
+                campoAlvo.value += " ";
+            } else {
+                if (campoAlvo.maxLength && textoAtual.length >= campoAlvo.maxLength) return;
+                campoAlvo.value += valor;
+            }
+            montarTextoCupomDinamico();
+        }
+
+        function fecharTecladoVirtual() {
+            document.getElementById('virtual-keyboard-container').classList.add('hidden');
+            const areaScroll = document.getElementById('review-modal-scroll-area');
+            if(areaScroll) areaScroll.style.paddingBottom = "128px";
+            
+            document.getElementById('cliente-nome').classList.remove('border-green-600', 'bg-white');
+            document.getElementById('cliente-contato').classList.remove('border-green-600', 'bg-white');
+            document.getElementById('cliente-observacao').classList.remove('border-green-600', 'bg-white');
+            
+            idInputAtivoGlobal = null;
+        }
+
+        function fecharModalEKeyboard(id) {
+            fecharTecladoVirtual();
+            fecharModal(id);
         }
 
         function renderizarSidebar() {
@@ -452,7 +580,7 @@
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
             atualizarRodape();
-            if (carrinhoItens.length === 0) { fecharModal('cart-modal'); fecharModal('review-modal'); }
+            if (carrinhoItens.length === 0) { fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); }
             else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
 
@@ -479,7 +607,7 @@
         }
 
         function avancarParaSeletorPagamento() {
-            fecharModal('review-modal');
+            fecharModalEKeyboard('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
         }
@@ -493,9 +621,11 @@
             document.getElementById('area-visual-cartao').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
+            document.getElementById('bloco-acao-confirmacao').classList.remove('hidden');
             document.getElementById('payment-screen').classList.remove('hidden');
 
             montarTextoCupomDinamico();
+            clearInterval(checagemPagamentoInterval);
 
             if(metodo === 'PIX') {
                 document.getElementById('area-visual-pix').classList.remove('hidden');
@@ -505,8 +635,6 @@
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
-                
-                configurarAprovacaoAutomaticaSimulada(4000);
             }
         }
 
@@ -548,32 +676,18 @@
                 colorLight : "#ffffff", 
                 correctLevel : QRCode.CorrectLevel.M 
             });
-
-            clearInterval(checagemPagamentoInterval);
         }
 
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
+            document.getElementById('area-visual-cartao').classList.add('hidden');
+            document.getElementById('bloco-acao-confirmacao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
             setTimeout(() => {
                 executarImpressaoFisicaDoPedido();
             }, 3000);
-        }
-
-        function configurarAprovacaoAutomaticaSimulada(tempoMs) {
-            clearInterval(checagemPagamentoInterval);
-            checagemPagamentoInterval = setTimeout(() => {
-                document.getElementById('area-visual-cartao').classList.add('hidden');
-                document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
-                document.getElementById('area-sucesso-impressao').classList.remove('hidden');
-
-                setTimeout(() => {
-                    executarImpressaoFisicaDoPedido();
-                }, 4000);
-
-            }, tempoMs);
         }
 
         function montarTextoCupomDinamico() {
@@ -627,8 +741,7 @@
         }
 
         function cancelarEVoltar() {
-            clearInterval(checagemPagamentoInterval);
-            fecharModal('payment-screen');
+            fecharModalEKeyboard('payment-screen');
             avancarParaSeletorPagamento();
         }
 
