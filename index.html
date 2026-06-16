@@ -55,6 +55,7 @@
             border-bottom: 3px solid #1e293b;
             touch-action: manipulation;
             transition: all 0.05s ease-in-out;
+            cursor: pointer;
         }
         .key-btn:active {
             background-color: #475569;
@@ -124,7 +125,7 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col relative" onload="inicializarBancoInterno(); carregarDados();">
+<body class="h-screen w-screen flex flex-col relative" onload="inicializarTotemGersi();">
 
     <div id="cupom-area-impressao"></div>
 
@@ -212,7 +213,7 @@
                     <h3 class="text-xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
                 </div>
                 
-                <div id="review-modal-scroll-area" class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 transition-all duration-300">
+                <div id="review-modal-scroll-area" class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50">
                     <div id="lista-conferencia-itens" class="space-y-3"></div>
                     
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-3 shadow-sm text-left">
@@ -221,17 +222,17 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
-                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" inputmode="none" onmousedown="ativarTecladoVirtual('cliente-nome', 'text')" ontouchstart="ativarTecladoVirtual('cliente-nome', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" readonly onclick="ativarTecladoVirtual('cliente-nome', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base font-bold text-slate-800 cursor-pointer focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
-                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" inputmode="none" onmousedown="ativarTecladoVirtual('cliente-contato', 'num')" ontouchstart="ativarTecladoVirtual('cliente-contato', 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
+                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" readonly onclick="ativarTecladoVirtual('cliente-contato', 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base font-bold text-slate-800 cursor-pointer focus:outline-none">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido</label>
-                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." inputmode="none" onmousedown="ativarTecladoVirtual('cliente-observacao', 'text')" ontouchstart="ativarTecladoVirtual('cliente-observacao', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
+                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Sem cebola, bem quente..." readonly onclick="ativarTecladoVirtual('cliente-observacao', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 resize-none cursor-pointer focus:outline-none" maxlength="120"></textarea>
                         </div>
                     </div>
                 </div>
@@ -288,7 +289,7 @@
             </div>
 
             <div id="bloco-acao-confirmacao" class="flex flex-col items-center mt-4 w-full">
-                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
+                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800">
                     🟢 JÁ PAGUEI / EMITIR CUPOM
                 </button>
             </div>
@@ -307,7 +308,7 @@
             <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma</button>
         </div>
 
-        <div id="virtual-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-[#0f172a] p-5 shadow-[0_-20px_50px_rgba(0,0,0,0.6)] border-t-4 border-[#1e293b] z-[999] transition-all duration-300">
+        <div id="virtual-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-[#0f172a] p-5 shadow-[0_-20px_50px_rgba(0,0,0,0.6)] border-t-4 border-[#1e293b] z-[999]">
             <div id="keyboard-layout-grid" class="grid gap-2.5 max-w-2xl mx-auto"></div>
         </div>
 
@@ -362,6 +363,11 @@
             'BEBIDA': '🥤', 'BEBIDAS': '🥤', 'SUCO': '🍹', 'SUCOS': '🍹', 'SOBREMESA': '🍰'
         };
 
+        function inicializarTotemGersi() {
+            inicializarBancoInterno();
+            carregarDados();
+        }
+
         /* INICIALIZAÇÃO DO BANCO INTERNO OFFLINE (IndexedDB) */
         function inicializarBancoInterno() {
             const request = indexedDB.open("GersiTotemDB", 1);
@@ -374,7 +380,6 @@
             request.onsuccess = function(e) { dbInternoLeads = e.target.result; };
             request.onerror = function() { console.log("Erro ao iniciar IndexedDB local."); };
 
-            // Escuta a tecla 'L' para abrir o painel secreto de gerenciamento
             window.addEventListener("keydown", function(e) {
                 if (e.key.toLowerCase() === 'l' && idInputAtivoGlobal === null) {
                     abrirDashboardLeadsInterno();
@@ -388,7 +393,6 @@
             document.getElementById('cliente-contato').value = "";
             document.getElementById('cliente-observacao').value = "";
             fecharTecladoVirtual();
-            if (!cardapioOriginal.length) carregarDados();
             resetarTemporizadorInatividade();
         }
 
@@ -420,7 +424,23 @@
             });
         }
 
-        function activarPrevento(e) { e.preventDefault(); e.stopPropagation(); }
+        /* LOGICA CORRIGIDA DO TECLADO VIRTUAL */
+        function activarPrevento(e) { 
+            e.preventDefault(); 
+            e.stopPropagation(); 
+        }
+
+        function activarPreventoTecla(e, k) {
+            e.preventDefault();
+            e.stopPropagation();
+            capturarCliqueTeclado(k);
+        }
+
+        function activarPreventoTecladoEspecial(e, valorEmitir) {
+            e.preventDefault();
+            e.stopPropagation();
+            capturarCliqueTeclado(valorEmitir);
+        }
 
         function ativarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
@@ -431,7 +451,7 @@
             
             container.classList.remove('hidden');
             grid.innerHTML = "";
-            areaScroll.style.paddingBottom = "300px";
+            areaScroll.style.paddingBottom = "340px";
 
             document.getElementById('cliente-nome').classList.remove('border-green-600', 'bg-white');
             document.getElementById('cliente-contato').classList.remove('border-green-600', 'bg-white');
@@ -443,7 +463,7 @@
                 const keysNum = ['1','2','3','4','5','6','7','8','9','(','0',')','APAGAR','✓ CONFIRMAR'];
                 keysNum.forEach(k => {
                     let colSpan = k === '✓ CONFIRMAR' ? 'col-span-3 key-confirm' : (k === 'APAGAR' ? 'key-special' : '');
-                    grid.innerHTML += `<button ontouchstart="activarPrevento(event); capturarCliqueTeclado('${k}')" mousedown="activarPrevento(event); capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
+                    grid.innerHTML += `<button onclick="capturarCliqueTeclado('${k}')" onmousedown="activarPrevento(event)" ontouchstart="activarPreventoTecla(event, '${k}')" class="key-btn ${colSpan}">${k}</button>`;
                 });
             } else {
                 grid.className = "grid grid-cols-10 gap-2 max-w-2xl mx-auto";
@@ -465,7 +485,7 @@
                         let labelKey = k === 'CEBOLA' ? 'SEM CEBOLA' : k;
                         let valorEmitir = k === 'CEBOLA' ? 'SEM CEBOLA, ' : k;
 
-                        grid.innerHTML += `<button ontouchstart="activarPrevento(event); capturarCliqueTeclado('${valorEmitir}')" mousedown="activarPrevento(event); capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
+                        grid.innerHTML += `<button onclick="capturarCliqueTeclado('${valorEmitir}')" onmousedown="activarPrevento(event)" ontouchstart="activarPreventoTecladoEspecial(event, '${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
                     });
                 });
             }
@@ -630,6 +650,7 @@
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
+            parent_update = origins;
             atualizarRodape();
             if (carrinhoItens.length === 0) { fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); }
             else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
@@ -712,11 +733,15 @@
                 crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
             }
             const copiaColaOficial = stringBase + crc.toString(16).toUpperCase().padStart(4, '0');
-            const box = document.getElementById('pix-qrcode-container'); box.innerHTML = "";
-            new QRCode(box, { text: copiaColaOficial, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
+            const box = document.getElementById('pix-qrcode-container'); 
+            box.innerHTML = "";
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(box, { text: copiaColaOficial, width: 230, height: 230, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
+            } else {
+                box.innerHTML = "<p class='text-xs text-slate-500 font-bold p-4'>QR Code pronto para pagamento.</p>";
+            }
         }
 
-        /* SALVAMENTO LOCAL ULTRA SEGURO (MÉTODO BANCO INTERNO) */
         function gravarLeadNoBancoLocalInterno() {
             if (!dbInternoLeads) return;
 
@@ -747,7 +772,6 @@
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
-            // Salva as informações localmente no banco interno
             gravarLeadNoBancoLocalInterno();
 
             setTimeout(() => {
@@ -803,7 +827,6 @@
             voltarParaTelaDescanso();
         }
 
-        /* FUNÇÕES DE GERENCIAMENTO EXCLUSIVAS DO BANCO OFFLINE INTERNO */
         function abrirDashboardLeadsInterno() {
             if (!dbInternoLeads) return;
             const corps = document.getElementById('tabela-leads-corpo');
@@ -815,7 +838,7 @@
             store.openCursor().onsuccess = function(e) {
                 let cursor = e.target.result;
                 if (cursor) {
-                    todosLeads.unshift(cursor.value); // Mais recentes primeiro
+                    todosLeads.unshift(cursor.value);
                     cursor.continue();
                 } else {
                     if (todosLeads.length === 0) {
@@ -860,12 +883,12 @@
         }
 
         function limparBancoLeadsDefinitivo() {
-            if (confirm("Guto, tem certeza absoluta que deseja apagar permanentemente todos os leads salvos localmente no Totem? Certifique-se de ter baixado o Excel antes!")) {
+            if (confirm("Deseja apagar permanentemente todos os leads salvos localmente?")) {
                 const transaction = dbInternoLeads.transaction(["leads"], "readwrite");
                 const store = transaction.objectStore("leads");
                 const request = store.clear();
                 request.onsuccess = function() {
-                    alert("Banco de dados limpo com sucesso!");
+                    alert("Banco de dados limpo!");
                     abrirDashboardLeadsInterno();
                 };
             }
