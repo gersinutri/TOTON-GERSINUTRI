@@ -237,28 +237,29 @@
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-4"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
-                
-                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="mt-6 bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-bounce">
-                    🟢 JÁ PAGUEI / EMITIR CUPOM
-                </button>
-                
-                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no celular.</p>
             </div>
 
             <div id="area-visual-cartao" class="hidden flex flex-col items-center mt-4">
                 <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
                 <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
-                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4 bg-white shadow-inner">
                     <div class="text-7xl animate-bounce mb-2">⬇️</div>
                     <span class="font-bold text-sm text-slate-600 text-center">Aguardando maquininha externa...</span>
                 </div>
+            </div>
+
+            <div id="bloco-acao-confirmacao" class="flex flex-col items-center mt-4 w-full">
+                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
+                    🟢 JÁ PAGUEI / EMITIR CUPOM
+                </button>
+                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no balcão / celular.</p>
             </div>
 
             <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md mt-4 mx-auto">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
                     ✓
                 </div>
-                <h2 class="text-3xl font-black text-slate-800">Pagamento Aprovado!</h2>
+                <h2 class="text-3xl font-black text-slate-800">Pagamento Confirmado!</h2>
                 <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Enviando cupom para impressão...</p>
                 <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
             </div>
@@ -493,9 +494,15 @@
             document.getElementById('area-visual-cartao').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
+            
+            // Ativa o bloco de ação unificado visível para Pix, Crédito e Débito
+            document.getElementById('bloco-acao-confirmacao').classList.remove('hidden');
             document.getElementById('payment-screen').classList.remove('hidden');
 
             montarTextoCupomDinamico();
+
+            // Desativa qualquer loop automático de tempo para garantir controle infinito do balcão
+            clearInterval(checagemPagamentoInterval);
 
             if(metodo === 'PIX') {
                 document.getElementById('area-visual-pix').classList.remove('hidden');
@@ -505,8 +512,6 @@
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
-                
-                configurarAprovacaoAutomaticaSimulada(4000);
             }
         }
 
@@ -548,32 +553,19 @@
                 colorLight : "#ffffff", 
                 correctLevel : QRCode.CorrectLevel.M 
             });
-
-            clearInterval(checagemPagamentoInterval);
         }
 
+        // FUNÇÃO UNIFICADA: CONTROLADA PELO ATENDENTE / CLIENTE APÓS O CARTÃO PASSAR NA MÁQUINA
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
+            document.getElementById('area-visual-cartao').classList.add('hidden');
+            document.getElementById('bloco-acao-confirmacao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
             setTimeout(() => {
                 executarImpressaoFisicaDoPedido();
             }, 3000);
-        }
-
-        function configurarAprovacaoAutomaticaSimulada(tempoMs) {
-            clearInterval(checagemPagamentoInterval);
-            checagemPagamentoInterval = setTimeout(() => {
-                document.getElementById('area-visual-cartao').classList.add('hidden');
-                document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
-                document.getElementById('area-sucesso-impressao').classList.remove('hidden');
-
-                setTimeout(() => {
-                    executarImpressaoFisicaDoPedido();
-                }, 4000);
-
-            }, tempoMs);
         }
 
         function montarTextoCupomDinamico() {
