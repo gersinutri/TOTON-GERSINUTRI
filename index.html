@@ -249,11 +249,15 @@
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center mt-4">
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
-                <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-6"></p>
+                <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-4"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
-                <div class="flex items-center gap-2 text-green-600 font-bold animate-pulse text-lg mt-4">
-                    <span>🔄</span><span id="label-status-pix">Aguardando escaneamento...</span>
-                </div>
+                
+                <!-- BOTÃO DE CONFIRMAÇÃO DO CLIENTE (SEM TIMEOUT FORÇADO) -->
+                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="mt-6 bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-bounce">
+                    🟢 JÁ PAGUEI / EMITIR CUPOM
+                </button>
+                
+                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no celular.</p>
             </div>
 
             <div id="area-visual-cartao" class="hidden flex flex-col items-center mt-4">
@@ -288,7 +292,6 @@
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
 
-        // Configuração Oficial Cadastrada: CNPJ Gersi Nutri
         const CONFIG_TOTEM = {
             cnpj: "47342129000141",
             titular: "GERSI NUTRI",
@@ -491,7 +494,7 @@
             `).join('');
         }
 
-        function avancarParaSeletorPagamento() {
+        function avanzarParaSeletorPagamento() {
             fecharModal('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
@@ -519,18 +522,17 @@
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
                 
+                // Simulação automática para Cartão mantém o timeout de 4s tradicional
                 configurarAprovacaoAutomaticaSimulada(4000);
             }
         }
 
-        // COORDENAÇÃO DE MONTAGEM DO PIX CNPJ EM CONFORMIDADE TOTAL COM O BANCO CENTRAL
         function gerarPixCnpjComercial() {
             function formatarBloco(id, conteudo) {
                 const tamanho = String(conteudo.length).padStart(2, '0');
                 return id + tamanho + conteudo;
             }
 
-            // Conta comercial estruturada a partir da chave CNPJ limpa
             const informacaoChave = formatarBloco("00", "br.gov.bcb.pix") + formatarBloco("01", CONFIG_TOTEM.cnpj);
             
             let stringBase = "000201" 
@@ -544,7 +546,6 @@
                 + "62070503***" 
                 + "6304";
 
-            // Processamento do CRC16 Sem risco de quebra de caracteres
             let crc = 0xFFFF;
             for (let i = 0; i < stringBase.length; i++) {
                 let x = ((crc >> 8) ^ stringBase.charCodeAt(i)) & 0xFF;
@@ -565,13 +566,24 @@
                 correctLevel : QRCode.CorrectLevel.M 
             });
 
-            configurarAprovacaoAutomaticaSimulada(7000);
+            // CRÍTICO: Limpa qualquer loop automático anterior para o QR Code ficar fixo na tela pelo tempo que for preciso
+            clearInterval(checagemPagamentoInterval);
+        }
+
+        // FUNÇÃO DE LIBERAÇÃO MANUAL DO PIX PELO CLIENTE TOQUEM SENSÍVEL
+        function confirmarPagamentoEfetuadoManualmente() {
+            document.getElementById('area-visual-pix').classList.add('hidden');
+            document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
+            document.getElementById('area-sucesso-impressao').classList.remove('hidden');
+
+            setTimeout(() => {
+                executarImpressaoFisicaDoPedido();
+            }, 3000);
         }
 
         function configurarAprovacaoAutomaticaSimulada(tempoMs) {
             clearInterval(checagemPagamentoInterval);
             checagemPagamentoInterval = setTimeout(() => {
-                document.getElementById('area-visual-pix').classList.add('hidden');
                 document.getElementById('area-visual-cartao').classList.add('hidden');
                 document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
                 document.getElementById('area-sucesso-impressao').classList.remove('hidden');
