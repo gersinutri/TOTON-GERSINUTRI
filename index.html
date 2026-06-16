@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
         
         .sidebar-btn { 
             transition: all 0.25s ease-in-out; 
@@ -72,14 +72,6 @@
             background-color: #16a34a;
         }
 
-        /* Placeholder para caixas customizadas */
-        .fake-input:empty::before {
-            content: attr(data-placeholder);
-            color: #94a3b8;
-            font-weight: normal;
-            pointer-events: none;
-        }
-
         @page {
             size: auto;
             margin: 0mm;
@@ -123,9 +115,11 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
+    <!-- ÁREA OCULTA DO SISTEMA DE IMPRESSÃO -->
     <div id="cupom-area-impressao"></div>
 
-    <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
+    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
+    <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
         <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10">
@@ -144,16 +138,20 @@
         </div>
     </div>
 
+    <!-- ESTRUTURA PRINCIPAL DO TOTEM -->
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
+            <!-- BARRA LATERAL -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
             </nav>
 
+            <!-- ÁREA DE PRODUTOS -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
                 <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6"></div>
 
@@ -163,8 +161,9 @@
             </main>
         </div>
 
+        <!-- RODAPÉ -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
-            <button id="btn-carrinho-aba" ontouchstart="abrirResumoCarrinho()" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
+            <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
                 <span id="carrinho-contador" class="bg-red-500 text-white font-black w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
                 <div class="text-left">
@@ -172,39 +171,42 @@
                     <p id="total-value" class="font-black text-2xl text-slate-800">R$ 0,00</p>
                 </div>
             </button>
-            <button ontouchstart="abrirTelaConferencia()" onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
+            <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
+        <!-- MODAL DE ADICIONAIS -->
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
                     <h2 id="addon-product-name" class="font-black text-xl text-slate-800 truncate">Opções do Item</h2>
-                    <button ontouchstart="fecharModal('addons-modal')" onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400">✕</button>
+                    <button onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400">✕</button>
                 </div>
                 <div id="container-lista-adicionais" class="p-6 overflow-y-auto max-h-[55vh] space-y-3 text-left"></div>
                 <div class="p-4 bg-slate-50 border-t flex items-center justify-between">
-                    <button ontouchstart="fecharModal('addons-modal')" onclick="fecharModal('addons-modal')" class="text-slate-500 font-bold px-4 py-2 text-sm">Cancelar</button>
-                    <button ontouchstart="confirmarAdicionaisPlanilha()" onclick="confirmarAdicionaisPlanilha()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider">Adicionar ao Pedido</button>
+                    <button onclick="fecharModal('addons-modal')" class="text-slate-500 font-bold px-4 py-2 text-sm">Cancelar</button>
+                    <button onclick="confirmarAdicionaisPlanilha()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider">Adicionar ao Pedido</button>
                 </div>
             </div>
         </div>
 
+        <!-- MODAL DO CARRINHO -->
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                     <h2 class="font-black text-2xl text-slate-800">Itens no Pedido</h2>
-                    <button ontouchstart="fecharModal('cart-modal')" onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400">✕</button>
+                    <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400">✕</button>
                 </div>
                 <div id="lista-carrinho" class="p-5 overflow-y-auto flex-1 space-y-3 content-start"></div>
                 <div class="p-5 bg-slate-50 border-t flex justify-between items-center shrink-0">
                     <div>
                         <p id="modal-total-carrinho" class="text-2xl font-black text-slate-800">R$ 0,00</p>
                     </div>
-                    <button ontouchstart="fecharModal('cart-modal')" onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs">Voltar</button>
+                    <button onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs">Voltar</button>
                 </div>
             </div>
         </div>
 
+        <!-- TELA DE CONFERÊNCIA COM INPUTS CORRIGIDOS (ULTRA RESPONSIVOS) -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
                 <div class="p-4 border-b text-center bg-slate-50 shrink-0">
@@ -212,25 +214,28 @@
                 </div>
                 
                 <div id="review-modal-scroll-area" class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 transition-all duration-300">
+                    <!-- Lista de Itens -->
                     <div id="lista-conferencia-itens" class="space-y-3"></div>
                     
+                    <!-- Identificação do Cliente e Observação -->
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-3 shadow-sm text-left">
                         <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
-                                <div id="cliente-nome" data-placeholder="Ex: Guto" ontouchstart="activarPrevento(event); ativarTecladoVirtual('cliente-nome', 'text')" onclick="ativarTecladoVirtual('cliente-nome', 'text')" class="fake-input w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 cursor-pointer min-h-[44px] flex items-center outline-none"></div>
+                                <!-- Retornado para INPUT real estável com eventos mousedown + touchstart combinados -->
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" inputmode="none" onmousedown="ativarTecladoVirtual('cliente-nome', 'text')" ontouchstart="ativarTecladoVirtual('cliente-nome', 'text')" onclick="ativarTecladoVirtual('cliente-nome', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
-                                <div id="cliente-contato" data-placeholder="Ex: 75999999999" ontouchstart="activarPrevento(event); ativarTecladoVirtual('cliente-contato', 'num')" onclick="ativarTecladoVirtual('cliente-contato', 'num')" class="fake-input w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 cursor-pointer min-h-[44px] flex items-center outline-none"></div>
+                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" inputmode="none" onmousedown="ativarTecladoVirtual('cliente-contato', 'num')" ontouchstart="ativarTecladoVirtual('cliente-contato', 'num')" onclick="ativarTecladoVirtual('cliente-contato', 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
-                            <div id="cliente-observacao" data-placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." ontouchstart="activarPrevento(event); ativarTecladoVirtual('cliente-observacao', 'text')" onclick="ativarTecladoVirtual('cliente-observacao', 'text')" class="fake-input w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 cursor-pointer min-h-[64px] block overflow-hidden whitespace-normal break-words outline-none"></div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 lines)</label>
+                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." inputmode="none" onmousedown="ativarTecladoVirtual('cliente-observacao', 'text')" ontouchstart="ativarTecladoVirtual('cliente-observacao', 'text')" onclick="ativarTecladoVirtual('cliente-observacao', 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
                         </div>
                     </div>
                 </div>
@@ -240,36 +245,38 @@
                         <span id="total-conferencia-valor" class="text-2xl font-black text-[#166534]">R$ 0,00</span>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <button ontouchstart="fecharModalEKeyboard('review-modal')" onclick="fecharModalEKeyboard('review-modal')" class="bg-slate-200 text-slate-700 font-black py-3.5 rounded-xl uppercase text-xs">Adicionar Mais</button>
-                        <button ontouchstart="avancarParaSeletorPagamento()" onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-3.5 rounded-xl uppercase text-xs shadow-md">Confirmar e Pagar</button>
+                        <button onclick="fecharModalEKeyboard('review-modal')" class="bg-slate-200 text-slate-700 font-black py-3.5 rounded-xl uppercase text-xs">Adicionar Mais</button>
+                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-3.5 rounded-xl uppercase text-xs shadow-md">Confirmar e Pagar</button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
                 <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
                 
                 <div class="grid grid-cols-3 gap-4 mb-6">
-                    <button ontouchstart="processarPagamento('PIX')" onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
+                    <button onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
                         <span class="text-4xl mb-3">📱</span>
                         <span class="font-black text-base text-slate-800">Pix</span>
                     </button>
-                    <button ontouchstart="processarPagamento('CREDITO')" onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
+                    <button onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
                         <span class="text-4xl mb-3">💳</span>
                         <span class="font-black text-base text-slate-800">Crédito</span>
                     </button>
-                    <button ontouchstart="processarPagamento('DEBITO')" onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
+                    <button onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
                         <span class="text-4xl mb-3">💵</span>
                         <span class="font-black text-base text-slate-800">Débito</span>
                     </button>
                 </div>
-                <button ontouchstart="cancelarEVoltarParaConferencia()" onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
+                <button onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
             </div>
         </div>
 
+        <!-- TELA DE PROCESSAMENTO FINAL -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-start p-6 text-center overflow-y-auto">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center mt-4">
@@ -288,7 +295,7 @@
             </div>
 
             <div id="bloco-acao-confirmacao" class="flex flex-col items-center mt-4 w-full">
-                <button ontouchstart="confirmarPagamentoEfetuadoManualmente()" onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
+                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
                     🟢 JÁ PAGUEI / EMITIR CUPOM
                 </button>
                 <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no balcão / celular.</p>
@@ -308,9 +315,10 @@
                 <div id="espelho-cupom-tela" class="font-mono text-[11px] text-slate-900 whitespace-pre leading-tight bg-white p-3 rounded border border-zinc-200 shadow-inner"></div>
             </div>
             
-            <button id="btn-cancelar-pagamento" ontouchstart="cancelarEVoltar()" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
+            <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
         </div>
 
+        <!-- PAINEL DO TECLADO VIRTUAL FIXADO NO RODAPÉ ABSOLUTO -->
         <div id="virtual-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 p-4 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] border-t-4 border-slate-700 z-[999] transition-all duration-300">
             <div id="keyboard-layout-grid" class="grid gap-2 max-w-xl mx-auto"></div>
         </div>
@@ -335,9 +343,9 @@
 
         function iniciarAtendimento() {
             document.getElementById('welcome-screen').classList.add('opacity-0', 'pointer-events-none');
-            document.getElementById('cliente-nome').textContent = "";
-            document.getElementById('cliente-contato').textContent = "";
-            document.getElementById('cliente-observacao').textContent = "";
+            document.getElementById('cliente-nome').value = "";
+            document.getElementById('cliente-contato').value = "";
+            document.getElementById('cliente-observacao').value = "";
             fecharTecladoVirtual();
             if (!cardapioOriginal.length) carregarDados();
             resetarTemporizadorInatividade();
@@ -355,7 +363,6 @@
             timeoutInatividade = setTimeout(voltarParaTelaDescanso, 180000);
         }
         window.addEventListener('click', resetarTemporizadorInatividade);
-        window.addEventListener('touchstart', resetarTemporizadorInatividade);
 
         function normalizarTexto(texto) {
             return texto ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
@@ -371,15 +378,6 @@
                     renderizarSidebar(); renderizarBanner(); renderizarProdutos();
                 }
             });
-        }
-
-        function activarPrevento(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        function activarClickTecladoEvent(k) {
-            capturarCliqueTeclado(k);
         }
 
         function activarTecladoVirtual(idInput, layoutTipo) {
@@ -405,7 +403,7 @@
                 const keysNum = ['1','2','3','4','5','6','7','8','9','(','0',')','APAGAR','✓ CONFIRMAR'];
                 keysNum.forEach(k => {
                     let colSpan = k === '✓ CONFIRMAR' ? 'col-span-3 key-confirm' : (k === 'APAGAR' ? 'key-special' : '');
-                    grid.innerHTML += `<button ontouchstart="activarPrevento(event); activarClickTecladoEvent('${k}')" onclick="capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
+                    grid.innerHTML += `<button onclick="capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
                 });
             } else {
                 grid.className = "grid grid-cols-10 gap-1.5 max-w-xl mx-auto";
@@ -427,7 +425,7 @@
                         let labelKey = k === 'CEBOLA' ? 'SEM CEBOLA' : k;
                         let valorEmitir = k === 'CEBOLA' ? 'SEM CEBOLA, ' : k;
 
-                        grid.innerHTML += `<button ontouchstart="activarPrevento(event); activarClickTecladoEvent('${valorEmitir}')" onclick="capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
+                        grid.innerHTML += `<button onclick="capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
                     });
                 });
             }
@@ -440,18 +438,17 @@
             resetarTemporizadorInatividade();
 
             const campoAlvo = document.getElementById(idInputAtivoGlobal);
-            let textoAtual = campoAlvo.textContent;
+            let textoAtual = campoAlvo.value;
 
             if (valor === 'APAGAR') {
-                campoAlvo.textContent = textoAtual.slice(0, -1);
+                campoAlvo.value = textoAtual.slice(0, -1);
             } else if (valor === '✓ CONFIRMAR') {
                 fecharTecladoVirtual();
             } else if (valor === 'ESPAÇO') {
-                campoAlvo.textContent = textoAtual + " ";
+                campoAlvo.value += " ";
             } else {
-                if (idInputAtivoGlobal === 'cliente-observacao' && textoAtual.length >= 120) return;
-                if (idInputAtivoGlobal !== 'cliente-observacao' && textoAtual.length >= 30) return;
-                campoAlvo.textContent = textoAtual + valor;
+                if (campoAlvo.maxLength && textoAtual.length >= campoAlvo.maxLength) return;
+                campoAlvo.value += valor;
             }
             montarTextoCupomDinamico();
         }
@@ -477,7 +474,7 @@
             const nav = document.getElementById('sidebar');
             const listaCategorias = ['TODOS', ...new Set(cardapioOriginal.map(r => r[2].trim()))];
             nav.innerHTML = listaCategorias.map(c => `
-                <button ontouchstart="filtrar('${c}')" onclick="filtrar('${c}')" class="sidebar-btn p-3 text-center text-[11px] uppercase font-bold ${c === catAtiva ? 'active' : ''}">
+                <button onclick="filtrar('${c}')" class="sidebar-btn p-3 text-center text-[11px] uppercase font-bold ${c === catAtiva ? 'active' : ''}">
                     <span class="text-2xl">${mapaIcones[normalizarTexto(c)] || '🍲'}</span>
                     <span class="leading-tight">${c}</span>
                 </button>
@@ -520,7 +517,7 @@
                                 <p class="text-[#166534] font-black text-xl mt-1">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
-                        <button ontouchstart="verificarAdicionaisPlanilha(${cardapioOriginal.indexOf(p)})" onclick="verificarAdicionaisPlanilha(${cardapioOriginal.indexOf(p)})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black">+</button>
+                        <button onclick="verificarAdicionaisPlanilha(${cardapioOriginal.indexOf(p)})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black">+</button>
                     </div>
                 `;
             }).join('');
@@ -588,7 +585,7 @@
                         <span class="text-xs text-slate-400 font-bold">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <span class="font-extrabold text-slate-700 px-4">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                    <button ontouchstart="excluir(${idx}, 'CARRINHO')" onclick="excluir(${idx}, 'CARRINHO')" class="text-xl">❌</button>
+                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-xl">❌</button>
                 </div>
             `).join('');
             document.getElementById('cart-modal').classList.remove('hidden');
@@ -619,7 +616,7 @@
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="font-black text-[#166534] text-lg">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
-                        <button ontouchstart="excluir(${idx}, 'CONFERENCIA')" onclick="excluir(${idx}, 'CONFERENCIA')" class="text-red-500">❌</button>
+                        <button onclick="excluir(${idx}, 'CONFERENCIA')" class="text-red-500">❌</button>
                     </div>
                 </div>
             `).join('');
@@ -697,11 +694,6 @@
             });
         }
 
-        function confirmarPagamentoEfetuamenteManualmente() {
-            // Mantido por retrocompatibilidade de chamadas antigas se houver
-            confirmarPagamentoEfetuadoManualmente();
-        }
-
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
@@ -716,9 +708,9 @@
 
         function montarTextoCupomDinamico() {
             const numeroSenha = Math.floor(Math.random() * 90) + 10;
-            const nomeCli = document.getElementById('cliente-nome').textContent.trim() || 'NAO INFORMADO';
-            const contatoCli = document.getElementById('cliente-contato').textContent.trim() || 'NAO INFORMADO';
-            const obsCli = document.getElementById('cliente-observacao').textContent.trim();
+            const nomeCli = document.getElementById('cliente-nome').value.trim() || 'NAO INFORMADO';
+            const contatoCli = document.getElementById('cliente-contato').value.trim() || 'NAO INFORMADO';
+            const obsCli = document.getElementById('cliente-observacao').value.trim();
             
             let textoCupom = `==================================\n`;
             textoCupom += `           GERSI NUTRI            \n`;
