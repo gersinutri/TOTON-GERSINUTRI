@@ -41,6 +41,37 @@
             overflow: hidden;
         }
 
+        /* Estilização das Teclas do Teclado Virtual */
+        .key-btn {
+            background-color: #ffffff;
+            color: #1e293b;
+            font-weight: bold;
+            font-size: 18px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            touch-action: manipulation;
+            transition: background 0.1s;
+        }
+        .key-btn:active {
+            background-color: #cbd5e1;
+        }
+        .key-special {
+            background-color: #e2e8f0;
+            font-size: 14px;
+        }
+        .key-confirm {
+            background-color: #22c55e;
+            color: white;
+            font-size: 15px;
+        }
+        .key-confirm:active {
+            background-color: #16a34a;
+        }
+
         @page {
             size: auto;
             margin: 0mm;
@@ -84,8 +115,10 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
+    <!-- ÁREA OCULTA DO SISTEMA DE IMPRESSÃO -->
     <div id="cupom-area-impressao"></div>
 
+    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
     <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
@@ -105,16 +138,20 @@
         </div>
     </div>
 
+    <!-- ESTRUTURA PRINCIPAL DO TOTEM -->
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
+        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
+            <!-- BARRA LATERAL -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
             </nav>
 
+            <!-- ÁREA DE PRODUTOS -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
                 <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6"></div>
 
@@ -124,6 +161,7 @@
             </main>
         </div>
 
+        <!-- RODAPÉ -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
             <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
@@ -136,6 +174,7 @@
             <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
+        <!-- MODAL DE ADICIONAIS -->
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
@@ -150,6 +189,7 @@
             </div>
         </div>
 
+        <!-- MODAL DO CARRINHO -->
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -166,48 +206,57 @@
             </div>
         </div>
 
+        <!-- TELA DE CONFERÊNCIA COM INPUTS DE DADOS DO CLIENTE -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-                <div class="p-5 border-b text-center bg-slate-50">
-                    <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
+            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[95vh] flex flex-col overflow-hidden shadow-2xl relative">
+                <div class="p-4 border-b text-center bg-slate-50 shrink-0">
+                    <h3 class="text-xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
                 </div>
                 
-                <div class="overflow-y-auto flex-1 p-6 space-y-5 bg-slate-50/50">
+                <div class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 pb-32">
+                    <!-- Lista de Itens -->
                     <div id="lista-conferencia-itens" class="space-y-3"></div>
                     
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 space-y-4 shadow-sm text-left">
-                        <h4 class="font-black text-slate-700 text-sm uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
+                    <!-- Identificação do Cliente e Observação -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-3 shadow-sm text-left">
+                        <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
-                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" readonly onclick="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
-                                <input type="text" id="cliente-contato" placeholder="Ex: (75) 99999-9999" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
+                                <input type="text" id="cliente-contato" placeholder="Ex: 75999999999" readonly onclick="ativarTecladoVirtual(this, 'num')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800 cursor-pointer">
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
-                            <textarea id="cliente-observacao" rows="3" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none" maxlength="120"></textarea>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
+                            <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." readonly onclick="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
-                    <div class="flex justify-between items-center px-2">
-                        <span id="total-conferencia-valor" class="text-3xl font-black text-[#166534]">R$ 0,00</span>
+                <!-- PAINEL FIXO DO TECLADO VIRTUAL INTERNO DO MODAL -->
+                <div id="virtual-keyboard-container" class="hidden absolute bottom-24 left-0 right-0 bg-slate-800 p-3 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] border-t-2 border-slate-700 z-[70] transition-all duration-300">
+                    <div id="keyboard-layout-grid" class="grid gap-2 max-w-xl mx-auto"></div>
+                </div>
+
+                <div class="p-5 bg-white border-t flex flex-col gap-3 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                    <div class="flex justify-between items-center px-1">
+                        <span id="total-conferencia-valor" class="text-2xl font-black text-[#166534]">R$ 0,00</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="fecharModal('review-modal')" class="bg-slate-200 text-slate-700 font-black py-4 rounded-xl uppercase text-sm">Adicionar Mais</button>
-                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-4 rounded-xl uppercase text-sm shadow-md">Confirmar e Pagar</button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="fecharModalEKeyboard('review-modal')" class="bg-slate-200 text-slate-700 font-black py-3.5 rounded-xl uppercase text-xs">Adicionar Mais</button>
+                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-3.5 rounded-xl uppercase text-xs shadow-md">Confirmar e Pagar</button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
@@ -231,6 +280,7 @@
             </div>
         </div>
 
+        <!-- TELA DE PROCESSAMENTO FINAL -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-start p-6 text-center overflow-y-auto">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center mt-4">
@@ -276,6 +326,7 @@
     <script>
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
+        let inputSelecionadoParaDigitar = null;
 
         const CONFIG_TOTEM = {
             cnpj: "47342129000141",
@@ -294,6 +345,7 @@
             document.getElementById('cliente-nome').value = "";
             document.getElementById('cliente-contato').value = "";
             document.getElementById('cliente-observacao').value = "";
+            fecharTecladoVirtual();
             if (!cardapioOriginal.length) carregarDados();
             resetarTemporizadorInatividade();
         }
@@ -301,7 +353,7 @@
         function voltarParaTelaDescanso() {
             clearInterval(checagemPagamentoInterval);
             carrinhoItens = []; totalGeral = 0; atualizarRodape();
-            fecharModal('cart-modal'); fecharModal('review-modal'); fecharModal('method-modal'); fecharModal('payment-screen'); fecharModal('addons-modal');
+            fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); fecharModalEKeyboard('method-modal'); fecharModalEKeyboard('payment-screen'); fecharModalEKeyboard('addons-modal');
             document.getElementById('welcome-screen').classList.remove('opacity-0', 'pointer-events-none');
         }
 
@@ -325,6 +377,79 @@
                     renderizarSidebar(); renderizarBanner(); renderizarProdutos();
                 }
             });
+        }
+
+        /* LÓGICA DO TECLADO VIRTUAL PREMIUM E INTEGRADO */
+        function activarTecladoVirtual(inputElement, layoutTipo) {
+            inputSelecionadoParaDigitar = inputElement;
+            const container = document.getElementById('virtual-keyboard-container');
+            const grid = document.getElementById('keyboard-layout-grid');
+            container.classList.remove('hidden');
+            grid.innerHTML = "";
+
+            if (layoutTipo === 'num') {
+                // Layout focado em números e DDD para o Celular do Cliente
+                grid.className = "grid grid-cols-3 gap-2 max-w-xs mx-auto";
+                const keysNum = ['1','2','3','4','5','6','7','8','9','(','0',')','APAGAR','✓ CONFIRMAR'];
+                keysNum.forEach(k => {
+                    let colSpan = k === '✓ CONFIRMAR' ? 'col-span-3 key-confirm' : (k === 'APAGAR' ? 'key-special' : '');
+                    grid.innerHTML += `<button onclick="capturarCliqueTeclado('${k}')" class="key-btn ${colSpan}">${k}</button>`;
+                });
+            } else {
+                // Layout Alfanumérico Completo QWERTY para Nome e Observações da Cozinha
+                grid.className = "grid grid-cols-10 gap-1.5 max-w-xl mx-auto";
+                const linhasQwerty = [
+                    ['1','2','3','4','5','6','7','8','9','0'],
+                    ['Q','W','E','R','T','Y','U','I','O','P'],
+                    ['A','S','D','F','G','H','J','K','L','CEBOLA'],
+                    ['Z','X','C','V','B','N','M',',','.','APAGAR'],
+                    ['ESPAÇO', '✓ CONFIRMAR']
+                ];
+
+                linhasQwerty.forEach((linha, idxL) => {
+                    linha.forEach(k => {
+                        let colSpan = "";
+                        if (k === 'ESPAÇO') colSpan = "col-span-4 key-special";
+                        else if (k === '✓ CONFIRMAR') colSpan = "col-span-6 key-confirm";
+                        else if (k === 'APAGAR' || k === 'CEBOLA') colSpan = "key-special";
+                        
+                        // Atalho divertido e inteligente para ajudar a cozinha da Gersi Nutri
+                        let labelKey = k === 'CEBOLA' ? 'SEM CEBOLA' : k;
+                        let valorEmitir = k === 'CEBOLA' ? 'SEM CEBOLA, ' : k;
+
+                        grid.innerHTML += `<button onclick="capturarCliqueTeclado('${valorEmitir}')" class="key-btn ${colSpan}">${labelKey}</button>`;
+                    });
+                });
+            }
+        }
+
+        function capturarCliqueTeclado(valor) {
+            if (!inputSelecionadoParaDigitar) return;
+            resetarTemporizadorInatividade();
+
+            let textoAtual = inputSelecionadoParaDigitar.value;
+
+            if (valor === 'APAGAR') {
+                inputSelecionadoParaDigitar.value = textoAtual.slice(0, -1);
+            } else if (valor === '✓ CONFIRMAR') {
+                fecharTecladoVirtual();
+            } else if (valor === 'ESPAÇO') {
+                inputSelecionadoParaDigitar.value += " ";
+            } else {
+                // Checa o limite do maxlength definido no HTML
+                if (inputSelecionadoParaDigitar.maxLength && textoAtual.length >= inputSelecionadoParaDigitar.maxLength) return;
+                inputSelecionadoParaDigitar.value += valor;
+            }
+        }
+
+        function fecharTecladoVirtual() {
+            document.getElementById('virtual-keyboard-container').classList.add('hidden');
+            inputSelecionadoParaDigitar = null;
+        }
+
+        function fecharModalEKeyboard(id) {
+            fecharTecladoVirtual();
+            fecharModal(id);
         }
 
         function renderizarSidebar() {
@@ -453,7 +578,7 @@
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
             atualizarRodape();
-            if (carrinhoItens.length === 0) { fecharModal('cart-modal'); fecharModal('review-modal'); }
+            if (carrinhoItens.length === 0) { fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); }
             else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
 
@@ -480,7 +605,7 @@
         }
 
         function avancarParaSeletorPagamento() {
-            fecharModal('review-modal');
+            fecharModalEKeyboard('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
         }
@@ -494,14 +619,10 @@
             document.getElementById('area-visual-cartao').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
-            
-            // Ativa o bloco de ação unificado visível para Pix, Crédito e Débito
             document.getElementById('bloco-acao-confirmacao').classList.remove('hidden');
             document.getElementById('payment-screen').classList.remove('hidden');
 
             montarTextoCupomDinamico();
-
-            // Desativa qualquer loop automático de tempo para garantir controle infinito do balcão
             clearInterval(checagemPagamentoInterval);
 
             if(metodo === 'PIX') {
@@ -555,7 +676,6 @@
             });
         }
 
-        // FUNÇÃO UNIFICADA: CONTROLADA PELO ATENDENTE / CLIENTE APÓS O CARTÃO PASSAR NA MÁQUINA
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
@@ -612,15 +732,14 @@
             document.getElementById('espelho-cupom-tela').innerText = textoCupom;
         }
 
-        function executarImpressaoFisicaDoPedido() {
+        function ejecutarImpressaoFisicaDoPedido() {
             window.print(); 
             document.getElementById('cupom-area-impressao').innerHTML = ""; 
             voltarParaTelaDescanso();
         }
 
         function cancelarEVoltar() {
-            clearInterval(checagemPagamentoInterval);
-            fecharModal('payment-screen');
+            fecharModalEKeyboard('payment-screen');
             avancarParaSeletorPagamento();
         }
 
