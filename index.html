@@ -41,7 +41,7 @@
             overflow: hidden;
         }
 
-        /* Estilização das Teclas do Teclado Virtual */
+        /* Estilização Profissional das Teclas do Teclado Virtual */
         .key-btn {
             background-color: #ffffff;
             color: #1e293b;
@@ -115,10 +115,8 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
-    <!-- ÁREA OCULTA DO SISTEMA DE IMPRESSÃO -->
     <div id="cupom-area-impressao"></div>
 
-    <!-- ================= TELA DE DESCANSO / TOQUE AQUI ================= -->
     <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
@@ -138,20 +136,16 @@
         </div>
     </div>
 
-    <!-- ESTRUTURA PRINCIPAL DO TOTEM -->
     <div id="totem-conteudo-geral" class="h-screen w-screen flex flex-col relative">
-        <!-- CABEÇALHO -->
         <header class="bg-[#166534] text-white p-4 shadow-md shrink-0 text-center">
             <h1 class="text-3xl font-black tracking-widest">GERSI NUTRI</h1>
             <p class="text-xs uppercase tracking-wider opacity-85 mt-0.5">Alimentação Saudável Inteligente</p>
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <!-- BARRA LATERAL -->
             <nav id="sidebar" class="w-28 bg-[#15803d] text-white flex flex-col gap-3 p-2.5 overflow-y-auto shrink-0 shadow-2xl">
             </nav>
 
-            <!-- ÁREA DE PRODUTOS -->
             <main class="flex-1 p-6 overflow-y-auto bg-slate-50 flex flex-col">
                 <div id="promo-slider" class="slide-container shadow-xl shrink-0 mb-6"></div>
 
@@ -161,11 +155,10 @@
             </main>
         </div>
 
-        <!-- RODAPÉ -->
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
             <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
-                <span id="carrinho-contador" class="bg-red-500 text-white font-black w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
+                <span id="carrinho-contador" class="bg-red-500 text-white font-white w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
                 <div class="text-left">
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Seu Pedido</p>
                     <p id="total-value" class="font-black text-2xl text-slate-800">R$ 0,00</p>
@@ -174,7 +167,6 @@
             <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
-        <!-- MODAL DE ADICIONAIS -->
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
@@ -189,7 +181,6 @@
             </div>
         </div>
 
-        <!-- MODAL DO CARRINHO -->
         <div id="cart-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
@@ -206,18 +197,15 @@
             </div>
         </div>
 
-        <!-- TELA DE CONFERÊNCIA COM INPUTS DE DADOS DO CLIENTE -->
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[95vh] flex flex-col overflow-hidden shadow-2xl relative">
+            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
                 <div class="p-4 border-b text-center bg-slate-50 shrink-0">
                     <h3 class="text-xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
                 </div>
                 
-                <div class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 pb-32">
-                    <!-- Lista de Itens -->
+                <div id="review-modal-scroll-area" class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 transition-all duration-300">
                     <div id="lista-conferencia-itens" class="space-y-3"></div>
                     
-                    <!-- Identificação do Cliente e Observação -->
                     <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-3 shadow-sm text-left">
                         <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
                         
@@ -233,15 +221,10 @@
                         </div>
                         
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 lines)</label>
                             <textarea id="cliente-observacao" rows="2" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." onmousedown="ativarTecladoVirtual(this, 'text')" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none cursor-pointer" maxlength="120"></textarea>
                         </div>
                     </div>
-                </div>
-
-                <!-- PAINEL FIXO DO TECLADO VIRTUAL INTERNO DO MODAL -->
-                <div id="virtual-keyboard-container" class="hidden absolute bottom-24 left-0 right-0 bg-slate-800 p-3 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] border-t-2 border-slate-700 z-[70] transition-all duration-300">
-                    <div id="keyboard-layout-grid" class="grid gap-2 max-w-xl mx-auto"></div>
                 </div>
 
                 <div class="p-5 bg-white border-t flex flex-col gap-3 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
@@ -256,7 +239,6 @@
             </div>
         </div>
 
-        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
@@ -280,7 +262,6 @@
             </div>
         </div>
 
-        <!-- TELA DE PROCESSAMENTO FINAL -->
         <div id="payment-screen" class="hidden fixed inset-0 bg-white z-[60] flex flex-col items-center justify-start p-6 text-center overflow-y-auto">
             
             <div id="area-visual-pix" class="hidden flex flex-col items-center mt-4">
@@ -320,6 +301,10 @@
             </div>
             
             <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
+        </div>
+
+        <div id="virtual-keyboard-container" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 p-4 shadow-[0_-15px_40px_rgba(0,0,0,0.4)] border-t-4 border-slate-700 z-[999] transition-all duration-300">
+            <div id="keyboard-layout-grid" class="grid gap-2 max-w-xl mx-auto"></div>
         </div>
     </div>
 
@@ -379,17 +364,20 @@
             });
         }
 
-        /* LÓGICA DO TECLADO VIRTUAL PREVENTIVA DE FOCO DO NAVEGADOR */
-        function ativarTecladoVirtual(inputElement, layoutTipo) {
+        /* CORREÇÃO DO TECLADO VIRTUAL: POSICIONADO NO FOOTER DO NAVEGADOR */
+        function activarTecladoVirtual(inputElement, layoutTipo) {
             inputSelecionadoParaDigitar = inputElement;
-            
-            // Força o preventDefault para não abrir o teclado nativo do sistema operacional do totem
             event.preventDefault();
 
             const container = document.getElementById('virtual-keyboard-container');
             const grid = document.getElementById('keyboard-layout-grid');
+            const areaScroll = document.getElementById('review-modal-scroll-area');
+            
             container.classList.remove('hidden');
             grid.innerHTML = "";
+
+            // Cria um recuo de rolagem para a caixa não ficar escondida atrás do teclado de rodapé
+            areaScroll.style.paddingBottom = "280px";
 
             if (layoutTipo === 'num') {
                 grid.className = "grid grid-cols-3 gap-2 max-w-xs mx-auto";
@@ -422,11 +410,13 @@
                     });
                 });
             }
-            inputElement.focus();
+            
+            // Faz a tela rolar automaticamente até a caixa focada
+            setTimeout(() => { inputElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function capturarCliqueTeclado(valor) {
-            event.preventDefault(); // Impede perda de foco do input
+            event.preventDefault();
             if (!inputSelecionadoParaDigitar) return;
             resetarTemporizadorInatividade();
 
@@ -442,11 +432,13 @@
                 if (inputSelecionadoParaDigitar.maxLength && textoAtual.length >= inputSelecionadoParaDigitar.maxLength) return;
                 inputSelecionadoParaDigitar.value += valor;
             }
-            montarTextoCupomDinamico(); // Atualiza a prévia da impressão em tempo real ao digitar
+            montarTextoCupomDinamico();
         }
 
         function fecharTecladoVirtual() {
             document.getElementById('virtual-keyboard-container').classList.add('hidden');
+            const areaScroll = document.getElementById('review-modal-scroll-area');
+            if(areaScroll) areaScroll.style.paddingBottom = "128px"; // Reseta o espaçamento de segurança
             inputSelecionadoParaDigitar = null;
         }
 
@@ -735,7 +727,7 @@
             document.getElementById('espelho-cupom-tela').innerText = textoCupom;
         }
 
-        function ejecutarImpressaoFisicaDoPedido() {
+        function executarImpressaoFisicaDoPedido() {
             window.print(); 
             document.getElementById('cupom-area-impressao').innerHTML = ""; 
             voltarParaTelaDescanso();
