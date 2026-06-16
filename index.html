@@ -2,13 +2,13 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GERSI NUTRI - Totem Profissional Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; }
         
         .sidebar-btn { 
             transition: all 0.25s ease-in-out; 
@@ -39,45 +39,6 @@
             width: 0;
             height: 0;
             overflow: hidden;
-        }
-
-        /* Estilização das Teclas do Teclado Virtual */
-        .key-btn {
-            background-color: #ffffff;
-            color: #1e293b;
-            font-weight: bold;
-            font-size: 18px;
-            height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            touch-action: manipulation;
-            transition: background 0.1s;
-        }
-        .key-btn:active {
-            background-color: #cbd5e1;
-        }
-        .key-special {
-            background-color: #e2e8f0;
-            font-size: 14px;
-        }
-        .key-confirm {
-            background-color: #22c55e;
-            color: white;
-            font-size: 15px;
-        }
-        .key-confirm:active {
-            background-color: #16a34a;
-        }
-
-        /* Placeholder para caixas customizadas */
-        .fake-input:empty::before {
-            content: attr(data-placeholder);
-            color: #94a3b8;
-            font-weight: normal;
-            pointer-events: none;
         }
 
         @page {
@@ -125,7 +86,7 @@
 
     <div id="cupom-area-impressao"></div>
 
-    <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
+    <div id="welcome-screen" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
         <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10">
@@ -164,7 +125,7 @@
         </div>
 
         <footer class="bg-white border-t p-5 flex justify-between items-center z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] shrink-0">
-            <button id="btn-carrinho-aba" ontouchstart="abrirResumoCarrinho()" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
+            <button id="btn-carrinho-aba" onclick="abrirResumoCarrinho()" class="flex items-center gap-4 bg-slate-100 hover:bg-slate-200 p-3 px-6 rounded-2xl transition-all active:scale-95">
                 <span class="text-3xl">🛒</span>
                 <span id="carrinho-contador" class="bg-red-500 text-white font-black w-7 h-7 rounded-full text-xs flex items-center justify-center">0</span>
                 <div class="text-left">
@@ -172,19 +133,19 @@
                     <p id="total-value" class="font-black text-2xl text-slate-800">R$ 0,00</p>
                 </div>
             </button>
-            <button ontouchstart="abrirTelaConferencia()" onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
+            <button onclick="abrirTelaConferencia()" class="bg-[#22c55e] hover:bg-[#16a34a] text-white px-14 py-5 rounded-2xl font-black text-2xl uppercase shadow-lg active:scale-95 transition-transform">Finalizar Pedido</button>
         </footer>
 
         <div id="addons-modal" class="hidden fixed inset-0 bg-black/60 z-[53] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b bg-slate-50 text-center relative">
                     <h2 id="addon-product-name" class="font-black text-xl text-slate-800 truncate">Opções do Item</h2>
-                    <button ontouchstart="fecharModal('addons-modal')" onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400">✕</button>
+                    <button onclick="fecharModal('addons-modal')" class="absolute right-5 top-5 font-bold text-xl text-slate-400">✕</button>
                 </div>
                 <div id="container-lista-adicionais" class="p-6 overflow-y-auto max-h-[55vh] space-y-3 text-left"></div>
                 <div class="p-4 bg-slate-50 border-t flex items-center justify-between">
-                    <button ontouchstart="fecharModal('addons-modal')" onclick="fecharModal('addons-modal')" class="text-slate-500 font-bold px-4 py-2 text-sm">Cancelar</button>
-                    <button ontouchstart="confirmarAdicionaisPlanilha()" onclick="confirmarAdicionaisPlanilha()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider">Adicionar ao Pedido</button>
+                    <button onclick="fecharModal('addons-modal')" class="text-slate-500 font-bold px-4 py-2 text-sm">Cancelar</button>
+                    <button onclick="confirmarAdicionaisPlanilha()" class="bg-[#166534] text-white font-black px-8 py-3 rounded-xl uppercase text-sm tracking-wider">Adicionar ao Pedido</button>
                 </div>
             </div>
         </div>
@@ -193,55 +154,55 @@
             <div class="bg-white rounded-3xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
                 <div class="p-5 border-b flex justify-between items-center bg-slate-50">
                     <h2 class="font-black text-2xl text-slate-800">Itens no Pedido</h2>
-                    <button ontouchstart="fecharModal('cart-modal')" onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400">✕</button>
+                    <button onclick="fecharModal('cart-modal')" class="font-bold text-2xl text-slate-400">✕</button>
                 </div>
                 <div id="lista-carrinho" class="p-5 overflow-y-auto flex-1 space-y-3 content-start"></div>
                 <div class="p-5 bg-slate-50 border-t flex justify-between items-center shrink-0">
                     <div>
                         <p id="modal-total-carrinho" class="text-2xl font-black text-slate-800">R$ 0,00</p>
                     </div>
-                    <button ontouchstart="fecharModal('cart-modal')" onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs">Voltar</button>
+                    <button onclick="fecharModal('cart-modal')" class="bg-[#166534] text-white font-black px-6 py-3 rounded-xl uppercase text-xs">Voltar</button>
                 </div>
             </div>
         </div>
 
         <div id="review-modal" class="hidden fixed inset-0 bg-black/60 z-[52] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
-                <div class="p-4 border-b text-center bg-slate-50 shrink-0">
-                    <h3 class="text-xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
+            <div class="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+                <div class="p-5 border-b text-center bg-slate-50">
+                    <h3 class="text-2xl font-black text-slate-800">Confirme o seu Pedido 🍽️</h3>
                 </div>
                 
-                <div id="review-modal-scroll-area" class="overflow-y-auto flex-1 p-5 space-y-4 bg-slate-50/50 transition-all duration-300">
+                <div class="overflow-y-auto flex-1 p-6 space-y-5 bg-slate-50/50">
                     <div id="lista-conferencia-itens" class="space-y-3"></div>
                     
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-3 shadow-sm text-left">
-                        <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 space-y-4 shadow-sm text-left">
+                        <h4 class="font-black text-slate-700 text-sm uppercase tracking-wider flex items-center gap-2">👤 Seus Dados e Preferências</h4>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
-                                <div id="cliente-nome" contenteditable="true" data-placeholder="Ex: Guto" ontouchstart="ativarTecladoVirtual('cliente-nome', 'text')" onclick="ativarTecladoVirtual('cliente-nome', 'text')" class="fake-input w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 cursor-pointer min-h-[44px] flex items-center outline-none"></div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nome do Cliente</label>
+                                <input type="text" id="cliente-nome" placeholder="Ex: Guto" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
-                                <div id="cliente-contato" contenteditable="true" data-placeholder="Ex: 75999999999" ontouchstart="ativarTecladoVirtual('cliente-contato', 'num')" onclick="ativarTecladoVirtual('cliente-contato', 'num')" class="fake-input w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 cursor-pointer min-h-[44px] flex items-center outline-none"></div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Contato / Celular</label>
+                                <input type="text" id="cliente-contato" placeholder="Ex: (75) 99999-9999" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-bold text-slate-800">
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
-                            <div id="cliente-observacao" contenteditable="true" data-placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." ontouchstart="ativarTecladoVirtual('cliente-observacao', 'text')" onclick="ativarTecladoVirtual('cliente-observacao', 'text')" class="fake-input w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 cursor-pointer min-h-[64px] block overflow-hidden whitespace-normal break-words outline-none"></div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Observações do Pedido (Máx. 3 linhas)</label>
+                            <textarea id="cliente-observacao" rows="3" placeholder="Ex: Quero com sal, pode esquentar, sem cebola..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-600 font-medium text-slate-700 resize-none" maxlength="120"></textarea>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-5 bg-white border-t flex flex-col gap-3 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-                    <div class="flex justify-between items-center px-1">
-                        <span id="total-conferencia-valor" class="text-2xl font-black text-[#166534]">R$ 0,00</span>
+                <div class="p-6 bg-white border-t flex flex-col gap-4 shrink-0">
+                    <div class="flex justify-between items-center px-2">
+                        <span id="total-conferencia-valor" class="text-3xl font-black text-[#166534]">R$ 0,00</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button ontouchstart="fecharModalEKeyboard('review-modal')" onclick="fecharModalEKeyboard('review-modal')" class="bg-slate-200 text-slate-700 font-black py-3.5 rounded-xl uppercase text-xs">Adicionar Mais</button>
-                        <button ontouchstart="avancarParaSeletorPagamento()" onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-3.5 rounded-xl uppercase text-xs shadow-md">Confirmar e Pagar</button>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="fecharModal('review-modal')" class="bg-slate-200 text-slate-700 font-black py-4 rounded-xl uppercase text-sm">Adicionar Mais</button>
+                        <button onclick="avancarParaSeletorPagamento()" class="bg-[#22c55e] text-white font-black py-4 rounded-xl uppercase text-sm shadow-md">Confirmar e Pagar</button>
                     </div>
                 </div>
             </div>
@@ -253,20 +214,20 @@
                 <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
                 
                 <div class="grid grid-cols-3 gap-4 mb-6">
-                    <button ontouchstart="processarPagamento('PIX')" onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
+                    <button onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
                         <span class="text-4xl mb-3">📱</span>
                         <span class="font-black text-base text-slate-800">Pix</span>
                     </button>
-                    <button ontouchstart="processarPagamento('CREDITO')" onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
+                    <button onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
                         <span class="text-4xl mb-3">💳</span>
                         <span class="font-black text-base text-slate-800">Crédito</span>
                     </button>
-                    <button ontouchstart="processarPagamento('DEBITO')" onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
+                    <button onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
                         <span class="text-4xl mb-3">💵</span>
                         <span class="font-black text-base text-slate-800">Débito</span>
                     </button>
                 </div>
-                <button ontouchstart="cancelarEVoltarParaConferencia()" onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
+                <button onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
             </div>
         </div>
 
@@ -276,7 +237,403 @@
                 <h2 class="text-4xl font-black text-slate-800 mb-2">Aponte a Câmera</h2>
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-4"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
+                
+                <button onclick="confirmarPagamentoEfetuadoManualmente()" class="mt-6 bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-bounce">
+                    🟢 JÁ PAGUEI / EMITIR CUPOM
+                </button>
+                
+                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no celular.</p>
             </div>
 
             <div id="area-visual-cartao" class="hidden flex flex-col items-center mt-4">
-                <h2 id="titulo-cartao-tela" class="text
+                <h2 id="titulo-cartao-tela" class="text-4xl font-black text-slate-800 mb-2">Insira ou Aproxime</h2>
+                <p id="total-confirm-cartao" class="text-3xl text-blue-700 font-black mb-6"></p>
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-blue-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4">
+                    <div class="text-7xl animate-bounce mb-2">⬇️</div>
+                    <span class="font-bold text-sm text-slate-600 text-center">Aguardando maquininha externa...</span>
+                </div>
+            </div>
+
+            <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md mt-4 mx-auto">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
+                    ✓
+                </div>
+                <h2 class="text-3xl font-black text-slate-800">Pagamento Aprovado!</h2>
+                <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Enviando cupom para impressão...</p>
+                <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
+            </div>
+
+            <div id="bloco-previa-totem" class="w-[78mm] bg-zinc-100 border-2 border-zinc-300 rounded-2xl p-4 shadow-lg text-left mx-auto mt-6 mb-4">
+                <p class="text-[10px] text-zinc-500 font-black uppercase tracking-wider mb-2 text-center">👁️ PRÉVIA REAL DA IMPRESSÃO (BOBINA 80MM)</p>
+                <div id="espelho-cupom-tela" class="font-mono text-[11px] text-slate-900 whitespace-pre leading-tight bg-white p-3 rounded border border-zinc-200 shadow-inner"></div>
+            </div>
+            
+            <button id="btn-cancelar-pagamento" onclick="cancelarEVoltar()" class="mt-4 text-slate-400 font-bold underline uppercase text-sm tracking-wider">Alterar Forma de Pagamento</button>
+        </div>
+    </div>
+
+    <script>
+        let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
+        let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
+
+        const CONFIG_TOTEM = {
+            cnpj: "47342129000141",
+            titular: "GERSI NUTRI",
+            cidade: "FEIRA DE SANTANA"
+        };
+
+        const mapaIcones = {
+            'TODOS': '🍽️', 'ALMOCO': '🍲', 'ALMOÇO': '🍲', 'OFERTA': '🏷️', 'OFERTAS': '🏷️', 
+            'PROTEINA': '🍗', 'PROTEÍNA': '🍗', 'COMBO': '✨', 'COMBOS': '✨', 'JANTAR': '🥗', 
+            'BEBIDA': '🥤', 'BEBIDAS': '🥤', 'SUCO': '🍹', 'SUCOS': '🍹', 'SOBREMESA': '🍰'
+        };
+
+        function iniciarAtendimento() {
+            document.getElementById('welcome-screen').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('cliente-nome').value = "";
+            document.getElementById('cliente-contato').value = "";
+            document.getElementById('cliente-observacao').value = "";
+            if (!cardapioOriginal.length) carregarDados();
+            resetarTemporizadorInatividade();
+        }
+
+        function voltarParaTelaDescanso() {
+            clearInterval(checagemPagamentoInterval);
+            carrinhoItens = []; totalGeral = 0; atualizarRodape();
+            fecharModal('cart-modal'); fecharModal('review-modal'); fecharModal('method-modal'); fecharModal('payment-screen'); fecharModal('addons-modal');
+            document.getElementById('welcome-screen').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function resetarTemporizadorInatividade() {
+            clearTimeout(timeoutInatividade);
+            timeoutInatividade = setTimeout(voltarParaTelaDescanso, 180000);
+        }
+        window.addEventListener('click', resetarTemporizadorInatividade);
+
+        function normalizarTexto(texto) {
+            return texto ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+        }
+
+        function carregarDados() {
+            Papa.parse('https://docs.google.com/spreadsheets/d/e/2PACX-1vQFKTyNpgaIyxIGB6qu5-5IluxLLNuOp_12UfO6D2mxUxfEL0NC2nj_sO1Na8lyzqZ_tNrqE5708GAF/pub?gid=0&single=true&output=csv', {
+                download: true, skipEmptyLines: true,
+                complete: (results) => {
+                    let dados = results.data;
+                    if(dados[0] && dados[0][0] && dados[0][0].toLowerCase().trim() === 'nome') dados.shift();
+                    cardapioOriginal = dados.filter(r => r[0] && r[6] && r[6].toLowerCase().trim() === 'sim');
+                    renderizarSidebar(); renderizarBanner(); renderizarProdutos();
+                }
+            });
+        }
+
+        function renderizarSidebar() {
+            const nav = document.getElementById('sidebar');
+            const listaCategorias = ['TODOS', ...new Set(cardapioOriginal.map(r => r[2].trim()))];
+            nav.innerHTML = listaCategorias.map(c => `
+                <button onclick="filtrar('${c}')" class="sidebar-btn p-3 text-center text-[11px] uppercase font-bold ${c === catAtiva ? 'active' : ''}">
+                    <span class="text-2xl">${mapaIcones[normalizarTexto(c)] || '🍲'}</span>
+                    <span class="leading-tight">${c}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderizarBanner() {
+            const slider = document.getElementById('promo-slider');
+            const itensPromo = cardapioOriginal.filter(r => { const c = normalizarTexto(r[2]); return c.includes('OFERTA') || c.includes('COMBO'); });
+            if (!itensPromo.length) { slider.style.display = 'none'; return; }
+            slider.style.display = 'block';
+
+            slider.innerHTML = itensPromo.map((o, idx) => {
+                const precoNum = parseFloat(o[1].replace('R$', '').replace(/\s/g, '').replace(',', '.'));
+                return `
+                    <div class="slide-item ${idx === 0 ? 'active' : ''}">
+                        <div class="text-left flex flex-col justify-center">
+                            <span class="bg-amber-400 text-black px-2.5 py-1 text-[10px] font-black uppercase rounded w-max">15% OFF DESTAQUE</span>
+                            <h2 class="text-2xl font-black mt-2 max-w-sm truncate">${o[0]}</h2>
+                            <p class="text-3xl font-black text-green-300 mt-2">R$ ${precoNum.toFixed(2).replace('.', ',')}</p>
+                        </div>
+                        <img src="${o[3]}" class="w-32 h-32 rounded-xl object-cover" onerror="this.src='https://via.placeholder.com/150'">
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderizarProdutos() {
+            const grade = document.getElementById('grid');
+            const exibicao = catAtiva === 'TODOS' ? cardapioOriginal : cardapioOriginal.filter(r => r[2] === catAtiva);
+            grade.innerHTML = exibicao.map(p => {
+                const valorFinal = parseFloat(p[1].replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
+                return `
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4 shadow-sm">
+                        <div class="flex items-center gap-4 min-w-0 flex-1">
+                            <img src="${p[3]}" class="w-28 h-28 rounded-xl object-cover shrink-0" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="min-w-0 text-left flex flex-col justify-center flex-1">
+                                <span class="text-[10px] text-green-700 font-bold uppercase tracking-wider">${p[2]}</span>
+                                <h3 class="font-black text-[13px] text-slate-800 line-clamp-2 leading-tight min-h-[2.2rem] flex items-center">${p[0]}</h3>
+                                <p class="text-[#166534] font-black text-xl mt-1">R$ ${valorFinal.toFixed(2).replace('.', ',')}</p>
+                            </div>
+                        </div>
+                        <button onclick="verificarAdicionaisPlanilha(${cardapioOriginal.indexOf(p)})" class="bg-[#166534] text-white w-12 h-12 rounded-xl text-3xl font-black">+</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function verificarAdicionaisPlanilha(idx) {
+            const produto = cardapioOriginal[idx];
+            const campoAdicionais = produto[4] ? produto[4].trim() : "";
+            const preco = parseFloat(produto[1].replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
+
+            if (!campoAdicionais || campoAdicionais.toLowerCase() === "nao") {
+                adicionarAoCarrinhoDefinitivo(produto[0], preco, []); return;
+            }
+
+            pratoSendoConfigurado = { nome: produto[0], preco };
+            document.getElementById('addon-product-name').innerText = produto[0];
+            const container = document.getElementById('container-lista-adicionais'); container.innerHTML = "";
+
+            campoAdicionais.split(',').forEach((addNome, i) => {
+                const addPreco = parseFloat(produto[5].split(',')[i]) || 0;
+                container.innerHTML += `
+                    <label class="flex items-center justify-between p-4 border rounded-2xl bg-slate-50 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" name="chk_adicionais_totem" value="${addNome.trim()}" data-price="${addPreco}" class="w-6 h-6 accent-green-700">
+                            <span class="text-base font-bold text-slate-700">${addNome.trim()}</span>
+                        </div>
+                        <span class="text-base font-black text-green-700">${addPreco > 0 ? '+ R$ '+addPreco.toFixed(2).replace('.', ',') : ''}</span>
+                    </label>
+                `;
+            });
+            document.getElementById('addons-modal').classList.remove('hidden');
+        }
+
+        function confirmarAdicionaisPlanilha() {
+            let opcionais = [], precoAcumulado = 0;
+            document.querySelectorAll('input[name="chk_adicionais_totem"]:checked').forEach(chk => {
+                opcionais.push(chk.value); precoAcumulado += parseFloat(chk.getAttribute('data-price')) || 0;
+            });
+            adicionarAoCarrinhoDefinitivo(pratoSendoConfigurado.nome, pratoSendoConfigurado.preco + precoAcumulado, opcionais);
+            fecharModal('addons-modal');
+        }
+
+        function adicionarAoCarrinhoDefinitivo(nome, preco, adicionais) {
+            const idUnico = nome + adicionais.join(',');
+            let encontrado = carrinhoItens.find(item => item.idUnico === idUnico);
+            if (encontrado) { encontrado.qtd++; encontrado.subtotal = encontrado.qtd * encontrado.preco; }
+            else { carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais }); }
+            totalGeral += preco; atualizarRodape();
+        }
+
+        function atualizarRodape() {
+            const fmt = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-value').innerText = fmt;
+            document.getElementById('modal-total-carrinho').innerText = fmt;
+            let c = 0; carrinhoItens.forEach(i => c += i.qtd);
+            document.getElementById('carrinho-contador').innerText = c;
+        }
+
+        function abrirResumoCarrinho() {
+            if(!carrinhoItens.length) return;
+            document.getElementById('lista-carrinho').innerHTML = carrinhoItens.map((item, idx) => `
+                <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div class="text-left flex-1 min-w-0 pr-2">
+                        <span class="font-bold text-slate-800 text-base block truncate">${item.qtd}x ${item.nome}</span>
+                        <span class="text-xs text-slate-400 font-bold">R$ ${item.preco.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <span class="font-extrabold text-slate-700 px-4">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                    <button onclick="excluir(${idx}, 'CARRINHO')" class="text-xl">❌</button>
+                </div>
+            `).join('');
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function excluir(idx, origins) {
+            totalGeral -= carrinhoItens[idx].preco;
+            carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
+            if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
+            atualizarRodape();
+            if (carrinhoItens.length === 0) { fecharModal('cart-modal'); fecharModal('review-modal'); }
+            else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
+        }
+
+        function abrirTelaConferencia() {
+            if(!carrinhoItens.length) return alert("Carrinho vazio!");
+            fecharModal('cart-modal'); atualizarTelaConferenciaExclusiva();
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
+
+        function atualizarTelaConferenciaExclusiva() {
+            document.getElementById('total-conferencia-valor').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('lista-conferencia-itens').innerHTML = carrinhoItens.map((item, idx) => `
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100">
+                    <div class="text-left flex-1 min-w-0 pr-2">
+                        <p class="font-black text-slate-800 text-base">${item.qtd}x ${item.nome}</p>
+                        ${item.adicionais.length ? `<p class="text-xs text-green-700 font-bold bg-green-50 px-2 py-1 rounded-md mt-1 w-max">+ ${item.adicionais.join(' + ')}</p>` : ''}
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="font-black text-[#166534] text-lg">R$ ${item.subtotal.toFixed(2).replace('.', ',')}</span>
+                        <button onclick="excluir(${idx}, 'CONFERENCIA')" class="text-red-500">❌</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function avancarParaSeletorPagamento() {
+            fecharModal('review-modal');
+            document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('method-modal').classList.remove('hidden');
+        }
+
+        function cancelarEVoltarParaConferencia() { fecharModal('method-modal'); document.getElementById('review-modal').classList.remove('hidden'); }
+
+        function processarPagamento(metodo) {
+            formaEscolhida = metodo; fecharModal('method-modal');
+            
+            document.getElementById('area-visual-pix').classList.add('hidden');
+            document.getElementById('area-visual-cartao').classList.add('hidden');
+            document.getElementById('area-sucesso-impressao').classList.add('hidden');
+            document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
+            document.getElementById('payment-screen').classList.remove('hidden');
+
+            montarTextoCupomDinamico();
+
+            if(metodo === 'PIX') {
+                document.getElementById('area-visual-pix').classList.remove('hidden');
+                document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+                gerarPixCnpjComercial();
+            } else {
+                document.getElementById('area-visual-cartao').classList.remove('hidden');
+                document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+                document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
+                
+                configurarAprovacaoAutomaticaSimulada(4000);
+            }
+        }
+
+        function gerarPixCnpjComercial() {
+            function formatarBloco(id, conteudo) {
+                const tamanho = String(conteudo.length).padStart(2, '0');
+                return id + tamanho + conteudo;
+            }
+
+            const informacaoChave = formatarBloco("00", "br.gov.bcb.pix") + formatarBloco("01", CONFIG_TOTEM.cnpj);
+            
+            let stringBase = "000201" 
+                + formatarBloco("26", informacaoChave) 
+                + "52040000" 
+                + "5303986" 
+                + formatarBloco("54", totalGeral > 0 ? totalGeral.toFixed(2) : "10.00") 
+                + "5802BR" 
+                + formatarBloco("59", CONFIG_TOTEM.titular) 
+                + formatarBloco("60", CONFIG_TOTEM.cidade) 
+                + "62070503***" 
+                + "6304";
+
+            let crc = 0xFFFF;
+            for (let i = 0; i < stringBase.length; i++) {
+                let x = ((crc >> 8) ^ stringBase.charCodeAt(i)) & 0xFF;
+                x ^= x >> 4;
+                crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+            }
+            
+            const copiaColaOficial = stringBase + crc.toString(16).toUpperCase().padStart(4, '0');
+            
+            const box = document.getElementById('pix-qrcode-container'); 
+            box.innerHTML = "";
+            new QRCode(box, { 
+                text: copiaColaOficial, 
+                width: 230, 
+                height: 230, 
+                colorDark : "#166534", 
+                colorLight : "#ffffff", 
+                correctLevel : QRCode.CorrectLevel.M 
+            });
+
+            clearInterval(checagemPagamentoInterval);
+        }
+
+        function confirmarPagamentoEfetuadoManualmente() {
+            document.getElementById('area-visual-pix').classList.add('hidden');
+            document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
+            document.getElementById('area-sucesso-impressao').classList.remove('hidden');
+
+            setTimeout(() => {
+                executarImpressaoFisicaDoPedido();
+            }, 3000);
+        }
+
+        function configurarAprovacaoAutomaticaSimulada(tempoMs) {
+            clearInterval(checagemPagamentoInterval);
+            checagemPagamentoInterval = setTimeout(() => {
+                document.getElementById('area-visual-cartao').classList.add('hidden');
+                document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
+                document.getElementById('area-sucesso-impressao').classList.remove('hidden');
+
+                setTimeout(() => {
+                    executarImpressaoFisicaDoPedido();
+                }, 4000);
+
+            }, tempoMs);
+        }
+
+        function montarTextoCupomDinamico() {
+            const numeroSenha = Math.floor(Math.random() * 90) + 10;
+            const nomeCli = document.getElementById('cliente-nome').value.trim() || 'NAO INFORMADO';
+            const contatoCli = document.getElementById('cliente-contato').value.trim() || 'NAO INFORMADO';
+            const obsCli = document.getElementById('cliente-observacao').value.trim();
+            
+            let textoCupom = `==================================\n`;
+            textoCupom += `           GERSI NUTRI            \n`;
+            textoCupom += `==================================\n\n`;
+            textoCupom += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
+            textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
+            textoCupom += `Hora: ${new Date().toLocaleTimeString('pt-BR')}\n`;
+            textoCupom += `Pagamento: ${formaEscolhida}\n`;
+            textoCupom += `----------------------------------\n`;
+            textoCupom += `CLIENTE: ${nomeCli.toUpperCase()}\n`;
+            textoCupom += `CONTATO: ${contatoCli}\n`;
+            textoCupom += `----------------------------------\n`;
+            textoCupom += `Qtd  Item                    Total\n`;
+            textoCupom += `----------------------------------\n`;
+
+            if(carrinhoItens.length === 0) {
+                textoCupom += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
+            } else {
+                carrinhoItens.forEach(item => {
+                    textoCupom += `${item.qtd}x ${item.nome.substring(0, 18).padEnd(19, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
+                    if(item.adicionais && item.adicionais.length > 0) {
+                        textoCupom += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
+                    }
+                });
+            }
+
+            textoCupom += `----------------------------------\n`;
+            if (obsCli) {
+                textoCupom += `OBSERVACOES:\n${obsCli}\n`;
+                textoCupom += `----------------------------------\n`;
+            }
+            textoCupom += `TOTAL:            R$ ${totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00'}\n`;
+            textoCupom += `==================================\n`;
+            textoCupom += `\n\n\n\n\n`; 
+
+            document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupom}</pre>`;
+            document.getElementById('espelho-cupom-tela').innerText = textoCupom;
+        }
+
+        function executarImpressaoFisicaDoPedido() {
+            window.print(); 
+            document.getElementById('cupom-area-impressao').innerHTML = ""; 
+            voltarParaTelaDescanso();
+        }
+
+        function cancelarEVoltar() {
+            clearInterval(checagemPagamentoInterval);
+            fecharModal('payment-screen');
+            avancarParaSeletorPagamento();
+        }
+
+        function filtrar(c) { catAtiva = c; document.getElementById('cat-title').innerText = c; renderizarSidebar(); renderizarProdutos(); }
+        function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>
