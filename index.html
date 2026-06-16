@@ -252,7 +252,6 @@
                 <p id="total-confirm-pix" class="text-3xl text-green-700 font-black mb-4"></p>
                 <div id="pix-qrcode-container" class="w-64 h-64 border-4 border-dashed border-green-600 rounded-3xl flex items-center justify-center p-4 bg-white shadow-inner"></div>
                 
-                <!-- BOTÃO DE CONFIRMAÇÃO DO CLIENTE (SEM TIMEOUT FORÇADO) -->
                 <button onclick="confirmarPagamentoEfetuadoManualmente()" class="mt-6 bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-bounce">
                     🟢 JÁ PAGUEI / EMITIR CUPOM
                 </button>
@@ -463,6 +462,7 @@
             document.getElementById('cart-modal').classList.remove('hidden');
         }
 
+        // CORREÇÃO EFETUADA NESTA FUNÇÃO (LIMPEZA DO INPUT ERRADO)
         function excluir(idx, origins) {
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
@@ -494,7 +494,7 @@
             `).join('');
         }
 
-        function avanzarParaSeletorPagamento() {
+        function avancarParaSeletorPagamento() {
             fecharModal('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
@@ -522,7 +522,6 @@
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 document.getElementById('titulo-cartao-tela').innerText = metodo === 'CREDITO' ? 'Cartão de Crédito' : 'Cartão de Débito';
                 
-                // Simulação automática para Cartão mantém o timeout de 4s tradicional
                 configurarAprovacaoAutomaticaSimulada(4000);
             }
         }
@@ -566,11 +565,9 @@
                 correctLevel : QRCode.CorrectLevel.M 
             });
 
-            // CRÍTICO: Limpa qualquer loop automático anterior para o QR Code ficar fixo na tela pelo tempo que for preciso
             clearInterval(checagemPagamentoInterval);
         }
 
-        // FUNÇÃO DE LIBERAÇÃO MANUAL DO PIX PELO CLIENTE TOQUEM SENSÍVEL
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
