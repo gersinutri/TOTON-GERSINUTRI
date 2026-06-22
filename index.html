@@ -332,6 +332,9 @@
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
         let idInputAtivoGlobal = null;
 
+        // Injeta a biblioteca de controle do QZ Tray direto no cabeçalho de forma limpa
+        const scriptQZ = document.createElement('script'); scriptQZ.src = 'https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js'; document.head.appendChild(scriptQZ);
+
         const CONFIG_TOTEM = {
             cnpj: "47342129000141",
             titular: "GERSI NUTRI",
@@ -755,16 +758,38 @@
             document.getElementById('espelho-cupom-tela').innerText = textoCupom;
         }
 
+        /* LOGÍSTICA DE DISPARO AUTOMÁTICO SIMULTÂNEO */
         function executarImpressaoFisicaDoPedido() {
-            window.print(); 
-            document.getElementById('cupom-area-impressao').innerHTML = ""; 
-            voltarParaTelaDescanso();
+            const textoCupom = document.getElementById('espelho-cupom-tela').innerText;
+
+            // Se o QZ Tray estiver aberto no PC do totem, ele faz o disparo duplo invisível
+            if (typeof qz !== 'undefined' && qz.websocket.isActive()) {
+                
+                // 1. Manda para o Caixa/Salão (Microsoft Print to PDF)
+                qz.printers.find("Microsoft Print to PDF").then(impressora => {
+                    let config = qz.configs.create(impressora);
+                    return qz.print(config, [textoCupom]);
+                }).catch(err => console.error("Erro no Salão:", err));
+
+                // 2. Manda para a Cozinha (ELGIN i9(USB))
+                qz.printers.find("ELGIN i9(USB)").then(impressora => {
+                    let config = qz.configs.create(impressora);
+                    return qz.print(config, [textoCupom]);
+                }).catch(err => console.error("Erro na Cozinha:", err));
+
+                // Limpa o totem e retorna para a tela inicial na hora
+                voltarParaTelaDescanso();
+
+            } else {
+                // Caso o QZ Tray esteja fechado, ele usa a janela nativa para segurança
+                window.print();
+                document.getElementById('cupom-area-impressao').innerHTML = ""; 
+                voltarParaTelaDescanso();
+            }
         }
 
-        function cancelarEVoltar() {
-            fecharModalEKeyboard('payment-screen');
-            avancarParaSeletorPagamento();
-        }
+        // Tenta conectar no QZ Tray 2 segundos após ligar o totem
+        setTimeout(() => { if (typeof qz !== 'undefined') qz.websocket.connect().catch(e => console.log("Aguardando QZ...")); }, 2000);
 
         function filtrar(c) { catAtiva = c; document.getElementById('cat-title').innerText = c; renderizarSidebar(); renderizarProdutos(); }
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
