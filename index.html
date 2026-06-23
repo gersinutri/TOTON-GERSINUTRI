@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- BIBLIOTECA PARA DISPARAR IMPRESSÃO DIRETA VIA WEB -->
+    <script src="https://printjs-40120.firebaseapp.com/js/print.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; -webkit-user-select: none; }
         
@@ -33,12 +35,7 @@
         ::-webkit-scrollbar { width: 0px; }
 
         #cupom-area-impressao {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            width: 0;
-            height: 0;
-            overflow: hidden;
+            display: none;
         }
 
         /* DESIGN PREMIUM DO TECLADO VIRTUAL ELEGANTE */
@@ -83,7 +80,6 @@
             background-color: #059669;
         }
 
-        /* Suporte ao Placeholder Visual nos campos customizados */
         .fake-input:empty::before {
             content: attr(data-placeholder);
             color: #94a3b8;
@@ -91,50 +87,26 @@
             pointer-events: none;
         }
 
-        @page {
-            size: auto;
-            margin: 0mm;
-        }
-
-        @media print {
-            html, body {
-                background: #ffffff !important;
-                margin: 0px !important;
-                padding: 0px !important;
-                height: auto !important;
-            }
-            #totem-conteudo-geral, #welcome-screen, .fixed, footer, header, main, nav { 
-                display: none !important; 
-            }
-            #cupom-area-impressao { 
-                display: block !important;
-                position: static !important;
-                width: 72mm !important;
-                max-width: 72mm !important;
-                height: auto !important;
-                overflow: visible !important;
-                margin: 0px auto !important;
-                padding: 0mm !important;
-                background: #ffffff !important;
-            }
-            pre {
-                display: block !important;
-                white-space: pre-wrap !important;
-                word-wrap: break-word !important;
-                font-family: 'Courier New', Courier, monospace !important;
-                font-size: 13px !important;
-                font-weight: bold !important;
-                line-height: 1.3 !important;
-                color: #000000 !important;
-                margin: 0px !important;
-                padding: 0px !important;
-            }
+        /* Formatação limpa para a Elgin na hora do envio */
+        .texto-pre-impressao {
+            font-family: 'Courier New', Courier, monospace !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            line-height: 1.3 !important;
+            color: #000000 !important;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            margin: 0px !important;
+            padding: 0px !important;
         }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
-    <div id="cupom-area-impressao"></div>
+    <!-- Elemento invisível que a biblioteca usará para capturar o texto -->
+    <div id="bloco-escondido-print" style="display:none; padding: 0mm; width: 72mm;">
+        <pre id="conteudo-pre-print" class="texto-pre-impressao"></pre>
+    </div>
 
     <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
@@ -384,7 +356,7 @@
             });
         }
 
-        function ativarTecladoVirtual(idInput, layoutTipo) {
+        function activarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
             const inputElement = document.getElementById(idInput);
 
@@ -706,7 +678,6 @@
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
-            // CORREÇÃO: Dispara a ordem de impressão e início de reset imediatamente sem esperas duplicadas
             executarImpressaoFisicaDoPedido();
         }
 
@@ -738,7 +709,7 @@
             const horaFormatada = new Date().toLocaleTimeString('pt-BR');
             const totalFormatado = totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00';
 
-            // VIA 1: CLIENTE / SALÃO
+            // VIA 1: CLIENTE
             let viaSalao = `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
             viaSalao += `       *** VIA DO CLIENTE ***     \n`;
@@ -758,7 +729,7 @@
             viaSalao += `TOTAL DO PEDIDO:  R$ ${totalFormatado}\n`;
             viaSalao += `==================================\n\n\n`;
 
-            // VIA 2: COZINHA / PREPARO
+            // VIA 2: COZINHA
             let viaCozinha = `==================================\n`;
             viaCozinha += `           GERSI NUTRI            \n`;
             viaCozinha += `       *** VIA DA COZINHA ***     \n`;
@@ -778,21 +749,28 @@
 
             let textoCupomCompleto = viaSalao + viaCozinha;
 
-            document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupomCompleto}</pre>`;
+            // Injeta o texto no bloco oculto que a biblioteca de impressão lerá
+            document.getElementById('conteudo-pre-print').innerText = textoCupomCompleto;
             document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
-        /* IMPRESSÃO INTERNA DIRETA E SILENCIOSA PELO NAVEGADOR */
-        function ejecutarImpressaoFisicaDoPedido() {
+        /* DISPARO DO IMPRESSOR WEB PRINT.JS SEM DEPENDER DE KIOSK-PRINTING LOCAL */
+        function executarImpressaoFisicaDoPedido() {
             try {
-                window.print(); 
+                // Chama o motor Print.js passando o ID do elemento contendo o texto formatado da bobina
+                printJS({
+                    printable: 'bloco-escondido-print',
+                    type: 'html',
+                    scanStyles: false,
+                    targetStyles: ['*']
+                });
             } catch (e) {
-                console.log("Erro ao tentar chamar o comando de impressão:", e);
+                console.log("Erro no módulo PrintJS:", e);
             }
             
-            // Limpa o documento e reseta o totem para a tela inicial após 3 segundos
+            // Força o reset da tela limpando tudo após 3 segundos
             setTimeout(() => {
-                document.getElementById('cupom-area-impressao').innerHTML = ""; 
+                document.getElementById('conteudo-pre-print').innerText = ""; 
                 voltarParaTelaDescanso();
             }, 3000);
         }
