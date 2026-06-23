@@ -332,9 +332,6 @@
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
         let idInputAtivoGlobal = null;
 
-        // Injeta a biblioteca de controle do QZ Tray direto no cabeçalho de forma limpa
-        const scriptQZ = document.createElement('script'); scriptQZ.src = 'https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js'; document.head.appendChild(scriptQZ);
-
         const CONFIG_TOTEM = {
             cnpj: "47342129000141",
             titular: "GERSI NUTRI",
@@ -385,6 +382,22 @@
                     renderizarSidebar(); renderizarBanner(); renderizarProdutos();
                 }
             });
+        }
+
+        function activarTecladoVirtual(idInput, layoutTipo) {
+            ativarTecladoVirtual(idInput, layoutTipo);
+        }
+
+        function activarTecladoVirtual(idInput, layoutTipo) {
+            ativarTecladoVirtual(idInput, layoutTipo);
+        }
+
+        function activarTecladoVirtual(idInput, layoutTipo) {
+            ativarTecladoVirtual(idInput, layoutTipo);
+        }
+
+        function activarTecladoVirtual(idInput, layoutTipo) {
+            ativarTecladoVirtual(idInput, layoutTipo);
         }
 
         function ativarTecladoVirtual(idInput, layoutTipo) {
@@ -720,76 +733,82 @@
             const contatoCli = document.getElementById('cliente-contato').textContent.trim() || 'NAO INFORMADO';
             const obsCli = document.getElementById('cliente-observacao').textContent.trim();
             
-            let textoCupom = `==================================\n`;
-            textoCupom += `           GERSI NUTRI            \n`;
-            textoCupom += `==================================\n\n`;
-            textoCupom += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
-            textoCupom += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
-            textoCupom += `Hora: ${new Date().toLocaleTimeString('pt-BR')}\n`;
-            textoCupom += `Pagamento: ${formaEscolhida}\n`;
-            textoCupom += `----------------------------------\n`;
-            textoCupom += `CLIENTE: ${nomeCli.toUpperCase()}\n`;
-            textoCupom += `CONTATO: ${contatoCli}\n`;
-            textoCupom += `----------------------------------\n`;
-            textoCupom += `Qtd  Item                    Total\n`;
-            textoCupom += `----------------------------------\n`;
-
+            let mioloItens = "";
             if(carrinhoItens.length === 0) {
-                textoCupom += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
+                mioloItens += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
             } else {
                 carrinhoItens.forEach(item => {
-                    textoCupom += `${item.qtd}x ${item.nome.substring(0, 18).padEnd(19, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
+                    mioloItens += `${item.qtd}x ${item.nome.substring(0, 18).padEnd(19, ' ')} R$ ${item.subtotal.toFixed(2).replace('.', ',')}\n`;
                     if(item.adicionais && item.adicionais.length > 0) {
-                        textoCupom += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
+                        mioloItens += `   + [${item.adicionais.join(', ').substring(0, 25)}]\n`;
                     }
                 });
             }
 
-            textoCupom += `----------------------------------\n`;
+            let blocoObs = "";
             if (obsCli) {
-                textoCupom += `OBSERVACOES:\n${obsCli}\n`;
-                textoCupom += `----------------------------------\n`;
+                blocoObs += `OBSERVACOES:\n${obsCli}\n----------------------------------\n`;
             }
-            textoCupom += `TOTAL:            R$ ${totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00'}\n`;
-            textoCupom += `==================================\n`;
-            textoCupom += `\n\n\n\n\n`; 
 
-            document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupom}</pre>`;
-            document.getElementById('espelho-cupom-tela').innerText = textoCupom;
+            const dataFormatada = new Date().toLocaleDateString('pt-BR');
+            const horaFormatada = new Date().toLocaleTimeString('pt-BR');
+            const totalFormatado = totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00';
+
+            // VIA 1: CLIENTE / SALÃO
+            let viaSalao = `==================================\n`;
+            viaSalao += `           GERSI NUTRI            \n`;
+            viaSalao += `       *** VIA DO CLIENTE ***     \n`;
+            viaSalao += `==================================\n\n`;
+            viaSalao += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
+            viaSalao += `Data: ${dataFormatada}   Hora: ${horaFormatada}\n`;
+            viaSalao += `Pagamento: ${formaEscolhida}\n`;
+            viaSalao += `----------------------------------\n`;
+            viaSalao += `CLIENTE: ${nomeCli.toUpperCase()}\n`;
+            viaSalao += `CONTATO: ${contatoCli}\n`;
+            viaSalao += `----------------------------------\n`;
+            viaSalao += `Qtd  Item                    Total\n`;
+            viaSalao += `----------------------------------\n`;
+            viaSalao += mioloItens;
+            viaSalao += `----------------------------------\n`;
+            viaSalao += blocoObs;
+            viaSalao += `TOTAL DO PEDIDO:  R$ ${totalFormatado}\n`;
+            viaSalao += `==================================\n\n\n`;
+
+            // VIA 2: COZINHA / PREPARO
+            let viaCozinha = `==================================\n`;
+            viaCozinha += `           GERSI NUTRI            \n`;
+            viaCozinha += `       *** VIA DA COZINHA ***     \n`;
+            viaCozinha += `==================================\n\n`;
+            viaCozinha += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
+            viaCozinha += `Hora: ${horaFormatada}\n`;
+            viaCozinha += `----------------------------------\n`;
+            viaCozinha += `CLIENTE: ${nomeCli.toUpperCase()}\n`;
+            viaCozinha += `----------------------------------\n`;
+            viaCozinha += `Qtd  Item / Preparo\n`;
+            viaCozinha += `----------------------------------\n`;
+            viaCozinha += mioloItens;
+            viaCozinha += `----------------------------------\n`;
+            viaCozinha += blocoObs;
+            viaCozinha += `==================================\n`;
+            viaCozinha += `\n\n\n\n\n`; 
+
+            let textoCupomCompleto = viaSalao + viaCozinha;
+
+            document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupomCompleto}</pre>`;
+            document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
-        /* LOGÍSTICA DE DISPARO AUTOMÁTICO SIMULTÂNEO */
+        /* IMPRESSÃO INTERNA DIRETA E SILENCIOSA PELO NAVEGADOR */
         function executarImpressaoFisicaDoPedido() {
-            const textoCupom = document.getElementById('espelho-cupom-tela').innerText;
-
-            // Se o QZ Tray estiver aberto no PC do totem, ele faz o disparo duplo invisível
-            if (typeof qz !== 'undefined' && qz.websocket.isActive()) {
-                
-                // 1. Manda para o Caixa/Salão (Microsoft Print to PDF)
-                qz.printers.find("Microsoft Print to PDF").then(impressora => {
-                    let config = qz.configs.create(impressora);
-                    return qz.print(config, [textoCupom]);
-                }).catch(err => console.error("Erro no Salão:", err));
-
-                // 2. Manda para a Cozinha (ELGIN i9(USB))
-                qz.printers.find("ELGIN i9(USB)").then(impressora => {
-                    let config = qz.configs.create(impressora);
-                    return qz.print(config, [textoCupom]);
-                }).catch(err => console.error("Erro na Cozinha:", err));
-
-                // Limpa o totem e retorna para a tela inicial na hora
-                voltarParaTelaDescanso();
-
-            } else {
-                // Caso o QZ Tray esteja fechado, ele usa a janela nativa para segurança
-                window.print();
-                document.getElementById('cupom-area-impressao').innerHTML = ""; 
-                voltarParaTelaDescanso();
-            }
+            window.print(); 
+            document.getElementById('cupom-area-impressao').innerHTML = ""; 
+            voltarParaTelaDescanso();
         }
 
-        // Tenta conectar no QZ Tray 2 segundos após ligar o totem
-        setTimeout(() => { if (typeof qz !== 'undefined') qz.websocket.connect().catch(e => console.log("Aguardando QZ...")); }, 2000);
+        function cancelarEVoltar() {
+            fecharModalEKeyboard('payment-screen');
+            avancarParaSeletorPagamento();
+        }
 
         function filtrar(c) { catAtiva = c; document.getElementById('cat-title').innerText = c; renderizarSidebar(); renderizarProdutos(); }
         function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
