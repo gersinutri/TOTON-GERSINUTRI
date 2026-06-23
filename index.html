@@ -785,10 +785,20 @@
             document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
+        /* IMPRESSÃO INTERNA DIRETA E SILENCIOSA PELO NAVEGADOR */
         function ejecutarImpressaoFisicaDoPedido() {
-            window.print(); 
-            document.getElementById('cupom-area-impressao').innerHTML = ""; 
-            voltarParaTelaDescanso();
+            try {
+                window.print(); 
+            } catch (e) {
+                console.log("Erro ao tentar chamar o comando de impressão:", e);
+            }
+            
+            // Força o fechamento da tela de sucesso e reseta o totem após 3 segundos,
+            // garantindo que ele não fique travado mesmo se o navegador demorar a responder.
+            setTimeout(() => {
+                document.getElementById('cupom-area-impressao').innerHTML = ""; 
+                voltarParaTelaDescanso();
+            }, 3000);
         }
 
         function cancelarEVoltar() {
