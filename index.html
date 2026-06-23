@@ -781,7 +781,7 @@
             document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
-        /* RETORNO AO MÉTODO CLÁSSICO E SEGURO */
+        /* COMANDO NATIVO DE DISPARO */
         function executarImpressaoFisicaDoPedido() {
             try {
                 window.print(); 
@@ -789,7 +789,6 @@
                 console.log("Erro ao tentar chamar o comando de impressão:", e);
             }
             
-            // Dá o tempo de 4 segundos estável antes de resetar o totem
             setTimeout(() => {
                 document.getElementById('cupom-area-impressao').innerHTML = ""; 
                 voltarParaTelaDescanso();
