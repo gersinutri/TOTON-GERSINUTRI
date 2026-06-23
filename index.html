@@ -706,9 +706,8 @@
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
-            setTimeout(() => {
-                executarImpressaoFisicaDoPedido();
-            }, 3000);
+            // CORREÇÃO: Dispara a ordem de impressão e início de reset imediatamente sem esperas duplicadas
+            executarImpressaoFisicaDoPedido();
         }
 
         function montarTextoCupomDinamico() {
@@ -718,7 +717,6 @@
             const obsCli = document.getElementById('cliente-observacao').textContent.trim();
             const pagamentoStr = formaEscolhida || 'AGUARDANDO';
             
-            // CONSTRÓI A SEÇÃO DE ITENS COMPARTILHADA
             let mioloItens = "";
             if(carrinhoItens.length === 0) {
                 mioloItens += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
@@ -778,7 +776,6 @@
             viaCozinha += `==================================\n`;
             viaCozinha += `\n\n\n\n\n`; 
 
-            // União das duas vias sequencialmente para a ELGIN i9
             let textoCupomCompleto = viaSalao + viaCozinha;
 
             document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupomCompleto}</pre>`;
@@ -793,8 +790,7 @@
                 console.log("Erro ao tentar chamar o comando de impressão:", e);
             }
             
-            // Força o fechamento da tela de sucesso e reseta o totem após 3 segundos,
-            // garantindo que ele não fique travado mesmo se o navegador demorar a responder.
+            // Limpa o documento e reseta o totem para a tela inicial após 3 segundos
             setTimeout(() => {
                 document.getElementById('cupom-area-impressao').innerHTML = ""; 
                 voltarParaTelaDescanso();
