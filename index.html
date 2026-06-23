@@ -384,22 +384,6 @@
             });
         }
 
-        function activarTecladoVirtual(idInput, layoutTipo) {
-            ativarTecladoVirtual(idInput, layoutTipo);
-        }
-
-        function activarTecladoVirtual(idInput, layoutTipo) {
-            ativarTecladoVirtual(idInput, layoutTipo);
-        }
-
-        function activarTecladoVirtual(idInput, layoutTipo) {
-            ativarTecladoVirtual(idInput, layoutTipo);
-        }
-
-        function activarTecladoVirtual(idInput, layoutTipo) {
-            ativarTecladoVirtual(idInput, layoutTipo);
-        }
-
         function ativarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
             const inputElement = document.getElementById(idInput);
@@ -643,7 +627,7 @@
             `).join('');
         }
 
-        function avancarParaSeletorPagamento() {
+        function avanzarParaSeletorPagamento() {
             fecharModalEKeyboard('review-modal');
             document.getElementById('total-payment-screen').innerText = `Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('method-modal').classList.remove('hidden');
@@ -733,6 +717,7 @@
             const contatoCli = document.getElementById('cliente-contato').textContent.trim() || 'NAO INFORMADO';
             const obsCli = document.getElementById('cliente-observacao').textContent.trim();
             
+            // CONSTRÓI A LISTA DE ITENS COMPARTILHADA ENTRE AS VIAS
             let mioloItens = "";
             if(carrinhoItens.length === 0) {
                 mioloItens += `1x   PRODUTO EXEMPLO TESTE    R$ 10,00\n`;
@@ -757,7 +742,7 @@
             // VIA 1: CLIENTE / SALÃO
             let viaSalao = `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
-            viaSalao += `       *** VIA DO CLIENTE ***     \n`;
+            viaSalao += `       *** VIA DO CLIENTE *** \n`;
             viaSalao += `==================================\n\n`;
             viaSalao += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaSalao += `Data: ${dataFormatada}   Hora: ${horaFormatada}\n`;
@@ -777,7 +762,7 @@
             // VIA 2: COZINHA / PREPARO
             let viaCozinha = `==================================\n`;
             viaCozinha += `           GERSI NUTRI            \n`;
-            viaCozinha += `       *** VIA DA COZINHA ***     \n`;
+            viaCozinha += `       *** VIA DA COZINHA *** \n`;
             viaCozinha += `==================================\n\n`;
             viaCozinha += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaCozinha += `Hora: ${horaFormatada}\n`;
@@ -792,13 +777,13 @@
             viaCozinha += `==================================\n`;
             viaCozinha += `\n\n\n\n\n`; 
 
+            // Junta as duas vias de papel para saírem sequencialmente na Elgin
             let textoCupomCompleto = viaSalao + viaCozinha;
 
             document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupomCompleto}</pre>`;
             document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
-        /* IMPRESSÃO INTERNA DIRETA E SILENCIOSA PELO NAVEGADOR */
         function executarImpressaoFisicaDoPedido() {
             window.print(); 
             document.getElementById('cupom-area-impressao').innerHTML = ""; 
