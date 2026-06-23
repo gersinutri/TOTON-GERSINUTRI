@@ -33,10 +33,6 @@
         
         ::-webkit-scrollbar { width: 0px; }
 
-        #cupom-area-impressao {
-            display: none;
-        }
-
         /* DESIGN PREMIUM DO TECLADO VIRTUAL ELEGANTE */
         .key-btn {
             background-color: #334155;
@@ -85,26 +81,9 @@
             font-weight: normal;
             pointer-events: none;
         }
-
-        /* Formatação limpa para a Elgin na hora do envio */
-        .texto-pre-impressao {
-            font-family: 'Courier New', Courier, monospace !important;
-            font-size: 14px !important;
-            font-weight: bold !important;
-            line-height: 1.3 !important;
-            color: #000000 !important;
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
-            margin: 0px !important;
-            padding: 0px !important;
-        }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
-
-    <div id="bloco-escondido-print" style="display:none; padding: 0mm; width: 72mm;">
-        <pre id="conteudo-pre-print" class="texto-pre-impressao"></pre>
-    </div>
 
     <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
@@ -301,6 +280,7 @@
         let cardapioOriginal = [], carrinhoItens = [], totalGeral = 0, catAtiva = 'TODOS', formaEscolhida = "";
         let pratoSendoConfigurado = null, timeoutInatividade = null, checagemPagamentoInterval = null;
         let idInputAtivoGlobal = null;
+        let textoGlobalCupomParaImpressao = ""; // Armazena a string exata das duas vias
 
         const CONFIG_TOTEM = {
             cnpj: "47342129000141",
@@ -354,7 +334,8 @@
             });
         }
 
-        // CORREÇÃO DA ESCRITA DA FUNÇÃO DO TECLADO VIRTUAL
+        function activarTecladoVirtual(idInput, layoutTipo) { ativarTecladoVirtual(idInput, layoutTipo); }
+
         function ativarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
             const inputElement = document.getElementById(idInput);
@@ -746,35 +727,26 @@
             viaCozinha += `==================================\n`;
             viaCozinha += `\n\n\n\n\n`; 
 
-            let textoCupomCompleto = viaSalao + viaCozinha;
+            // Junta as duas vias na string global estável
+            textoGlobalCupomParaImpressao = viaSalao + viaCozinha;
 
-            document.getElementById('conteudo-pre-print').innerText = textoCupomCompleto;
-            document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
+            document.getElementById('espelho-cupom-tela').innerText = textoGlobalCupomParaImpressao;
         }
 
-        /* DISPARO DO IMPRESSOR WEB PRINT.JS */
+        /* FIX CRÍTICO: DISPARO RAW DIRETO VIA PRINT.JS SEM SE PERDER */
         function executarImpressaoFisicaDoPedido() {
             try {
-                const bloco = document.getElementById('bloco-escondido-print');
-                bloco.style.display = 'block';
-
+                // Força o Print.js a pegar a string e enviar de forma direta e sem firulas
                 printJS({
-                    printable: 'bloco-escondido-print',
-                    type: 'html',
-                    scanStyles: false,
-                    targetStyles: ['*']
+                    printable: textoGlobalCupomParaImpressao,
+                    type: 'raw'
                 });
-
-                setTimeout(() => {
-                    bloco.style.display = 'none';
-                }, 100);
-
             } catch (e) {
                 console.log("Erro no módulo PrintJS:", e);
             }
             
+            // Aguarda os 4 segundos normais para o usuário ler a tela de sucesso antes de resetar
             setTimeout(() => {
-                document.getElementById('conteudo-pre-print').innerText = ""; 
                 voltarParaTelaDescanso();
             }, 4000);
         }
