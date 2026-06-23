@@ -384,6 +384,8 @@
             });
         }
 
+        function activarTecladoVirtual(idInput, layoutTipo) { activarTecladoVirtual(idInput, layoutTipo); }
+
         function ativarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
             const inputElement = document.getElementById(idInput);
@@ -706,7 +708,10 @@
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
-            executarImpressaoFisicaDoPedido();
+            // FIX DE SEGURANÇA: Pequena pausa para o Chrome manter o foco do clique e autorizar o print automático
+            setTimeout(() => {
+                executarImpressaoFisicaDoPedido();
+            }, 300);
         }
 
         function montarTextoCupomDinamico() {
@@ -781,8 +786,8 @@
             document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
-        /* COMANDO NATIVO DE DISPARO DO WINDOWS */
-        function ejecutarImpressaoFisicaDoPedido() {
+        /* COMANDO NATIVO DISPARADO PELO GESTO DO USUÁRIO */
+        function executarImpressaoFisicaDoPedido() {
             try {
                 window.print(); 
             } catch (e) {
