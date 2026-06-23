@@ -116,6 +116,13 @@
                 padding: 0mm !important;
                 background: #ffffff !important;
             }
+            
+            /* CLASSE QUE FORÇA A ELGIN A CORTAR O PAPEL NESSA LINHA */
+            .quebra-pagina-via {
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+
             pre {
                 display: block !important;
                 white-space: pre-wrap !important;
@@ -383,8 +390,6 @@
                 }
             });
         }
-
-        function activarTecladoVirtual(idInput, layoutTipo) { activarTecladoVirtual(idInput, layoutTipo); }
 
         function ativarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
@@ -708,7 +713,6 @@
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
 
-            // FIX DE SEGURANÇA: Pequena pausa para o Chrome manter o foco do clique e autorizar o print automático
             setTimeout(() => {
                 executarImpressaoFisicaDoPedido();
             }, 300);
@@ -742,8 +746,9 @@
             const horaFormatada = new Date().toLocaleTimeString('pt-BR');
             const totalFormatado = totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00';
 
-            // VIA 1: CLIENTE
-            let viaSalao = `==================================\n`;
+            // ESTRUTURAÇÃO EM DUAS TAGS "PRE" SEPARADAS POR PÁGINA PARA FORÇAR O CORTE FÍSICO
+            let viaSalao = `<pre class="quebra-pagina-via">`;
+            viaSalao += `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
             viaSalao += `       *** VIA DO CLIENTE ***     \n`;
             viaSalao += `==================================\n\n`;
@@ -760,10 +765,11 @@
             viaSalao += `----------------------------------\n`;
             viaSalao += blocoObs;
             viaSalao += `TOTAL DO PEDIDO:  R$ ${totalFormatado}\n`;
-            viaSalao += `==================================\n\n\n`;
+            viaSalao += `==================================\n`;
+            viaSalao += `</pre>`;
 
-            // VIA 2: COZINHA
-            let viaCozinha = `==================================\n`;
+            let viaCozinha = `<pre>`;
+            viaCozinha += `==================================\n`;
             viaCozinha += `           GERSI NUTRI            \n`;
             viaCozinha += `       *** VIA DA COZINHA ***     \n`;
             viaCozinha += `==================================\n\n`;
@@ -778,15 +784,12 @@
             viaCozinha += `----------------------------------\n`;
             viaCozinha += blocoObs;
             viaCozinha += `==================================\n`;
-            viaCozinha += `\n\n\n\n\n`; 
+            viaCozinha += `</pre>`; 
 
-            let textoCupomCompleto = viaSalao + viaCozinha;
-
-            document.getElementById('cupom-area-impressao').innerHTML = `<pre>${textoCupomCompleto}</pre>`;
-            document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
+            document.getElementById('cupom-area-impressao').innerHTML = viaSalao + viaCozinha;
+            document.getElementById('espelho-cupom-tela').innerText = (viaSalao + viaCozinha).replace(/<[^>]*>/g, '');
         }
 
-        /* COMANDO NATIVO DISPARADO PELO GESTO DO USUÁRIO */
         function executarImpressaoFisicaDoPedido() {
             try {
                 window.print(); 
