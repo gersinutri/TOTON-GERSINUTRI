@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- BIBLIOTECA PARA DISPARAR IMPRESSÃO DIRETA VIA WEB -->
     <script src="https://printjs-40120.firebaseapp.com/js/print.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; overflow: hidden; user-select: none; -webkit-user-select: none; }
@@ -103,7 +102,6 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
-    <!-- Elemento auxiliar que a biblioteca usará para capturar o texto -->
     <div id="bloco-escondido-print" style="display:none; padding: 0mm; width: 72mm;">
         <pre id="conteudo-pre-print" class="texto-pre-impressao"></pre>
     </div>
@@ -356,6 +354,7 @@
             });
         }
 
+        // CORREÇÃO DA ESCRITA DA FUNÇÃO DO TECLADO VIRTUAL
         function ativarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
             const inputElement = document.getElementById(idInput);
@@ -712,7 +711,7 @@
             // VIA 1: CLIENTE
             let viaSalao = `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
-            viaSalao += `       *** VIA DO CLIENTE ***     \n`;
+            viaSalao += `       *** VIA DO CLIENTE *** \n`;
             viaSalao += `==================================\n\n`;
             viaSalao += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaSalao += `Data: ${dataFormatada}   Hora: ${horaFormatada}\n`;
@@ -732,7 +731,7 @@
             // VIA 2: COZINHA
             let viaCozinha = `==================================\n`;
             viaCozinha += `           GERSI NUTRI            \n`;
-            viaCozinha += `       *** VIA DA COZINHA ***     \n`;
+            viaCozinha += `       *** VIA DA COZINHA *** \n`;
             viaCozinha += `==================================\n\n`;
             viaCozinha += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaCozinha += `Hora: ${horaFormatada}\n`;
@@ -749,19 +748,16 @@
 
             let textoCupomCompleto = viaSalao + viaCozinha;
 
-            // Injeta o texto no bloco oculto que a biblioteca de impressão lerá
             document.getElementById('conteudo-pre-print').innerText = textoCupomCompleto;
             document.getElementById('espelho-cupom-tela').innerText = textoCupomCompleto;
         }
 
-        /* DISPARO DO IMPRESSOR WEB PRINT.JS ATUALIZADO */
+        /* DISPARO DO IMPRESSOR WEB PRINT.JS */
         function executarImpressaoFisicaDoPedido() {
             try {
-                // Torna o bloco visível por um momento para o Chrome renderizar
                 const bloco = document.getElementById('bloco-escondido-print');
                 bloco.style.display = 'block';
 
-                // Chama o motor Print.js
                 printJS({
                     printable: 'bloco-escondido-print',
                     type: 'html',
@@ -769,7 +765,6 @@
                     targetStyles: ['*']
                 });
 
-                // Oculta novamente logo após o disparo
                 setTimeout(() => {
                     bloco.style.display = 'none';
                 }, 100);
@@ -778,7 +773,6 @@
                 console.log("Erro no módulo PrintJS:", e);
             }
             
-            // Aguarda 4 segundos antes de sumir com a tela e redefinir o totem
             setTimeout(() => {
                 document.getElementById('conteudo-pre-print').innerText = ""; 
                 voltarParaTelaDescanso();
