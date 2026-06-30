@@ -153,7 +153,7 @@
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
         <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10">
-            <!-- Emblemas da Copa (Aparecem dinamicamente via JS) -->
+            <!-- Emblemas da Copa -->
             <div id="copa-badges" class="hidden text-white font-black text-xl tracking-widest bg-black/20 px-6 py-2 rounded-full border border-yellow-400/30 animate-pulse">
                 ⚽ RUMO AO HEXA 2026 🇧🇷🏆
             </div>
@@ -279,20 +279,24 @@
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
-                <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
+                <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-6">Total: R$ 0,00</p>
                 
-                <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="grid grid-cols-2 gap-4 mb-6 max-w-md mx-auto">
                     <button ontouchstart="processarPagamento('PIX')" onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-3">📱</span>
+                        <span class="text-4xl mb-2">📱</span>
                         <span class="font-black text-base text-slate-800">Pix</span>
                     </button>
                     <button ontouchstart="processarPagamento('CREDITO')" onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-3">💳</span>
+                        <span class="text-4xl mb-2">💳</span>
                         <span class="font-black text-base text-slate-800">Crédito</span>
                     </button>
                     <button ontouchstart="processarPagamento('DEBITO')" onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-3">💵</span>
+                        <span class="text-4xl mb-2">💵</span>
                         <span class="font-black text-base text-slate-800">Débito</span>
+                    </button>
+                    <button ontouchstart="processarPagamento('DINHEIRO')" onclick="processarPagamento('DINHEIRO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-emerald-600 rounded-2xl p-5 transition-all active:scale-95">
+                        <span class="text-4xl mb-2">💰</span>
+                        <span class="font-black text-base text-slate-800">Dinheiro</span>
                     </button>
                 </div>
                 <button ontouchstart="cancelarEVoltarParaConferencia()" onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
@@ -316,18 +320,27 @@
                 </div>
             </div>
 
+            <div id="area-visual-dinheiro" class="hidden flex flex-col items-center mt-4">
+                <h2 class="text-4xl font-black text-slate-800 mb-2">Pagamento no Caixa</h2>
+                <p id="total-confirm-dinheiro" class="text-3xl text-emerald-700 font-black mb-6"></p>
+                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-emerald-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4 bg-white shadow-inner">
+                    <div class="text-7xl mb-2 animate-pulse">🙋‍♂️</div>
+                    <span class="font-bold text-sm text-slate-600 text-center">Dirija-se ao caixa para efetuar o pagamento em dinheiro.</span>
+                </div>
+            </div>
+
             <div id="bloco-acao-confirmacao" class="flex flex-col items-center mt-4 w-full">
                 <button ontouchstart="confirmarPagamentoEfetuadoManualmente()" onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
-                    🟢 JÁ PAGUEI / EMITIR CUPOM
+                    🟢 EMITIR CUPOM DO PEDIDO
                 </button>
-                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no balcão / celular.</p>
+                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação ou para liberar as vias.</p>
             </div>
 
             <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md mt-4 mx-auto">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
                     ✓
                 </div>
-                <h2 class="text-3xl font-black text-slate-800">Pagamento Confirmado!</h2>
+                <h2 class="text-3xl font-black text-slate-800">Pedido Confirmado!</h2>
                 <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Enviando cupom para impressão...</p>
                 <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
             </div>
@@ -681,6 +694,7 @@
             
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
+            document.getElementById('area-visual-dinheiro').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
             document.getElementById('bloco-acao-confirmacao').classList.remove('hidden');
@@ -693,6 +707,9 @@
                 document.getElementById('area-visual-pix').classList.remove('hidden');
                 document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 gerarPixCnpjComercial();
+            } else if (metodo === 'DINHEIRO') {
+                document.getElementById('area-visual-dinheiro').classList.remove('hidden');
+                document.getElementById('total-confirm-dinheiro').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             } else {
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -743,6 +760,7 @@
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
+            document.getElementById('area-visual-dinheiro').classList.add('hidden');
             document.getElementById('bloco-acao-confirmacao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
