@@ -145,12 +145,15 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="checarTemaETelefone(); carregarDados()">
 
+    <!-- Elemento Nativo de Impressão de Bobina -->
     <div id="cupom-area-impressao"></div>
 
+    <!-- Tela de Descanso Dinâmica (Clássica / Copa do Mundo) -->
     <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
         <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10">
+            <!-- Emblemas da Copa (Aparecem dinamicamente via JS) -->
             <div id="copa-badges" class="hidden text-white font-black text-xl tracking-widest bg-black/20 px-6 py-2 rounded-full border border-yellow-400/30 animate-pulse">
                 ⚽ RUMO AO HEXA 2026 🇧🇷🏆
             </div>
@@ -276,24 +279,20 @@
         <div id="method-modal" class="hidden fixed inset-0 bg-black/60 z-[55] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-xl p-6 text-center shadow-2xl">
                 <h3 class="text-3xl font-black text-slate-800 mb-1">Forma de Pagamento</h3>
-                <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-6">Total: R$ 0,00</p>
+                <p id="total-payment-screen" class="text-3xl text-green-700 font-black mb-8">Total: R$ 0,00</p>
                 
-                <div class="grid grid-cols-2 gap-4 mb-6 max-w-md mx-auto">
+                <div class="grid grid-cols-3 gap-4 mb-6">
                     <button ontouchstart="processarPagamento('PIX')" onclick="processarPagamento('PIX')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-green-600 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-2">📱</span>
+                        <span class="text-4xl mb-3">📱</span>
                         <span class="font-black text-base text-slate-800">Pix</span>
                     </button>
                     <button ontouchstart="processarPagamento('CREDITO')" onclick="processarPagamento('CREDITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-blue-600 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-2">💳</span>
+                        <span class="text-4xl mb-3">💳</span>
                         <span class="font-black text-base text-slate-800">Crédito</span>
                     </button>
                     <button ontouchstart="processarPagamento('DEBITO')" onclick="processarPagamento('DEBITO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-amber-500 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-2">💵</span>
+                        <span class="text-4xl mb-3">💵</span>
                         <span class="font-black text-base text-slate-800">Débito</span>
-                    </button>
-                    <button ontouchstart="processarPagamento('DINHEIRO')" onclick="processarPagamento('DINHEIRO')" class="flex flex-col items-center justify-center border-2 border-slate-200 bg-slate-50 hover:border-emerald-600 rounded-2xl p-5 transition-all active:scale-95">
-                        <span class="text-4xl mb-2">💰</span>
-                        <span class="font-black text-base text-slate-800">Dinheiro</span>
                     </button>
                 </div>
                 <button ontouchstart="cancelarEVoltarParaConferencia()" onclick="cancelarEVoltarParaConferencia()" class="text-slate-400 font-bold underline uppercase text-sm">Voltar</button>
@@ -317,27 +316,18 @@
                 </div>
             </div>
 
-            <div id="area-visual-dinheiro" class="hidden flex flex-col items-center mt-4">
-                <h2 class="text-4xl font-black text-slate-800 mb-2">Pagamento no Caixa</h2>
-                <p id="total-confirm-dinheiro" class="text-3xl text-emerald-700 font-black mb-6"></p>
-                <div class="w-64 h-64 bg-slate-50 border-4 border-dashed border-emerald-500 rounded-3xl flex flex-col items-center justify-center text-slate-400 p-4 bg-white shadow-inner">
-                    <div class="text-7xl mb-2 animate-pulse">🙋‍♂️</div>
-                    <span class="font-bold text-sm text-slate-600 text-center">Dirija-se ao caixa para efetuar o pagamento em dinheiro.</span>
-                </div>
-            </div>
-
             <div id="bloco-acao-confirmacao" class="flex flex-col items-center mt-4 w-full">
                 <button ontouchstart="confirmarPagamentoEfetuadoManualmente()" onclick="confirmarPagamentoEfetuadoManualmente()" class="bg-green-600 hover:bg-green-700 text-white font-black px-12 py-5 rounded-2xl uppercase text-xl tracking-wider shadow-xl active:scale-95 transition-all border-b-4 border-green-800 animate-pulse">
-                    🟢 EMITIR CUPOM DO PEDIDO
+                    🟢 JÁ PAGUEI / EMITIR CUPOM
                 </button>
-                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação ou para liberar as vias.</p>
+                <p class="text-zinc-400 text-xs mt-3">Toque acima assim que concluir a transação no balcão / celular.</p>
             </div>
 
             <div id="area-sucesso-impressao" class="hidden flex flex-col items-center space-y-4 w-full max-w-md mt-4 mx-auto">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl text-green-600 animate-bounce">
                     ✓
                 </div>
-                <h2 class="text-3xl font-black text-slate-800">Pedido Confirmado!</h2>
+                <h2 class="text-3xl font-black text-slate-800">Pagamento Confirmado!</h2>
                 <p class="text-base text-green-700 font-bold animate-pulse">🖨️ Enviando cupom para impressão...</p>
                 <p class="text-slate-400 text-xs">Aguarde o fechamento automático da transação.</p>
             </div>
@@ -621,10 +611,10 @@
             let encontrado = carrinhoItens.find(item => item.idUnico === idUnico);
             if (encontrado) { encontrado.qtd++; encontrado.subtotal = encontrado.qtd * encontrado.preco; }
             else { carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais }); }
-            totalGeral += preco; tabularRodape();
+            totalGeral += preco; atualizarRodape();
         }
 
-        function tabularRodape() {
+        function atualizarRodape() {
             const fmt = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('total-value').innerText = fmt;
             document.getElementById('modal-total-carrinho').innerText = fmt;
@@ -651,7 +641,7 @@
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
-            tabularRodape();
+            atualizarRodape();
             if (carrinhoItens.length === 0) { fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); }
             else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
@@ -691,7 +681,6 @@
             
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
-            document.getElementById('area-visual-dinheiro').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.remove('hidden');
             document.getElementById('bloco-acao-confirmacao').classList.remove('hidden');
@@ -704,9 +693,6 @@
                 document.getElementById('area-visual-pix').classList.remove('hidden');
                 document.getElementById('total-confirm-pix').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
                 gerarPixCnpjComercial();
-            } else if (metodo === 'DINHEIRO') {
-                document.getElementById('area-visual-dinheiro').classList.remove('hidden');
-                document.getElementById('total-confirm-dinheiro').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             } else {
                 document.getElementById('area-visual-cartao').classList.remove('hidden');
                 document.getElementById('total-confirm-cartao').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
@@ -757,7 +743,6 @@
         function confirmarPagamentoEfetuadoManualmente() {
             document.getElementById('area-visual-pix').classList.add('hidden');
             document.getElementById('area-visual-cartao').classList.add('hidden');
-            document.getElementById('area-visual-dinheiro').classList.add('hidden');
             document.getElementById('bloco-acao-confirmacao').classList.add('hidden');
             document.getElementById('btn-cancelar-pagamento').classList.add('hidden');
             document.getElementById('area-sucesso-impressao').classList.remove('hidden');
@@ -799,7 +784,7 @@
             let viaSalao = `<pre class="quebra-pagina-via">`;
             viaSalao += `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
-            viaSalao += `       *** VIA DO CLIENTE *** \n`;
+            viaSalao += `       *** VIA DO CLIENTE ***     \n`;
             viaSalao += `==================================\n\n`;
             viaSalao += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaSalao += `Data: ${dataFormatada}   Hora: ${horaFormatada}\n`;
@@ -820,7 +805,7 @@
             let viaCozinha = `<pre>`;
             viaCozinha += `==================================\n`;
             viaCozinha += `           GERSI NUTRI            \n`;
-            viaCozinha += `       *** VIA DA COZINHA *** \n`;
+            viaCozinha += `       *** VIA DA COZINHA ***     \n`;
             viaCozinha += `==================================\n\n`;
             viaCozinha += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaCozinha += `Hora: ${horaFormatada}\n`;
