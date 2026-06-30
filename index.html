@@ -509,6 +509,15 @@
             montarTextoCupomDinamico();
         }
 
+        // CORREÇÃO OPERACIONAL DO ESCOPO DE RESET DO CARRINHO
+        function atualizarRodape() {
+            const fmt = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-value').innerText = fmt;
+            document.getElementById('modal-total-carrinho').innerText = fmt;
+            let c = 0; carrinhoItens.forEach(i => c += i.qtd);
+            document.getElementById('carrinho-contador').innerText = c;
+        }
+
         function fecharTecladoVirtual() {
             document.getElementById('virtual-keyboard-container').classList.add('hidden');
             const areaScroll = document.getElementById('review-modal-scroll-area');
@@ -621,15 +630,7 @@
             let encontrado = carrinhoItens.find(item => item.idUnico === idUnico);
             if (encontrado) { encontrado.qtd++; encontrado.subtotal = encontrado.qtd * encontrado.preco; }
             else { carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais }); }
-            totalGeral += preco; tabularRodape();
-        }
-
-        function tabularRodape() {
-            const fmt = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-            document.getElementById('total-value').innerText = fmt;
-            document.getElementById('modal-total-carrinho').innerText = fmt;
-            let c = 0; carrinhoItens.forEach(i => c += i.qtd);
-            document.getElementById('carrinho-contador').innerText = c;
+            totalGeral += preco; atualizarRodape();
         }
 
         function abrirResumoCarrinho() {
@@ -651,7 +652,7 @@
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
-            tabularRodape();
+            atualizarRodape();
             if (carrinhoItens.length === 0) { fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); }
             else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
@@ -795,7 +796,6 @@
             const horaFormatada = new Date().toLocaleTimeString('pt-BR');
             const totalFormatado = totalGeral > 0 ? totalGeral.toFixed(2).replace('.', ',') : '10,00';
 
-            // ESTRUTURAÇÃO EM DUAS TAGS "PRE" SEPARADAS POR PÁGINA PARA FORÇAR O CORTE FÍSICO
             let viaSalao = `<pre class="quebra-pagina-via">`;
             viaSalao += `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
