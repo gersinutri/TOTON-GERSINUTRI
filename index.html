@@ -145,15 +145,12 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="checarTemaETelefone(); carregarDados()">
 
-    <!-- Elemento Nativo de Impressão de Bobina -->
     <div id="cupom-area-impressao"></div>
 
-    <!-- Tela de Descanso Dinâmica (Clássica / Copa do Mundo) -->
     <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
         <div class="flex flex-col items-center max-w-2xl text-center space-y-10 z-10">
-            <!-- Emblemas da Copa -->
             <div id="copa-badges" class="hidden text-white font-black text-xl tracking-widest bg-black/20 px-6 py-2 rounded-full border border-yellow-400/30 animate-pulse">
                 ⚽ RUMO AO HEXA 2026 🇧🇷🏆
             </div>
@@ -624,10 +621,10 @@
             let encontrado = carrinhoItens.find(item => item.idUnico === idUnico);
             if (encontrado) { encontrado.qtd++; encontrado.subtotal = encontrado.qtd * encontrado.preco; }
             else { carrinhoItens.push({ idUnico, nome, preco, qtd: 1, subtotal: preco, adicionais }); }
-            totalGeral += preco; atualizarRodape();
+            totalGeral += preco; tabularRodape();
         }
 
-        function atualizarRodape() {
+        function tabularRodape() {
             const fmt = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
             document.getElementById('total-value').innerText = fmt;
             document.getElementById('modal-total-carrinho').innerText = fmt;
@@ -654,7 +651,7 @@
             totalGeral -= carrinhoItens[idx].preco;
             carrinhoItens[idx].qtd--; carrinhoItens[idx].subtotal = carrinhoItens[idx].qtd * carrinhoItens[idx].preco;
             if (carrinhoItens[idx].qtd <= 0) carrinhoItens.splice(idx, 1);
-            atualizarRodape();
+            tabularRodape();
             if (carrinhoItens.length === 0) { fecharModalEKeyboard('cart-modal'); fecharModalEKeyboard('review-modal'); }
             else { origins === 'CARRINHO' ? abrirResumoCarrinho() : atualizarTelaConferenciaExclusiva(); }
         }
@@ -802,7 +799,7 @@
             let viaSalao = `<pre class="quebra-pagina-via">`;
             viaSalao += `==================================\n`;
             viaSalao += `           GERSI NUTRI            \n`;
-            viaSalao += `       *** VIA DO CLIENTE ***     \n`;
+            viaSalao += `       *** VIA DO CLIENTE *** \n`;
             viaSalao += `==================================\n\n`;
             viaSalao += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaSalao += `Data: ${dataFormatada}   Hora: ${horaFormatada}\n`;
@@ -823,7 +820,7 @@
             let viaCozinha = `<pre>`;
             viaCozinha += `==================================\n`;
             viaCozinha += `           GERSI NUTRI            \n`;
-            viaCozinha += `       *** VIA DA COZINHA ***     \n`;
+            viaCozinha += `       *** VIA DA COZINHA *** \n`;
             viaCozinha += `==================================\n\n`;
             viaCozinha += `SENHA DO PEDIDO: ${numeroSenha}\n\n`;
             viaCozinha += `Hora: ${horaFormatada}\n`;
