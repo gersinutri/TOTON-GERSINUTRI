@@ -140,8 +140,10 @@
 </head>
 <body class="h-screen w-screen flex flex-col relative" onload="carregarDados()">
 
+    <!-- Elemento Nativo de Impressão de Bobina -->
     <div id="cupom-area-impressao"></div>
 
+    <!-- Tela de Descanso Clássica Original Gersi Nutri -->
     <div id="welcome-screen" ontouchstart="iniciarAtendimento()" onclick="iniciarAtendimento()" class="fixed inset-0 bg-[#166534] z-[100] flex flex-col items-center justify-center p-10 cursor-pointer transition-opacity duration-500 ease-in-out">
         <div class="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none"></div>
         
@@ -388,7 +390,7 @@
         window.addEventListener('touchstart', resetarTemporizadorInatividade);
 
         function normalizarTexto(texto) {
-            return text ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+            return texto ? texto.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
         }
 
         function carregarDados() {
@@ -403,7 +405,7 @@
             });
         }
 
-        function ativarTecladoVirtual(idInput, layoutTipo) {
+        function activarTecladoVirtual(idInput, layoutTipo) {
             idInputAtivoGlobal = idInput;
             const inputElement = document.getElementById(idInput);
 
